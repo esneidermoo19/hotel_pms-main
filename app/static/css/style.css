@@ -1,0 +1,253 @@
+/* 
+   Hotel La Orquídea - Component Library
+   Refined Neutral Aesthetic
+*/
+
+/* Stats Dashboard */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+.stat-card {
+    background: var(--clr-surface);
+    padding: 35px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--clr-border);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: var(--transition-base, all 0.3s ease);
+}
+
+.stat-info { display: flex; flex-direction: column; }
+
+.stat-number {
+    font-family: var(--font-heading);
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--clr-ink);
+}
+
+.stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #AAA;
+    font-weight: 700;
+}
+
+/* Room Cards */
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.room-card {
+    background: var(--clr-surface);
+    border-radius: var(--radius-md);
+    padding: 35px;
+    border: 1px solid var(--clr-border);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.room-card:hover {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-elegant);
+}
+
+.room-number {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    color: var(--clr-ink);
+    margin-bottom: 5px;
+}
+
+.room-type {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--clr-taupe);
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+.room-price {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--clr-ink);
+    margin-bottom: 25px;
+}
+
+/* Buttons */
+.btn-reservar, .btn-primary, .btn-pagar, .btn-liberar, .btn-actualizar {
+    display: inline-block;
+    width: 100%;
+    padding: 16px;
+    background: var(--clr-ink);
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-reservar:hover, .btn-primary:hover {
+    background: #333;
+    letter-spacing: 0.25em;
+}
+
+.btn-liberar {
+    background: white;
+    color: var(--clr-ink);
+    border: 1px solid var(--clr-ink);
+}
+
+.btn-liberar:hover {
+    background: var(--clr-bone);
+}
+
+/* Specific Status Colors (Subtle Accents) */
+.room-card.room-disponible { border-top: 4px solid var(--clr-sage); }
+.room-card.room-pendiente { border-top: 4px solid var(--clr-rose); }
+.room-card.room-pagada   { border-top: 4px solid var(--clr-sage); }
+.room-card.room-mantenimiento { border-top: 4px solid var(--clr-taupe); }
+
+/* Forms */
+.form-control {
+    width: 100%;
+    padding: 15px 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #EEE;
+    border-radius: 0;
+    font-family: inherit;
+    font-size: 14px;
+    margin-bottom: 20px;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-bottom-color: var(--clr-ink);
+}
+
+/* Misc */
+.no-data {
+    color: #AAA;
+    font-style: italic;
+    padding: 40px;
+    text-align: center;
+    border: 1px dashed var(--clr-border);
+    border-radius: var(--radius-md);
+}
+
+.section {
+    margin-bottom: 80px;
+}
+
+.room-guest {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: var(--clr-ink);
+}
+
+/* Tables */
+.table-wrapper {
+    background: var(--clr-surface);
+    border-radius: var(--radius-md);
+    padding: 30px;
+    border: 1px solid var(--clr-border);
+    margin-top: 30px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 20px;
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #AAA;
+    border-bottom: 1px solid var(--clr-border);
+}
+
+td {
+    padding: 20px;
+    border-bottom: 1px solid var(--clr-border);
+    font-size: 14px;
+    color: var(--clr-ink);
+}
+
+tr:last-child td { border-bottom: none; }
+
+tr:hover td {
+    background: var(--clr-bone);
+}
+
+/* Badges */
+.badge {
+    padding: 6px 12px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    border-radius: 4px;
+}
+
+.badge-success { background: #F0F4F0; color: var(--clr-sage); }
+.badge-danger  { background: #FFF5F5; color: var(--clr-rose); }
+.badge-warning { background: #FFF9F4; color: var(--clr-taupe); }
+
+/* Alerts */
+.alert {
+    padding: 20px 30px;
+    border-radius: var(--radius-md);
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.alert-success { background: #F0F4F0; color: var(--clr-sage); border-left: 4px solid var(--clr-sage); }
+.alert-danger  { background: #FFF5F5; color: var(--clr-rose); border-left: 4px solid var(--clr-rose); }
+
+/* Responsive adjustments for components */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .room-grid {
+        grid-template-columns: 1fr;
+    }
+    .table-wrapper {
+        padding: 15px;
+    }
+    th, td {
+        padding: 12px 10px;
+        font-size: 13px;
+    }
+    .stat-card, .room-card {
+        padding: 20px;
+    }
+}

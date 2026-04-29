@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Punto de Venta - La Orquidea{% endblock %}
+
+{% block content %}
+<div class="pos-container">
+    <div class="pos-header">
+        <div>
+            <h1>Punto de Venta</h1>
+            <p>Gestiona consumos adicionales</p>
+        </div>
+    </div>
+
+    {% if activas %}
+    <div class="section">
+        <div class="section-header">
+            <h2><span class="dot dot-ocupada"></span> Habitaciones Ocupadas</h2>
+            <span class="badge badge-ocupada">{{ activas|length }}</span>
+        </div>
+        <div class="habitaciones-grid">
+            {% for item in activas %}
+            <div class="habitacion-card">
+                <div class="habitacion-cabecera">
+                    <div class="hab-info">
+                        <span class="hab-numero">{{ item.habitacion.numero }}</span>
+                        <span class="hab-tipo">{{ item.habitacion.tipo }}</span>
+                    </div>
+                    <span class="reserva-id">RES-{{ item.reserva_id }}</span>
+                </div>
+                
+                <div class="habitacion-consumo">
+                    <span class="label">Gestión</span>
+                    <span class="value">Registro de Consumo</span>
+                </div>
+                
+                <a href="{{ url_for('pos.cargar_consumo', reserva_id=item.reserva_id) }}" class="btn-agregar">
+                    + Registrar Consumo
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🛎️</div>
+        <h3>Sin ocupantes activos</h3>
+        <p>No hay habitaciones ocupadas en este momento.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.pos-container { padding: 30px; max-width: 1400px; margin: 0 auto; }
+.pos-header { margin-bottom: 30px; }
+.pos-header h1 { margin: 0; font-size: 28px; color: var(--clr-ink); }
+.pos-header p { margin: 5px 0 0; color: var(--clr-text-light); font-size: 14px; }
+
+.section { margin-bottom: 40px; }
+.section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+.section-header h2 { margin: 0; font-size: 18px; color: var(--clr-ink); display: flex; align-items: center; gap: 10px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot-ocupada { background: #EF4444; }
+.badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.badge-ocupada { background: #FEE2E2; color: #DC2626; }
+
+.habitaciones-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.habitacion-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.habitacion-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); transition: 0.2s; }
+
+.habitacion-cabecera { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.hab-info { display: flex; flex-direction: column; }
+.hab-numero { font-size: 28px; font-weight: 700; color: var(--clr-ink); }
+.hab-tipo { font-size: 12px; color: var(--clr-text-light); text-transform: uppercase; }
+.reserva-id { padding: 4px 10px; background: #F3F4F6; border-radius: 6px; font-size: 11px; font-weight: 600; color: var(--clr-text-light); }
+
+.habitacion-consumo { padding: 15px; background: #F0F9FF; border-radius: 10px; margin-bottom: 20px; }
+.habitacion-consumo .label { display: block; font-size: 10px; color: #0369A1; text-transform: uppercase; margin-bottom: 4px; }
+.habitacion-consumo .value { font-size: 14px; font-weight: 600; color: #0369A1; }
+
+.btn-agregar { display: block; width: 100%; padding: 14px; background: var(--clr-accent); color: var(--clr-primary); text-align: center; border-radius: 10px; text-decoration: none; font-weight: 600; }
+.btn-agregar:hover { background: #D97706; }
+
+.empty-state { padding: 80px; text-align: center; background: white; border-radius: 16px; border: 2px dashed #E5E7EB; }
+.empty-icon { font-size: 48px; opacity: 0.2; margin-bottom: 20px; }
+.empty-state h3 { margin: 0 0 10px; color: var(--clr-ink); }
+.empty-state p { color: var(--clr-text-light); font-size: 14px; }
+</style>
+{% endblock %}

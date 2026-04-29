@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Clientes - La Orquídea{% endblock %}
+
+{% block content %}
+<div class="page-header animate-in">
+    <div>
+        <h1>👥 Base de Clientes</h1>
+        <p>Huéspedes registrados para facturación electrónica.</p>
+    </div>
+    <a href="{{ url_for('empleado.nuevo_cliente') }}" class="btn btn-primary">+ Nuevo Cliente</a>
+</div>
+
+<div class="card animate-in">
+    <form method="GET" style="display: flex; gap: 15px; margin-bottom: 25px;">
+        <input type="text" name="buscar" placeholder="Buscar por Nombre o NIT/Cédula..." value="{{ buscar or '' }}" class="form-control" style="flex: 1; margin-bottom: 0;">
+        <button type="submit" class="btn btn-outline" style="min-width: 120px; justify-content: center;">🔍 Buscar</button>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>NIT / Identificación</th>
+                <th>Email</th>
+                <th>Ciudad/Dirección</th>
+                <th>Teléfono</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in clientes %}
+            <tr>
+                <td style="font-weight: 600; color: var(--primary);">{{ c.nombre }}</td>
+                <td><code style="background: var(--bg); padding: 2px 6px; border-radius: 4px;">{{ c.nit }}</code></td>
+                <td>{{ c.email or '-' }}</td>
+                <td>{{ c.direccion or '-' }}</td>
+                <td>{{ c.telefono or '-' }}</td>
+                <td>
+                    <!-- Opcional: Link para editar si se desea implementar luego -->
+                    <span style="opacity: 0.3;">✏️</span>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center" style="padding: 40px; color: var(--text-light);">No se encontraron clientes</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

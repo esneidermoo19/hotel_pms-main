@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Editar' if usuario else 'Nuevo' }} Usuario - La Orquídea{% endblock %}
+
+{% block content %}
+<div class="page-header animated stagger-1">
+    <h1>{{ 'Editar Perfil' if usuario else 'Nuevo Usuario' }}</h1>
+    <p class="text-muted">{{ 'Modifique las credenciales de acceso' if usuario else 'Registre una nueva cuenta para el personal' }}</p>
+</div>
+
+<div class="elegant-card animated stagger-2" style="max-width: 600px;">
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+        <div class="form-group">
+            <label class="text-uppercase" for="username">Identificador</label>
+            <input type="text" id="username" name="username" class="form-control" value="{{ usuario.username if usuario else '' }}" {{ 'readonly' if usuario }} required>
+        </div>
+
+        <div class="form-group">
+            <label class="text-uppercase" for="nombre">Nombre Completo</label>
+            <input type="text" id="nombre" name="nombre" class="form-control" value="{{ usuario.nombre if usuario else '' }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="text-uppercase" for="rol">Nivel de Acceso</label>
+            <select id="rol" name="rol" class="form-control" required>
+                <option value="recepcionista" {{ 'selected' if usuario and usuario.rol == 'recepcionista' }}>Operativo / Recepción</option>
+                <option value="admin" {{ 'selected' if usuario and usuario.rol == 'admin' }}>Administrador Central</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="text-uppercase" for="password">Clave de Acceso</label>
+            <input type="password" id="password" name="password" class="form-control" {{ 'required' if not usuario }} placeholder="{{ 'Dejar en blanco para conservar actual' if usuario else 'Mínimo 4 caracteres' }}">
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 40px;">
+            <button type="submit" class="btn-primary">
+                {{ 'Guardar' if usuario else 'Crear Usuario' }}
+            </button>
+            <a href="{{ url_for('admin.gestionar_usuarios') }}" class="btn-liberar">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Configuración del Hotel - La Orquídea{% endblock %}
+
+{% block content %}
+<div class="page-header" style="margin-bottom: 30px; text-align: center;">
+    <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--primary-dark); display: inline-flex; align-items: center; gap: 15px;">
+        <span style="background: var(--accent-gold-glow); padding: 12px; border-radius: 16px; box-shadow: 0 4px 15px rgba(197, 160, 89, 0.2);">⚙️</span>
+        Configuración del Hotel
+    </h1>
+    <p style="color: var(--text-light); margin-top: 10px; font-size: 1.1rem;">Gestione la información corporativa y detalles de facturación.</p>
+</div>
+
+<div class="elegant-card animated stagger-3" style="max-width: 750px; margin: 0 auto 50px; padding: 40px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); border: 1px solid rgba(197, 160, 89, 0.2);">
+    <h3 style="margin-bottom: 35px; display: flex; align-items: center; gap: 15px; border-bottom: 2px solid rgba(197, 160, 89, 0.1); padding-bottom: 20px; color: var(--primary-dark);">
+        <span style="background: linear-gradient(135deg, var(--primary-mid), var(--primary-dark)); color: white; width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 10px rgba(74, 35, 90, 0.2);">🏢</span>
+        Datos Corporativos (Facturación)
+    </h3>
+    
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="nombre" style="font-weight: 600; color: var(--primary-dark);">Nombre Legal / Comercial</label>
+                <input type="text" id="nombre" name="nombre" value="{{ config.nombre }}" required style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: #fdfdfd; transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='var(--primary-light)'; this.style.boxShadow='0 0 0 3px rgba(162, 116, 184, 0.1)';" onblur="this.style.borderColor='rgba(0,0,0,0.1)'; this.style.boxShadow='inset 0 2px 4px rgba(0,0,0,0.02)';">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="nit" style="font-weight: 600; color: var(--primary-dark);">NIT / Identificación Fiscal</label>
+                <input type="text" id="nit" name="nit" value="{{ config.nit }}" required placeholder="Ej: 900.123.456-7" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: #fdfdfd; transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='var(--primary-light)'; this.style.boxShadow='0 0 0 3px rgba(162, 116, 184, 0.1)';" onblur="this.style.borderColor='rgba(0,0,0,0.1)'; this.style.boxShadow='inset 0 2px 4px rgba(0,0,0,0.02)';">
+            </div>
+        </div>
+        
+        <div class="form-group" style="margin-top: 25px;">
+            <label for="direccion" style="font-weight: 600; color: var(--primary-dark);">Dirección Física</label>
+            <input type="text" id="direccion" name="direccion" value="{{ config.direccion }}" required style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: #fdfdfd; transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='var(--primary-light)'; this.style.boxShadow='0 0 0 3px rgba(162, 116, 184, 0.1)';" onblur="this.style.borderColor='rgba(0,0,0,0.1)'; this.style.boxShadow='inset 0 2px 4px rgba(0,0,0,0.02)';">
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 25px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="ciudad" style="font-weight: 600; color: var(--primary-dark);">Ciudad / Municipio</label>
+                <input type="text" id="ciudad" name="ciudad" value="{{ config.ciudad }}" required style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: #fdfdfd; transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='var(--primary-light)'; this.style.boxShadow='0 0 0 3px rgba(162, 116, 184, 0.1)';" onblur="this.style.borderColor='rgba(0,0,0,0.1)'; this.style.boxShadow='inset 0 2px 4px rgba(0,0,0,0.02)';">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="telefono" style="font-weight: 600; color: var(--primary-dark);">Teléfono de Contacto</label>
+                <input type="text" id="telefono" name="telefono" value="{{ config.telefono }}" required style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: #fdfdfd; transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='var(--primary-light)'; this.style.boxShadow='0 0 0 3px rgba(162, 116, 184, 0.1)';" onblur="this.style.borderColor='rgba(0,0,0,0.1)'; this.style.boxShadow='inset 0 2px 4px rgba(0,0,0,0.02)';">
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 25px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="email" style="font-weight: 600; color: var(--primary-dark);">Correo Electrónico</label>
+                <input type="email" id="email" name="email" value="{{ config.email }}" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: #fdfdfd; transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='var(--primary-light)'; this.style.boxShadow='0 0 0 3px rgba(162, 116, 184, 0.1)';" onblur="this.style.borderColor='rgba(0,0,0,0.1)'; this.style.boxShadow='inset 0 2px 4px rgba(0,0,0,0.02)';">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="web" style="font-weight: 600; color: var(--primary-dark);">Sitio Web (URL)</label>
+                <input type="text" id="web" name="web" value="{{ config.web }}" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: #fdfdfd; transition: all 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='var(--primary-light)'; this.style.boxShadow='0 0 0 3px rgba(162, 116, 184, 0.1)';" onblur="this.style.borderColor='rgba(0,0,0,0.1)'; this.style.boxShadow='inset 0 2px 4px rgba(0,0,0,0.02)';">
+            </div>
+        </div>
+        
+        <button type="submit" class="btn-gold" style="width: 100%; justify-content: center; margin-top: 40px; padding: 18px; font-size: 1.1rem; border-radius: 12px; box-shadow: 0 8px 20px rgba(197, 160, 89, 0.3); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 25px rgba(197, 160, 89, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(197, 160, 89, 0.3)';">
+            💾 Guardar Cambios del Sistema
+        </button>
+    </form>
+</div>
+
+{% endblock %}

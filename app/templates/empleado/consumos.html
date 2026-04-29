@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Consumos y Extras - La Orquídea{% endblock %}
+
+{% block content %}
+<div class="page-header animate-in">
+    <h1>🍿 Consumos y Extras</h1>
+    <p>Agregue productos o servicios adicionales a la cuenta de los huéspedes.</p>
+</div>
+
+<div class="card animate-in">
+    <h3>Cargar a Reservación Activa</h3>
+    <p style="color: var(--text-light); font-size: 14px; margin-bottom: 25px;">Seleccione la habitación y el producto.</p>
+
+    {% if activas %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
+        {% for a in activas %}
+        <div class="card" style="margin-bottom: 0; background: var(--bg); border: 1px dashed var(--border);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <strong style="font-size: 18px;">Hab # {{ a.habitacion.numero }}</strong>
+                <span class="badge badge-warning">{{ a.reserva.nombre_huesped }}</span>
+            </div>
+            
+            <form action="{{ url_for('empleado.agregar_consumo', reserva_id=a.reserva_id) }}" method="POST">
+                <input type="text" name="producto" class="form-control" placeholder="Ej: Servicio al cuarto, Desayuno, Lavandería" required>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" name="monto" class="form-control" placeholder="Monto $" required step="0.01">
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">Cargar</button>
+                </div>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center" style="padding: 40px; color: var(--text-light);">
+        <p>No hay reservaciones activas en este momento para cargar consumos.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Factura - La Orquídea{% endblock %}
+
+{% block content %}
+<style>
+    /* Estilos para impresión */
+    @media print {
+        @page {
+            margin: 0.5cm;
+            size: auto;
+        }
+        
+        /* Ocultar elementos innecesarios */
+        .sidebar, 
+        .animation-controls, 
+        .btn-purple, 
+        .btn-gold, 
+        form, 
+        .page-header p, 
+        .no-print, 
+        .splash-screen, 
+        .orchid-decoration,
+        .animation-controls {
+            display: none !important;
+            height: 0 !important;
+            width: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            visibility: hidden !important;
+        }
+        
+        /* Reset de estructura principal */
+        html, body {
+            background: white !important;
+            color: black !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            height: auto !important;
+            width: 100% !important;
+            overflow: visible !important;
+            display: block !important;
+            position: relative !important;
+        }
+        
+        .main-content, .dashboard-content {
+            padding: 0 !important;
+            margin: 0 !important;
+            height: auto !important;
+            width: 100% !important;
+            overflow: visible !important;
+            display: block !important;
+            position: relative !important;
+            flex: none !important;
+        }
+        
+        /* Asegurar que la tarjeta de la factura ocupe todo el ancho y sea visible */
+        .elegant-card {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            transform: none !important;
+            animation: none !important;
+            display: block !important;
+            position: relative !important;
+            top: 0 !important;
+            left: 0 !important;
+        }
+
+        /* Forzar visibilidad de texto */
+        h1, h2, h3, h4, p, span, td, th {
+            color: black !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+    }
+</style>
+
+<div class="page-header no-print">
+    <h1 class="animated stagger-1">📄 Resumen de Cuenta</h1>
+    <p><a href="{{ url_for('recep.dashboard') }}" class="btn-outline">← Volver al Panel de Recepción</a></p>
+</div>
+
+<div class="elegant-card animated stagger-3" id="invoice-to-print" style="max-width: 850px; margin: 0 auto 50px; position: relative; padding: 50px;">
+    <!-- Logo y Cabecera -->
+    <div style="text-align: center; border-bottom: 2px solid var(--accent-gold); padding-bottom: 30px; margin-bottom: 40px;">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="width: 80px; height: 80px; margin-bottom: 15px; border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+        <h2 style="font-family: var(--font-headings); color: var(--primary-dark); margin: 0; font-size: 32px; letter-spacing: 1px;">{{ config.nombre if config else 'Hotel Boutique La Orquídea' }}</h2>
+        <p style="color: var(--accent-gold); margin: 8px 0; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 13px;">NIT: {{ config.nit if config else '900.123.456-7' }}</p>
+        <p style="color: var(--text-muted); margin: 0; font-size: 13px;">{{ config.direccion if config else 'Calle 10 #5-30' }} • {{ config.ciudad if config else 'Bogotá' }}</p>
+        <p style="color: var(--text-muted); margin: 3px 0; font-size: 13px;">Tel: {{ config.telefono if config else '+57 1 234 5678' }} | {{ config.web if config else 'www.laorquidea.com' }}</p>
+    </div>
+    
+    <!-- Cuadrícula de Datos -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 50px;">
+        <div style="background: rgba(15, 5, 29, 0.02); padding: 25px; border-radius: 16px; border-left: 5px solid var(--primary-dark);">
+            <h4 style="margin: 0 0 15px 0; text-transform: uppercase; font-size: 11px; color: var(--text-muted); letter-spacing: 1px; font-weight: 700;">Huésped Titular</h4>
+            <p style="margin: 5px 0; font-weight: 700; font-size: 18px; color: var(--primary-dark);">{{ reserva.nombre_huesped }}</p>
+            <p style="margin: 2px 0; color: var(--text-light); font-size: 14px;">{{ reserva.tipo_documento|capitalize }}: {{ reserva.cedula_nit }}</p>
+            <p style="margin: 2px 0; color: var(--text-light); font-size: 14px;">Contacto: {{ reserva.telefono_huesped }}</p>
+            {% if reserva.email_huesped %}
+            <p style="margin: 2px 0; color: var(--text-light); font-size: 14px;">Email: {{ reserva.email_huesped }}</p>
+            {% endif %}
+        </div>
+        
+        <div style="background: rgba(197, 160, 89, 0.03); padding: 25px; border-radius: 16px; border-left: 5px solid var(--accent-gold);">
+            <h4 style="margin: 0 0 15px 0; text-transform: uppercase; font-size: 11px; color: var(--text-muted); letter-spacing: 1px; font-weight: 700;">Detalle Estancia</h4>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
+                <span>Habitación:</span> <strong style="color: var(--primary-dark);">{{ habitacion.numero }} ({{ habitacion.tipo }})</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
+                <span>Check-in:</span> <strong style="color: var(--primary-dark);">{{ reserva.fecha_ingreso.strftime('%d/%m/%Y') }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 14px;">
+                <span>Check-out:</span> <strong style="color: var(--primary-dark);">{{ reserva.fecha_salida.strftime('%d/%m/%Y') }}</strong>
+            </div>
+        </div>
+    </div>
+    
+    <h3 style="font-family: var(--font-headings); color: var(--primary-dark); margin: 0 0 20px 0; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 12px; font-size: 22px;">Liquidación de Cargos</h3>
+    
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: var(--primary-dark); color: white;">
+                <th style="padding: 15px; text-align: left; border-radius: 12px 0 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Descripción del Servicio</th>
+                <th style="padding: 15px; text-align: right; border-radius: 0 12px 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Monto (COP)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="animated stagger-4">
+                <td style="padding: 20px 15px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                    <div style="font-weight: 700; color: var(--primary-mid);">Alojamiento en Suite - {{ ((reserva.fecha_salida - reserva.fecha_ingreso).days) }} Noches</div>
+                    <small style="color: var(--text-muted);">Tarifa base: ${{ habitacion.precio_noche|currency }} / noche</small>
+                </td>
+                <td style="text-align: right; padding: 20px 15px; border-bottom: 1px solid rgba(0,0,0,0.05); font-weight: 700; font-size: 16px; color: var(--primary-dark);">${{ costo_noches|currency }}</td>
+            </tr>
+            
+            {% for consumo in consumos %}
+            <tr class="animated stagger-{{ loop.index + 4 if loop.index + 4 <= 6 else 6 }}">
+                <td style="padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.02);">
+                    <div style="font-weight: 600;">{{ consumo.producto }}</div>
+                    <small style="color: var(--text-muted);">Registro: {{ consumo.fecha.strftime('%d/%m - %H:%M') }}</small>
+                </td>
+                <td style="text-align: right; padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.02); color: var(--primary-alt); font-weight: 600;">${{ consumo.monto|currency }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr style="background: rgba(197, 160, 89, 0.05);">
+                <td style="padding: 25px 15px; font-size: 18px; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; border-radius: 0 0 0 12px;">Total General</td>
+                <td style="text-align: right; padding: 25px 15px; font-size: 32px; font-weight: 800; color: var(--accent-gold-rich); border-radius: 0 0 12px 0;">${{ reserva.total_pago|currency }}</td>
+            </tr>
+        </tfoot>
+    </table>
+    
+    <div class="no-print" style="text-align: center; margin-top: 50px; padding-top: 30px; border-top: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: center; gap: 20px;">
+        <form method="POST" style="display: inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn-gold" style="padding: 18px 40px; font-size: 15px;">
+                ✅ Registrar Pago y Finalizar
+            </button>
+        </form>
+        
+        <a href="{{ url_for('recep.dashboard') }}" class="btn-purple" style="background: transparent; border: 2px solid var(--primary-dark); color: var(--primary-dark); padding: 18px 40px; font-size: 15px;">
+            Regresar
+        </a>
+    </div>
+    
+    <div style="text-align: center; color: var(--text-muted); font-size: 11px; margin-top: 40px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 25px;">
+        <p style="margin: 0; text-transform: uppercase; letter-spacing: 1px;">{{ config.nombre if config else 'La Orquídea Hotel Boutique' }} • {{ config.ciudad if config else 'Colombia' }}</p>
+        <p style="margin: 8px 0 0 0; font-style: italic;">"Exclusividad en cada detalle. Gracias por elegirnos."</p>
+    </div>
+</div>
+    
+    <div style="text-align: center; color: var(--text-light); font-size: 12px; margin-top: 30px; border-top: 1px dotted #ccc; padding-top: 20px;">
+        <p style="margin: 0;">Esta es una representación física de una factura digital de propiedad interna.</p>
+        <p style="margin: 5px 0 0 0;">Gracias por su preferencia en <strong>La Orquídea</strong>.</p>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Editar' if empleado else 'Nuevo' }} Empleado - La Orquidea{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>👨‍💼 {{ 'Editar' if empleado else 'Nuevo' }} Empleado</h1>
+</div>
+
+<div style="max-width: 600px; margin: 0 auto;">
+    <a href="{{ url_for('admin.gestionar_empleados') }}" class="btn-outline" style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 25px;">
+        ← Volver
+    </a>
+    
+    <div class="elegant-card">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="form-group">
+                <label for="nombre">Nombre Completo *</label>
+                <input type="text" id="nombre" name="nombre" value="{{ empleado.nombre if empleado else '' }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="cargo">Cargo</label>
+                <select id="cargo" name="cargo">
+                    <option value="Empleado" {{ 'selected' if empleado and empleado.cargo == 'Empleado' else '' }}>Empleado</option>
+                    <option value="Recepcionista" {{ 'selected' if empleado and empleado.cargo == 'Recepcionista' else '' }}>Recepcionista</option>
+                    <option value="Camarero" {{ 'selected' if empleado and empleado.cargo == 'Camarero' else '' }}>Camarero</option>
+                    <option value="Cocinero" {{ 'selected' if empleado and empleado.cargo == 'Cocinero' else '' }}>Cocinero</option>
+                    <option value="Gerente" {{ 'selected' if empleado and empleado.cargo == 'Gerente' else '' }}>Gerente</option>
+                </select>
+            </div>
+            
+            {% if not empleado %}
+            <div class="form-group">
+                <label for="username">Usuario (Login) *</label>
+                <input type="text" id="username" name="username" placeholder="Ej: jhonny" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña *</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <input type="text" id="telefono" name="telefono" value="{{ empleado.telefono if empleado else '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ empleado.email if empleado else '' }}">
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                <button type="submit" class="btn-gold" style="flex: 2; justify-content: center; padding: 18px;">
+                    💾 {{ 'Guardar Cambios' if empleado else 'Crear Empleado' }}
+                </button>
+                <a href="{{ url_for('admin.gestionar_empleados') }}" class="btn-outline" style="flex: 1; justify-content: center; padding: 18px;">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Hotel La Orquídea</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        :root {
+            --login-primary: #1A1A1A;
+            --login-accent: #C5B4A5;
+        }
+
+        body {
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            background: #FAF9F8;
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+        }
+
+        .login-wrapper {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Image Side */
+        .login-hero {
+            flex: 1.2;
+            position: relative;
+            background-image: url("{{ url_for('static', filename='img/login_bg.png') }}");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+        }
+
+        .hero-overlay {
+            position: relative;
+            z-index: 2;
+            color: white;
+            text-align: center;
+            padding: 40px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 5rem;
+            margin: 0;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            color: #FFFFFF;
+            animation: fadeInHero 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .hero-subtitle {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6em;
+            margin-top: 25px;
+            color: var(--login-accent);
+            font-weight: 600;
+            opacity: 0.9;
+            animation: fadeInHero 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s backwards;
+        }
+
+        @keyframes fadeInHero {
+            from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        /* Form Side */
+        .login-form-container {
+            flex: 0.8;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px;
+            position: relative;
+            box-shadow: -20px 0 50px rgba(0,0,0,0.05);
+        }
+
+        .login-header {
+            margin-bottom: 40px;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #EEE;
+            padding-bottom: 15px;
+        }
+
+        .role-tab {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #AAA;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            position: relative;
+            padding-bottom: 15px;
+            margin-bottom: -16px;
+        }
+
+        .role-tab:hover {
+            color: var(--login-primary);
+        }
+
+        .role-tab.active {
+            color: var(--login-primary);
+        }
+
+        .role-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--login-primary);
+        }
+
+        .orchid-mini-logo {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .login-brand {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--login-primary);
+            margin-bottom: 8px;
+        }
+
+        .login-tagline {
+            font-size: 14px;
+            color: #888;
+            font-weight: 400;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 700;
+            color: #AAA;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #EEE;
+            border-radius: 0;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-bottom-color: var(--login-primary);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 20px;
+            background: var(--login-primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            letter-spacing: 0.25em;
+            background: #333;
+        }
+
+        .flash-message {
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .danger { background: #FFF5F5; color: #C53030; border-left: 3px solid #FC8181; }
+        .success { background: #F0FFF4; color: #2F855A; border-left: 3px solid #68D391; }
+
+        .login-footer {
+            margin-top: 60px;
+            font-size: 11px;
+            color: #CCC;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 1024px) {
+            .login-hero { display: none; }
+            .login-form-container { flex: 1; padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-hero">
+            <div class="hero-overlay">
+                <h1 class="hero-title">La Orquídea</h1>
+                <p class="hero-subtitle">Boutique & Luxury Experience</p>
+            </div>
+        </div>
+        
+        <div class="login-form-container">
+            <div class="login-header">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="orchid-mini-logo">
+                <div class="login-brand">SISTEMA PMS</div>
+                <div class="login-tagline">Panel de Gestión Administrativa</div>
+            </div>
+
+            <div class="role-selector">
+                <div class="role-tab active" onclick="selectRole('admin', this)">Administrador</div>
+                <div class="role-tab" onclick="selectRole('recep', this)">Recepción</div>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="context" id="login-context" value="admin">
+                
+                <div class="form-group">
+                    <label for="username">Identificador</label>
+                    <input type="text" id="username" name="username" placeholder="Usuario" required autocomplete="username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Clave de Acceso</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                
+                <button type="submit" class="btn-login" id="login-button">Ingresar al Recinto</button>
+            </form>
+            
+            <div class="login-footer">
+                &copy; 2026 LA ORQUÍDEA HOTEL BOUTIQUE • VERSIÓN NEUTRAL 2.0
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectRole(role, element) {
+            // Update UI
+            document.querySelectorAll('.role-tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+            
+            // Update Hidden Input (for potential backend use)
+            document.getElementById('login-context').value = role;
+            
+            // Subtle UI feedback
+            const btn = document.getElementById('login-button');
+            if(role === 'admin') {
+                btn.innerText = 'Ingresar al Recinto';
+            } else {
+                btn.innerText = 'Acceder a Recepción';
+            }
+        }
+    </script>
+</body>
+</html>

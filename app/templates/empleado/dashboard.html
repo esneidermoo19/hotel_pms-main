@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Panel Operativo - La Orquidea{% endblock %}
+
+{% block content %}
+<div class="dashboard-header anim-stagger" style="margin-bottom: 48px;">
+    <h1 class="text-gold">¡Buen día, {{ current_user.nombre }}!</h1>
+    <p style="color: var(--text-muted); font-size: 1.1rem;">Panel de Operaciones - Hotel La Orquídea</p>
+</div>
+
+<!-- Control de Horario -->
+<div class="horario-card">
+    <div class="horario-info">
+        <div class="horario-titulo">Control de Horario</div>
+        
+        {% if horas_trabajadas is not none %}
+        <div class="horario-horas">
+            <span class="horas-numero">{{ horas_trabajadas }}</span>
+            <span class="horas-label">horas trabajadas hoy</span>
+        </div>
+        <div class="horario-detalle">
+            <div>Entrada: {{ hora_entrada.strftime('%H:%M') if hora_entrada else '-' }}</div>
+            <div>Salida: {{ hora_salida.strftime('%H:%M') if hora_salida else 'En turno' }}</div>
+        </div>
+        {% else %}
+        <div class="horario-mensaje">No has registrado entrada hoy</div>
+        {% endif %}
+    </div>
+    
+    <div class="horario-botones">
+        {% if not hora_entrada %}
+        <form method="POST" action="{{ url_for('empleado.registrar_entrada') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btnHora btn-entrada">🟢 Entrada</button>
+        </form>
+        {% elif not hora_salida %}
+        <form method="POST" action="{{ url_for('empleado.registrar_salida') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btnHora btn-salida">🔴 Salida</button>
+        </form>
+        {% else %}
+        <div class="turno-completo">Turno completado</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="grid anim-stagger" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 48px;">
+    <a href="{{ url_for('empleado.recepcion') }}" class="elegant-card" style="text-decoration: none;">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="font-size: 2.5rem; background: var(--surface-raised); width: 70px; height: 70px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">🛎️</div>
+            <div>
+                <h4 style="margin: 0; color: var(--accent);">Recepción</h4>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--text-dim);">Check-in / Check-out</p>
+            </div>
+        </div>
+    </a>
+    
+    <a href="{{ url_for('pos.caja_principal') }}" class="elegant-card" style="text-decoration: none;">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="font-size: 2.5rem; background: var(--surface-raised); width: 70px; height: 70px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">🛒</div>
+            <div>
+                <h4 style="margin: 0; color: var(--accent);">Servicios</h4>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--text-dim);">Cargar consumos</p>
+            </div>
+        </div>
+    </a>
+    
+    <a href="{{ url_for('empleado.facturacion') }}" class="elegant-card" style="text-decoration: none;">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="font-size: 2.5rem; background: var(--surface-raised); width: 70px; height: 70px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; border: 1px solid var(--border);">🧾</div>
+            <div>
+                <h4 style="margin: 0; color: var(--accent);">Caja</h4>
+                <p style="margin: 0; font-size: 0.85rem; color: var(--text-dim);">Emitir comprobantes</p>
+            </div>
+        </div>
+    </a>
+</div>
+
+<style>
+.horario-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #1F2937 0%, #374151 100%);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 40px;
+    color: white;
+}
+
+.horario-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.horario-titulo {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.7;
+}
+
+.horario-horas {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.horas-numero {
+    font-size: 48px;
+    font-weight: 700;
+    color: #10B981;
+}
+
+.horas-label {
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.horario-detalle {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.horario-mensaje {
+    font-size: 18px;
+    color: #F59E0B;
+}
+
+.horario-botones {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btnHora {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-entrada {
+    background: #10B981;
+    color: white;
+}
+
+.btn-entrada:hover {
+    background: #059669;
+}
+
+.btn-salida {
+    background: #EF4444;
+    color: white;
+}
+
+.btn-salida:hover {
+    background: #DC2626;
+}
+
+.turno-completo {
+    padding: 15px 30px;
+    background: #374151;
+    color: #9CA3AF;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 600;
+}
+</style>
+{% endblock %}

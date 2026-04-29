@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Administración - La Orquídea{% endblock %}
+
+{% block content %}
+<div class="page-header animated stagger-1">
+    <h1>Administración</h1>
+    <p class="text-muted">Control estratégico y auditoría del complejo La Orquídea.</p>
+</div>
+
+<!-- Key Management Metrics -->
+<div class="stats-grid animated stagger-2">
+    <div class="stat-card">
+        <div class="stat-info">
+            <span class="stat-label">Inventario Habitaciones</span>
+            <span class="stat-number">{{ habitaciones|length }}</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <span class="stat-label">Usuarios con Acceso</span>
+            <span class="stat-number">{{ usuarios|length }}</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <span class="stat-label">Tasa de Ocupación</span>
+            <span class="stat-number">{{ ((habitaciones|selectattr('estado', 'equalto', 'Ocupada')|list|length / habitaciones|length * 100))|int if habitaciones|length > 0 else 0 }}%</span>
+        </div>
+    </div>
+</div>
+
+<!-- Strategic Actions -->
+<div class="section animated stagger-3">
+    <h2 class="section-title">Gestión de Activos</h2>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+        <a href="{{ url_for('admin.gestionar_habitaciones') }}" class="elegant-card" style="text-align: center; text-decoration: none; padding: 30px;">
+            <div style="font-size: 1.5rem; margin-bottom: 10px;">🏩</div>
+            <div class="text-uppercase" style="color: var(--clr-ink);">Habitaciones</div>
+        </a>
+        <a href="{{ url_for('admin.gestionar_usuarios') }}" class="elegant-card" style="text-align: center; text-decoration: none; padding: 30px;">
+            <div style="font-size: 1.5rem; margin-bottom: 10px;">👥</div>
+            <div class="text-uppercase" style="color: var(--clr-ink);">Usuarios</div>
+        </a>
+        <a href="{{ url_for('admin.gestionar_empleados') }}" class="elegant-card" style="text-align: center; text-decoration: none; padding: 30px;">
+            <div style="font-size: 1.5rem; margin-bottom: 10px;">👨‍💼</div>
+            <div class="text-uppercase" style="color: var(--clr-ink);">Staff</div>
+        </a>
+        <a href="{{ url_for('reportes.config_hotel') }}" class="elegant-card" style="text-align: center; text-decoration: none; padding: 30px;">
+            <div style="font-size: 1.5rem; margin-bottom: 10px;">🔩</div>
+            <div class="text-uppercase" style="color: var(--clr-ink);">Config</div>
+        </a>
+    </div>
+</div>
+
+<!-- Real-time Status -->
+<div class="section animated stagger-4">
+    <h2 class="section-title">Estatus de Propiedad</h2>
+    <div class="room-grid">
+        {% for hab in habitaciones %}
+        <div class="room-card room-{{ hab.estado|lower }}" style="padding: 25px;">
+            <div class="d-flex justify-between align-center">
+                <div>
+                    <div class="room-number" style="font-size: 1.5rem; margin: 0;">#{{ hab.numero }}</div>
+                    <div class="room-type" style="margin: 0; font-size: 10px;">{{ hab.tipo }}</div>
+                </div>
+                <div class="badge {% if hab.estado == 'Disponible' %}badge-success{% elif hab.estado == 'Ocupada' %}badge-danger{% else %}badge-warning{% endif %}">
+                    {{ hab.estado }}
+                </div>
+            </div>
+            <div style="margin-top: 15px; font-weight: 600; font-size: 13px;">
+                ${{ "{:,}".format(hab.precio_noche) }} <span class="text-muted" style="font-weight: 400;">/ noche</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Empleados en Turno Ahora -->
+{% if empleados_en_turno %}
+<div class="section animated stagger-5">
+    <h2 class="section-title">👨‍💼 Empleados en Turno Ahora</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+        {% for emp in empleados_en_turno %}
+        <div class="elegant-card" style="display: flex; justify-content: space-between; align-items: center; padding: 20px;">
+            <div>
+                <div style="font-weight: 700; font-size: 16px;">{{ emp.nombre }}</div>
+                <div style="font-size: 12px; color: var(--text-light);">{{ emp.cargo }}</div>
+                <div style="font-size: 12px; color: var(--text-light); margin-top: 5px;">Entrada: {{ emp.entrada }}</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 24px; font-weight: 700; color: #10B981;">{{ emp.horas }}</div>
+                <div style="font-size: 11px; color: var(--text-light);">horas</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Turnos del Día -->
+{% if turnos_hoy %}
+<div class="section animated stagger-6">
+    <h2 class="section-title">📊 Turnos de Hoy</h2>
+    <div class="elegant-card" style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: var(--primary-dark); color: white;">
+                    <th style="padding: 14px; text-align: left; font-size: 11px;">Empleado</th>
+                    <th style="padding: 14px; text-align: left; font-size: 11px;">Cargo</th>
+                    <th style="padding: 14px; text-align: center; font-size: 11px;">Entrada</th>
+                    <th style="padding: 14px; text-align: center; font-size: 11px;">Salida</th>
+                    <th style="padding: 14px; text-align: center; font-size: 11px;">Horas</th>
+                    <th style="padding: 14px; text-align: center; font-size: 11px;">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in turnos_hoy %}
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 14px; font-weight: 600;">{{ t.nombre }}</td>
+                    <td style="padding: 14px; color: var(--text-light);">{{ t.cargo }}</td>
+                    <td style="padding: 14px; text-align: center;">{{ t.entrada }}</td>
+                    <td style="padding: 14px; text-align: center;">{{ t.salida }}</td>
+                    <td style="padding: 14px; text-align: center; font-weight: 700; color: #10B981;">{{ t.horas }}</td>
+                    <td style="padding: 14px; text-align: center;">
+                        <span class="badge {% if t.estado == 'completado' %}badge-success{% else %}badge-warning{% endif %}">
+                            {{ 'Completado' if t.estado == 'completado' else 'En turno' }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

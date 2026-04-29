@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Reserva - La Orquídea{% endblock %}
+
+{% block content %}
+<div class="page-header animated stagger-1">
+    <div class="d-flex justify-between align-center">
+        <div>
+            <h1>Registro de Estancia</h1>
+            <p class="text-muted">Gestor de admisiones y Check-In.</p>
+        </div>
+        <a href="{{ url_for('recep.dashboard') }}" class="btn-liberar" style="width: auto; padding: 15px 30px;">
+            ← Volver a Recepción
+        </a>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; align-items: start; max-width: 1200px; margin: 0 auto; margin-top: 30px;">
+    
+    <!-- Lado Izquierdo: Resumen de Habitación -->
+    <div class="animated stagger-2">
+        <div class="elegant-card" style="position: sticky; top: 20px; background: var(--clr-ink); color: white; padding: 40px; border-color: var(--clr-ink);">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <span style="display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: var(--clr-taupe); margin-bottom: 20px;">Habitación Seleccionada</span>
+                <h2 style="font-size: 4rem; color: white; margin: 0; font-family: var(--font-serif);">{{ habitacion.numero }}</h2>
+                <p style="opacity: 0.7; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--clr-bone);">{{ habitacion.tipo }}</p>
+            </div>
+            
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 25px 0; margin-bottom: 30px;">
+                <div class="d-flex justify-between" style="margin-bottom: 15px; font-size: 14px;">
+                    <span style="opacity: 0.6;">Tarifa base:</span>
+                    <span style="font-weight: 700; color: var(--clr-bone);">${{ "{:,}".format(habitacion.precio_noche) }} <span style="font-weight: 400; opacity: 0.6; font-size: 11px;">/ noche</span></span>
+                </div>
+                <div class="d-flex justify-between" style="font-size: 14px;">
+                    <span style="opacity: 0.6;">Impuestos:</span>
+                    <span style="font-weight: 500;">Incluidos</span>
+                </div>
+            </div>
+            
+            <div style="text-align: center; font-size: 12px; color: rgba(255,255,255,0.4);">
+                <p>Equipada con todos los servicios luxury de la cadena La Orquídea.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lado Derecho: Formulario -->
+    <div class="animated stagger-3">
+        <div class="elegant-card" style="padding: 50px;">
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <h3 style="margin-bottom: 30px; font-size: 18px; color: var(--clr-ink); font-family: var(--font-heading); font-weight: 600;">
+                    Información del Titular
+                </h3>
+
+                <div style="background: var(--clr-bone); padding: 25px; border-radius: var(--radius-sm); border: 1px solid var(--clr-border); margin-bottom: 30px;">
+                    <label class="text-uppercase" style="display: block; margin-bottom: 10px;">Identificación Fiscal / Personal</label>
+                    <div style="display: flex; gap: 15px;">
+                        <select id="tipo_documento" name="tipo_documento" class="form-control" style="width: 35%; margin-bottom: 0;" required onchange="buscarCliente()">
+                            <option value="nit">NIT (Empresa)</option>
+                            <option value="cedula" selected>Cédula (Persona)</option>
+                            <option value="cedula_extranjeria">Pasaporte / C.E.</option>
+                        </select>
+                        <div style="position: relative; flex: 1;">
+                            <input type="text" id="cedula_nit" name="cedula_nit" class="form-control" style="margin-bottom: 0;" required placeholder="Número de identificación" onblur="buscarCliente()">
+                            <button type="button" class="btn-primary" onclick="buscarCliente()" style="position: absolute; right: 4px; top: 4px; bottom: 4px; width: auto; padding: 0 15px; border-radius: var(--radius-sm); font-size: 11px;">Buscar</button>
+                        </div>
+                    </div>
+                    
+                    <div id="cliente_info" style="display:none; padding: 12px 18px; background: white; border: 1px solid var(--clr-border); border-left: 4px solid var(--clr-sage); margin-top: 15px; font-size: 13px;">
+                        <span style="color: var(--clr-sage); font-weight: 700; margin-right: 10px;">✓ ENCONTRADO </span> <span id="cliente_nombre" style="font-weight: 600;"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="text-uppercase" for="nombre_huesped">Nombre Completo / Razón Social</label>
+                    <input type="text" id="nombre_huesped" name="nombre_huesped" class="form-control" required placeholder="Escriba el nombre exacto">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label class="text-uppercase" for="telefono_huesped">Teléfono de Contacto</label>
+                        <input type="tel" id="telefono_huesped" name="telefono_huesped" class="form-control" required placeholder="+57 321 000 0000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="text-uppercase" for="email_huesped">Correo Electrónico</label>
+                        <input type="email" id="email_huesped" name="email_huesped" class="form-control" placeholder="huesped@ejemplo.com">
+                    </div>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid var(--clr-border); margin: 40px 0;">
+
+                <h3 style="margin-bottom: 30px; font-size: 18px; color: var(--clr-ink); font-family: var(--font-heading); font-weight: 600;">
+                    Detalles de la Estadía
+                </h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label class="text-uppercase" for="fecha_ingreso">Ingreso (Check-in)</label>
+                        <input type="date" id="fecha_ingreso" name="fecha_ingreso" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="text-uppercase" for="fecha_salida">Salida (Check-out)</label>
+                        <input type="date" id="fecha_salida" name="fecha_salida" class="form-control" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label class="text-uppercase" for="num_personas">Huéspedes (Cap. {{ habitacion.capacidad_max }})</label>
+                        <input type="number" id="num_personas" name="num_personas" class="form-control" required min="1" max="{{ habitacion.capacidad_max }}" value="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="text-uppercase" for="hay_menores">¿Viaja con menores?</label>
+                        <select id="hay_menores" name="hay_menores" class="form-control" onchange="toggleMenoresFields()">
+                            <option value="no">No</option>
+                            <option value="si">Sí, registrar menores</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Sección Dinámica de Menores -->
+                <div id="menores_cantidad_div" style="display: none; padding: 25px; background: var(--clr-bone); border-radius: var(--radius-sm); border: 1px solid var(--clr-border); margin-top: 10px;">
+                    <div class="form-group" style="margin: 0;">
+                        <label class="text-uppercase" for="menores">Número de menores a cargo</label>
+                        <input type="number" id="menores" name="menores" class="form-control" min="1" max="5" value="1" onchange="generarCamposMenores()" style="background: white;">
+                    </div>
+                </div>
+
+                <div id="menores_fields" style="display: none; margin-top: 25px;">
+                    <h4 class="text-uppercase" style="margin-bottom: 20px; opacity: 0.6;">Registro de Infantes</h4>
+                    <div id="menores_container"></div>
+                </div>
+
+                <div style="margin-top: 50px; text-align: center;">
+                    <p class="text-muted" style="font-size: 12px; margin-bottom: 20px;">Al confirmar, la habitación pasará automáticamente a estado <strong>Ocupada</strong>.</p>
+                    <div class="d-flex gap-20">
+                        <button type="submit" class="btn-primary" style="flex: 2; padding: 18px;">
+                            Confirmar Reserva y Check-In
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleMenoresFields() {
+    const hayMenores = document.getElementById('hay_menores').value;
+    const cantidadDiv = document.getElementById('menores_cantidad_div');
+    const camposDiv = document.getElementById('menores_fields');
+    
+    if (hayMenores === 'si') {
+        cantidadDiv.style.display = 'block';
+        generarCamposMenores();
+    } else {
+        cantidadDiv.style.display = 'none';
+        camposDiv.style.display = 'none';
+        document.getElementById('menores_container').innerHTML = '';
+    }
+}
+
+function generarCamposMenores() {
+    const cantidad = parseInt(document.getElementById('menores').value) || 0;
+    const camposDiv = document.getElementById('menores_fields');
+    const containerDiv = document.getElementById('menores_container');
+    
+    if (cantidad > 0) {
+        camposDiv.style.display = 'block';
+        containerDiv.innerHTML = '';
+        
+        for (let i = 1; i <= cantidad; i++) {
+            const html = `
+                <div style="padding: 20px; background: white; border: 1px solid var(--clr-border); border-radius: var(--radius-sm); margin-bottom: 15px;">
+                    <div style="display: flex; gap: 15px;">
+                        <div class="form-group" style="flex: 2; margin: 0;">
+                            <label class="text-uppercase">Nombre del Menor #${i}</label>
+                            <input type="text" name="menor_nombre_${i}" class="form-control" style="margin-bottom: 0;" required placeholder="Nombre completo">
+                        </div>
+                        <div class="form-group" style="flex: 1; margin: 0;">
+                            <label class="text-uppercase">Edad</label>
+                            <input type="number" name="menor_edad_${i}" class="form-control" style="margin-bottom: 0;" required min="0" max="17" placeholder="Años">
+                        </div>
+                    </div>
+                </div>
+            `;
+            containerDiv.innerHTML += html;
+        }
+    } else {
+        camposDiv.style.display = 'none';
+    }
+}
+
+function buscarCliente() {
+    const nit = document.getElementById('cedula_nit').value.trim();
+    if (nit.length < 3) return;
+    
+    fetch('/reportes/clientes/buscar/' + encodeURIComponent(nit))
+    .then(r => r.json())
+    .then(data => {
+        if (data.encontrado) {
+            document.getElementById('cliente_info').style.display = 'block';
+            document.getElementById('cliente_nombre').textContent = data.nombre;
+            
+            // Auto-fill
+            document.getElementById('nombre_huesped').value = data.nombre;
+            if (data.email && !document.getElementById('email_huesped').value) {
+                document.getElementById('email_huesped').value = data.email;
+            }
+            if (data.telefono && !document.getElementById('telefono_huesped').value) {
+                document.getElementById('telefono_huesped').value = data.telefono;
+            }
+            if (data.tipo_documento) {
+                document.getElementById('tipo_documento').value = data.tipo_documento;
+            }
+        } else {
+            document.getElementById('cliente_info').style.display = 'none';
+        }
+    })
+    .catch(e => console.error(e));
+}
+</script>
+{% endblock %}

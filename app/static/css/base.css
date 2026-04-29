@@ -1,0 +1,375 @@
+/* 
+   Hotel La Orquídea - Neutral Elegant Design System
+   Color Palette: Ink, Bone, Taupe, Sage
+*/
+
+:root {
+    /* Primary Neutrals */
+    --clr-ink: #0F0F0F;
+    /* Deepest obsidian for sidebars and text */
+    --clr-bone: #e2e0e077;
+    /* Beige background */
+    --clr-surface: #FFFFFF;
+    /* Pure white for cards */
+    --clr-border: rgba(0, 0, 0, 0.06);
+
+    /* Accents */
+    --clr-taupe: #C5B4A5;
+    /* Warm muted gold for highlights */
+    --clr-sage: #8C9C8E;
+    /* Muted green for successes */
+    --clr-rose: #B28E8E;
+    /* Dusty rose for alerts/danger */
+
+    /* Typography */
+    --font-heading: 'Outfit', sans-serif;
+    --font-serif: 'Playfair Display', serif;
+    --font-ui: 'Inter', sans-serif;
+
+    /* Spacing & Borders */
+    --radius-sm: 4px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.03);
+    --shadow-elegant: 0 20px 40px rgba(0, 0, 0, 0.06);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-ui);
+    background-color: var(--clr-bone);
+    color: var(--clr-ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Layout */
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 280px;
+    background: var(--clr-ink);
+    color: white;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.hotel-logo-container {
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.orchid-wrapper {
+    width: 55px;
+    height: 55px;
+    background: transparent;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(197, 160, 89, 0.3);
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.orchid-graphic {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hotel-logo-text {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: white;
+    text-transform: uppercase;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 60px;
+    min-height: 100vh;
+    transition: all 0.3s ease;
+}
+
+/* Typography Primitives */
+h1,
+h2,
+h3 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+}
+
+h1 {
+    font-size: 3.5rem;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+}
+
+.text-muted {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.text-uppercase {
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* Components */
+.elegant-card {
+    background: var(--clr-surface);
+    border-radius: var(--radius-md);
+    padding: 40px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--clr-border);
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.elegant-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-elegant);
+}
+
+/* Navigation inside Sidebar */
+.sidebar nav {
+    padding: 0 30px;
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.nav-section-label {
+    font-size: 10px;
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 25px 0 10px 15px;
+    font-weight: 600;
+}
+
+.sidebar nav a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 20px;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    font-family: var(--font-ui);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    background: transparent;
+    border: 1px solid transparent;
+}
+
+.sidebar nav a .nav-icon {
+    font-size: 16px;
+    opacity: 0.7;
+    transition: all 0.4s ease;
+    filter: grayscale(100%);
+}
+
+.sidebar nav a:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transform: translateX(5px);
+}
+
+.sidebar nav a:hover .nav-icon {
+    opacity: 1;
+    filter: grayscale(0%);
+    transform: scale(1.1);
+}
+
+.sidebar nav a.active {
+    color: var(--clr-ink);
+    background: var(--clr-bone);
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(249, 248, 246, 0.1);
+}
+
+.sidebar nav a.active .nav-icon {
+    opacity: 1;
+    filter: grayscale(0%);
+}
+
+.sidebar nav a.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: var(--clr-taupe);
+    border-radius: 0 4px 4px 0;
+}
+
+.nav-footer {
+    margin-top: auto;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ui-speed-control {
+    padding: 15px 20px;
+}
+
+.ui-speed-control label {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 10px;
+}
+
+.ui-speed-control input[type=range] {
+    width: 100%;
+    accent-color: var(--clr-taupe);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+        filter: blur(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+.animated {
+    animation: fadeIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.stagger-1 {
+    animation-delay: 0.1s;
+}
+
+.stagger-2 {
+    animation-delay: 0.2s;
+}
+
+.stagger-3 {
+    animation-delay: 0.3s;
+}
+
+.stagger-4 {
+    animation-delay: 0.4s;
+}
+
+.mobile-menu-toggle {
+    display: none;
+    cursor: pointer;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: var(--clr-surface);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-soft);
+    width: max-content;
+    color: var(--clr-ink);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 0;
+        overflow: hidden;
+        transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .sidebar.mobile-open {
+        width: 280px;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 30px;
+    }
+
+    .mobile-menu-toggle {
+        display: block;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+
+    h2 {
+        font-size: 1.4rem;
+        margin-bottom: 20px;
+    }
+
+    .elegant-card {
+        padding: 20px;
+    }
+}

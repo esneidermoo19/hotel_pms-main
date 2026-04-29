@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes de Empleados - La Orquídea{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📊 Reporte de Ventas por Empleado</h1>
+    <p>Ventas registradas: {{ hoy.strftime('%d/%m/%Y') }}</p>
+</div>
+
+<div style="display: flex; gap: 15px; margin-bottom: 30px;">
+    <a href="{{ url_for('admin.gestionar_empleados') }}" class="btn-outline" style="display: inline-flex; align-items: center; gap: 8px;">
+        ← Volver a Empleados
+    </a>
+</div>
+
+{% if ventas %}
+<div class="table-container">
+    <div class="table-header">
+        <h3>Resumen de Ventas</h3>
+    </div>
+    <table class="historial-table">
+        <thead>
+            <tr>
+                <th>Empleado</th>
+                <th>Cargo</th>
+                <th style="text-align: right;">Hoy</th>
+                <th style="text-align: right;">Quincenal</th>
+                <th style="text-align: right;">Mensual</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in ventas %}
+            <tr>
+                <td>
+                    <strong>{{ v.empleado.nombre }}</strong>
+                </td>
+                <td>{{ v.empleado.cargo }}</td>
+                <td style="text-align: right; font-weight: 700; color: var(--success);">
+                    ${{ "{:,}".format(v.diario) }}
+                </td>
+                <td style="text-align: right; font-weight: 700; color: var(--primary-mid);">
+                    ${{ "{:,}".format(v.quincenal) }}
+                </td>
+                <td style="text-align: right; font-weight: 700;">
+                    ${{ "{:,}".format(v.mensual) }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot style="background: var(--primary-dark); color: white;">
+            <tr>
+                <td colspan="2"><strong>TOTAL</strong></td>
+                <td style="text-align: right; font-weight: 700; color: var(--accent-gold);">
+                    <strong>${{ "{:,}".format(ventas|sum(attribute='diario')|default(0)) }}</strong>
+                </td>
+                <td style="text-align: right; font-weight: 700; color: var(--accent-gold);">
+                    <strong>${{ "{:,}".format(ventas|sum(attribute='quincenal')|default(0)) }}</strong>
+                </td>
+                <td style="text-align: right; font-weight: 700; color: var(--accent-gold);">
+                    <strong>${{ "{:,}".format(ventas|sum(attribute='mensual')|default(0)) }}</strong>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{% else %}
+<div class="elegant-card" style="text-align: center; padding: 60px 20px; border-style: dashed;">
+    <div style="font-size: 48px; opacity: 0.3; margin-bottom: 20px;">📊</div>
+    <h3 style="margin-bottom: 10px;">Sin datos de ventas</h3>
+    <p style="color: var(--text-light);">No hay ventas registradas para el período actual.</p>
+</div>
+{% endif %}
+{% endblock %}

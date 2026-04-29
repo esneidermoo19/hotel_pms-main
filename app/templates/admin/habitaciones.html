@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Habitaciones - La Orquídea{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🏠 Gestión de Habitaciones</h1>
+</div>
+
+<div class="animated stagger-3" style="margin-bottom: 30px;">
+    <a href="{{ url_for('admin.nueva_habitacion') }}" class="btn-gold">➕ Nueva Habitación</a>
+</div>
+
+{% if habitaciones %}
+<div class="grid-rooms">
+    {% for hab in habitaciones %}
+    <div class="elegant-card animated stagger-{{ loop.index if loop.index <= 6 else 6 }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+        <div class="room-image-container" style="position: relative; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 16px;">
+            {% if hab.imagen %}
+            <img src="{{ url_for('static', filename='img/habitaciones/' + hab.imagen) }}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 16px;">
+            {% else %}
+            {% set default_img = 'default_simple.png' %}
+            {% if 'doble' in hab.tipo|lower %}
+                {% set default_img = 'default_doble.png' %}
+            {% elif 'suite' in hab.tipo|lower %}
+                {% set default_img = 'default_suite.png' %}
+            {% endif %}
+            <img src="{{ url_for('static', filename='img/habitaciones/' ~ default_img) }}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 16px; border: 1px solid rgba(197, 160, 89, 0.2);">
+            {% endif %}
+            <div style="position: absolute; top: 15px; right: 15px;">
+                <span class="badge badge-{{ 'disponible' if hab.estado == 'Disponible' else 'ocupada' if hab.estado == 'Ocupada' else 'mantenimiento' }}">
+                    {{ hab.estado }}
+                </span>
+            </div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+            <div>
+                <h3 style="font-size: 18px; margin-bottom: 5px;">Habitación {{ hab.numero }}</h3>
+                <p style="color: var(--text-light); font-size: 13px;">{{ hab.tipo }}</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <a href="{{ url_for('admin.editar_habitacion', id=hab.id) }}" class="btn-purple" style="padding: 10px; border-radius: 10px;" title="Editar">✏️</a>
+                {% if hab.estado != 'Ocupada' %}
+                <a href="{{ url_for('admin.eliminar_habitacion', id=hab.id) }}" class="btn-gold" style="padding: 10px; border-radius: 10px; background: #EF4444; border-color: #EF4444;" onclick="return confirm('¿Eliminar esta habitación?')" title="Eliminar">🗑️</a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div style="margin: 15px 0;">
+            <p style="color: var(--primary-dark); font-weight: 700; font-size: 20px; margin: 0;">
+                ${{ "{:,}".format(hab.precio_noche) }}
+                <span style="font-size: 13px; color: var(--text-light); font-weight: 400;">/ noche</span>
+            </p>
+        </div>
+        
+        <div style="background: rgba(197, 160, 89, 0.03); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(197, 160, 89, 0.05);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px;">
+                <div><strong>🛏️ Camas:</strong> {{ hab.cantidad_camas }}</div>
+                <div><strong>👥 Capacidad:</strong> {{ hab.capacidad_max }}</div>
+            </div>
+        </div>
+        
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            {% if hab.tiene_bano_privado %}<span style="font-size: 11px; background: #f0fdf4; padding: 4px 10px; border-radius: 20px; color: #166534; border: 1px solid #dcfce7;">🛁 Baño</span>{% endif %}
+            {% if hab.tiene_aire %}<span style="font-size: 11px; background: #eff6ff; padding: 4px 10px; border-radius: 20px; color: #1e40af; border: 1px solid #dbeafe;">❄️ A/C</span>{% endif %}
+            {% if hab.wifi %}<span style="font-size: 11px; background: #fffbeb; padding: 4px 10px; border-radius: 20px; color: #92400e; border: 1px solid #fef3c7;">📶 WiFi</span>{% endif %}
+            {% if hab.tiene_television %}<span style="font-size: 11px; background: #f8fafc; padding: 4px 10px; border-radius: 20px; color: #334155; border: 1px solid #f1f5f9;">📺 TV</span>{% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="elegant-card animated stagger-1" style="text-align: center; padding: 60px 20px;">
+    <div style="font-size: 64px; margin-bottom: 20px;">🛎️</div>
+    <h2 style="margin-bottom: 15px;">No hay habitaciones registradas</h2>
+    <p style="color: var(--text-light); margin-bottom: 30px;">Comience configurando su primera habitación de lujo.</p>
+    <a href="{{ url_for('admin.nueva_habitacion') }}" class="btn-gold">Registrar Habitación</a>
+</div>
+{% endif %}
+{% endblock %}

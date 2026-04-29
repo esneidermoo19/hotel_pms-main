@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Perfil de Huésped - {{ cliente.nombre }}{% endblock %}
+
+{% block content %}
+<div class="header-editorial anim-stagger">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <p style="text-transform: uppercase; letter-spacing: 3px; color: var(--accent); margin-bottom: 8px; font-weight: 800;">Expediente de Huésped</p>
+            <h1 class="text-gold" style="margin: 0;">{{ cliente.nombre }}</h1>
+        </div>
+        <div style="text-align: right;">
+            <span class="editorial-badge" style="background: var(--accent); color: var(--primary); font-weight: 800; font-size: 0.8rem;">
+                {% if noches_totales > 10 %}HUÉSPED PLATINUM{% elif noches_totales > 5 %}HUÉSPED PREFERENTE{% else %}CLIENTE REGULAR{% endif %}
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Grid de Perfil -->
+<div style="display: grid; grid-template-columns: 350px 1fr; gap: 40px;" class="anim-stagger">
+    
+    <!-- Sidebar de Contacto -->
+    <div class="detail-column">
+        <div class="elegant-card" style="padding: 32px; border-top: 4px solid var(--accent);">
+            <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">Información de Contacto</h4>
+            
+            <div style="margin-bottom: 24px;">
+                <p style="margin: 0; font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px;">Identificación</p>
+                <p style="margin: 4px 0 0; font-weight: 700; color: var(--text);">{{ cliente.nit }} ({{ cliente.tipo_documento|upper }})</p>
+            </div>
+            
+            <div style="margin-bottom: 24px;">
+                <p style="margin: 0; font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px;">Correo Electrónico</p>
+                <p style="margin: 4px 0 0; font-weight: 600; color: var(--accent-light);">{{ cliente.email or 'Sin registrar' }}</p>
+            </div>
+            
+            <div style="margin-bottom: 24px;">
+                <p style="margin: 0; font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px;">Teléfono</p>
+                <p style="margin: 4px 0 0; font-weight: 600;">{{ cliente.telefono or 'N/A' }}</p>
+            </div>
+            
+            <div style="margin-bottom: 0;">
+                <p style="margin: 0; font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px;">Dirección Fiscal</p>
+                <p style="margin: 4px 0 0; font-size: 0.9rem;">{{ cliente.direccion or 'Sin dirección registrada' }}</p>
+            </div>
+        </div>
+        
+        <div class="elegant-card" style="margin-top: 32px; padding: 32px; background: rgba(212, 175, 55, 0.03);">
+            <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 24px;">Estadísticas Acumuladas</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <label style="font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; display: block;">Estancias</label>
+                    <span style="font-family: var(--font-serif); font-size: 1.5rem; color: var(--text);">{{ reservas|length }}</span>
+                </div>
+                <div>
+                    <label style="font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; display: block;">Noches</label>
+                    <span style="font-family: var(--font-serif); font-size: 1.5rem; color: var(--text);">{{ noches_totales }}</span>
+                </div>
+            </div>
+            <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px;">
+                <label style="font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; display: block;">Inversión Total Bruta</label>
+                <span style="font-family: var(--font-serif); font-size: 2rem; color: var(--accent);">$ {{ "{:,}".format(total_invertido|int) }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial de Estancias -->
+    <div class="main-column">
+        <div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+            <h3 style="font-family: var(--font-serif); font-size: 1.5rem; margin: 0;">Bitácora de <span class="text-gold">Experiencias</span></h3>
+        </div>
+
+        {% if reservas %}
+        <div class="elegant-card" style="padding: 0; overflow: hidden; border: 1px solid var(--border);">
+            <table class="editorial-table">
+                <thead>
+                    <tr>
+                        <th style="padding: 20px 30px;">Periodo</th>
+                        <th>Unidad</th>
+                        <th>Consumo Total</th>
+                        <th style="text-align: right; padding-right: 30px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reservas %}
+                    <tr class="table-row">
+                        <td style="padding: 20px 30px;">
+                            <div style="font-weight: 700;">{{ r.fecha_ingreso.strftime('%d %b, %Y') }}</div>
+                            <div style="font-size: 0.7rem; color: var(--text-dim);">Check-out: {{ r.fecha_salida.strftime('%d %b') }}</div>
+                        </td>
+                        <td>
+                            <span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.1);">#{{ r.habitacion.numero }}</span>
+                        </td>
+                        <td style="font-weight: 800; color: var(--accent); font-family: var(--font-sans);">
+                            $ {{ "{:,}".format(r.total_pago|int) }}
+                        </td>
+                        <td style="text-align: right; padding-right: 30px;">
+                            <a href="#" class="action-btn" style="width: 36px; height: 36px;">🧾</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="elegant-card" style="text-align: center; padding: 60px; border: 1px dashed var(--border);">
+            <p style="color: var(--text-dim); font-style: italic;">No hay registros de estancias previas para este perfil.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
