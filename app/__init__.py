@@ -19,26 +19,20 @@ migrate = Migrate()
 def create_app(config_class=None):
     app = Flask(__name__)
     
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key-2024')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///hotel.db')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
-    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'true').lower() == 'true'
-    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+    # Load config from config.py
+    from app.config import Config
+    app.config.from_object(Config)
 
     # Initialize extensions
     db.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
-    
-    # Disable CSRF protection globally for testing
-    app.config['WTF_CSRF_ENABLED'] = False
     migrate.init_app(app, db)
     
     login_manager.login_view = 'auth.login'
+    login_manager.login_message = 'Por favor inicie sesión para continuar.'
+    login_manager.login_message_category = 'warning'
 
     @app.route('/')
     def index():
@@ -68,16 +62,13 @@ def create_app(config_class=None):
     app.register_blueprint(auth_bp)
     app.register_blueprint(empleado_bp)
     
-    # Exempt empleado routes from CSRF
+    # Exempt specific routes from CSRF where needed
     csrf.exempt('empleado.nuevo_cliente')
     csrf.exempt('empleado.cobrar_reserva')
     csrf.exempt('empleado.lista_clientes')
 
-    # Register currency filter
-    @app.template_filter('currency')
-    def currency_filter(value):
-        if value is None:
-            return "0"
-        return "{:,}".format(int(value))
+    # Register template filters
+    from app.filters import register_filters
+    register_filters(app)
 
     return app

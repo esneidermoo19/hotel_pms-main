@@ -7,10 +7,10 @@ class Reservacion(db.Model):
     habitacion_id = db.Column(db.Integer, db.ForeignKey('habitacion.id'))
     fecha_ingreso = db.Column(db.DateTime, nullable=False)
     fecha_salida = db.Column(db.DateTime, nullable=False)
-    total_pago = db.Column(db.Float, default=0.0)
+    total_pago = db.Column(db.Numeric(12, 2), default=0.0)
     estado = db.Column(db.String(20), default='activa')
     pagado = db.Column(db.Boolean, default=False)
-    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+    fecha_creacion = db.Column(db.DateTime, default=datetime.now)
     
     nombre_huesped = db.Column(db.String(100), nullable=False)
     telefono_huesped = db.Column(db.String(20), nullable=False)

@@ -3,88 +3,98 @@
 {% block title %}Horarios - Hotel La Orquídea{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>⏰ Control de Horarios</h1>
-    <p>Semana del {{ inicio_semana.strftime('%d/%m/%Y') }} al {{ fin_semana.strftime('%d/%m/%Y') }}</p>
+<div class="page-header animated">
+    <h1 style="font-family: var(--font-serif); font-size: 3rem; margin-bottom: 10px;">Control de Horarios</h1>
+    <p class="text-muted" style="letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.8rem;">Semana del {{ inicio_semana.strftime('%d/%m/%Y') }} al {{ fin_semana.strftime('%d/%m/%Y') }}</p>
 </div>
 
-<div style="display: flex; gap: 15px; margin-bottom: 30px;">
-    <a href="{{ url_for('admin.gestionar_empleados') }}" class="btn-outline" style="display: inline-flex; align-items: center; gap: 8px;">
-        ← Volver
+<div class="animated stagger-1" style="display: flex; gap: 15px; margin-bottom: 40px;">
+    <a href="{{ url_for('admin.gestionar_empleados') }}" class="btn-liberar" style="width: auto; padding: 12px 25px; display: flex; align-items: center; gap: 10px; border: none; background: var(--clr-bone); color: var(--clr-ink);">
+        ← Volver al Listado
     </a>
 </div>
 
-<div class="stats-grid" style="margin-bottom: 30px;">
+<div class="stats-grid animated stagger-2" style="margin-bottom: 40px;">
     {% set activos = horarios|selectattr('hora_salida', 'none')|list %}
-    <div class="stat-card gold-gradient">
-        <div class="stat-icon">👨‍💼</div>
-        <div class="stat-info">
-            <p>Empleados Activos</p>
-            <strong>{{ activos|length }}</strong>
+    <div class="stat-card" style="border-left: 5px solid var(--clr-taupe);">
+        <div class="stat-label">Personal en Turno</div>
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+            <div class="stat-number">{{ activos|length }}</div>
+            <div style="width: 10px; height: 10px; background: var(--clr-sage); border-radius: 50%; animation: pulse 2s infinite;"></div>
         </div>
+        <p class="text-muted" style="font-size: 12px;">Colaboradores activos ahora</p>
     </div>
     
-    <div class="stat-card">
-        <div class="stat-icon">⏱️</div>
-        <div class="stat-info">
-            <p>Horas esta Semana</p>
-            <strong>{{ "%.1f"|format(horarios|sum(attribute='horas')) }}</strong>
-        </div>
+    <div class="stat-card" style="border-left: 5px solid var(--clr-ink);">
+        <div class="stat-label">Productividad Semanal</div>
+        <div class="stat-number">{{ "%.1f"|format(horarios|sum(attribute='horas')) }} <span style="font-size: 1.2rem; color: var(--clr-taupe);">hrs</span></div>
+        <p class="text-muted" style="font-size: 12px;">Total de horas registradas</p>
     </div>
 </div>
 
-<div class="elegant-card" style="padding: 0; overflow: hidden;">
-    <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-            <tr style="background: var(--primary-dark); color: white;">
-                <th style="padding: 18px 20px; text-align: left; font-size: 12px; text-transform: uppercase;">Empleado</th>
-                <th style="padding: 18px 20px; text-align: left; font-size: 12px; text-transform: uppercase;">Contacto</th>
-                <th style="padding: 18px 20px; text-align: left; font-size: 12px; text-transform: uppercase;">Entrada</th>
-                <th style="padding: 18px 20px; text-align: left; font-size: 12px; text-transform: uppercase;">Salida</th>
-                <th style="padding: 18px 20px; text-align: center; font-size: 12px; text-transform: uppercase;">Horas</th>
-                <th style="padding: 18px 20px; text-align: center; font-size: 12px; text-transform: uppercase;">Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for h in horarios %}
-            <tr style="border-bottom: 1px solid var(--border-color);">
-                <td style="padding: 18px 20px;">
-                    <strong style="font-size: 15px;">{{ h.empleado.nombre if h.empleado else 'Desconocido' }}</strong><br>
-                    <span style="color: var(--text-light); font-size: 13px;">{{ h.empleado.cargo if h.empleado else '-' }}</span>
-                </td>
-                <td style="padding: 18px 20px; font-size: 13px; color: var(--text-light);">
-                    {% if h.empleado %}
-                    <div style="margin-bottom: 4px;">📞 {{ h.empleado.telefono or 'Sin teléfono' }}</div>
-                    <div>✉️ {{ h.empleado.email or 'Sin email' }}</div>
-                    {% else %}
-                    -
-                    {% endif %}
-                </td>
-                <td style="padding: 18px 20px; font-size: 14px;">
-                    {{ h.hora_entrada.strftime('%d/%m/%Y') }}
-                    <span style="color: var(--text-light); font-size: 12px;">{{ h.hora_entrada.strftime('%H:%M') }}</span>
-                </td>
-                <td style="padding: 18px 20px; font-size: 14px;">
-                    {% if h.hora_salida %}
-                    {{ h.hora_salida.strftime('%d/%m/%Y') }}
-                    <span style="color: var(--text-light); font-size: 12px;">{{ h.hora_salida.strftime('%H:%M') }}</span>
-                    {% else %}
-                    <span style="color: var(--text-muted);">-</span>
-                    {% endif %}
-                </td>
-                <td style="padding: 18px 20px; text-align: center; font-weight: 700;">
-                    {{ "%.1f"|format(h.horas) if h.horas else '-' }}
-                </td>
-                <td style="padding: 18px 20px; text-align: center;">
-                    {% if h.hora_salida %}
-                    <span class="badge badge-disponible">Completado</span>
-                    {% else %}
-                    <span class="badge badge-ocupada" style="background: var(--accent-gold-light); color: var(--primary-dark);">En Turno</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="elegant-card animated stagger-3" style="padding: 0; overflow: hidden; border: none; box-shadow: var(--shadow-elegant);">
+    <div class="table-wrapper" style="margin-top: 0; border: none; padding: 0;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: var(--clr-ink); color: white;">
+                    <th style="padding: 25px 30px; font-weight: 700; color: rgba(255,255,255,0.6);">Colaborador</th>
+                    <th style="padding: 25px 30px; font-weight: 700; color: rgba(255,255,255,0.6);">Registro de Entrada</th>
+                    <th style="padding: 25px 30px; font-weight: 700; color: rgba(255,255,255,0.6);">Registro de Salida</th>
+                    <th style="padding: 25px 30px; text-align: center; font-weight: 700; color: rgba(255,255,255,0.6);">Inversión Tiempo</th>
+                    <th style="padding: 25px 30px; text-align: center; font-weight: 700; color: rgba(255,255,255,0.6);">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in horarios %}
+                <tr style="transition: all 0.3s ease;">
+                    <td style="padding: 25px 30px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 40px; height: 40px; background: var(--clr-bone); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 1.1rem; color: var(--clr-taupe);">
+                                {{ h.empleado.nombre[0] if h.empleado else '?' }}
+                            </div>
+                            <div>
+                                <strong style="display: block; font-size: 15px; color: var(--clr-ink);">{{ h.empleado.nombre if h.empleado else 'Desconocido' }}</strong>
+                                <span style="font-size: 12px; color: var(--clr-taupe);">{{ h.empleado.cargo if h.empleado else '-' }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding: 25px 30px;">
+                        <div style="font-size: 14px; color: var(--clr-ink); font-weight: 600;">{{ h.hora_entrada.strftime('%H:%M') }}</div>
+                        <div style="font-size: 12px; color: #999;">{{ h.hora_entrada.strftime('%d/%m/%Y') }}</div>
+                    </td>
+                    <td style="padding: 25px 30px;">
+                        {% if h.hora_salida %}
+                        <div style="font-size: 14px; color: var(--clr-ink); font-weight: 600;">{{ h.hora_salida.strftime('%H:%M') }}</div>
+                        <div style="font-size: 12px; color: #999;">{{ h.hora_salida.strftime('%d/%m/%Y') }}</div>
+                        {% else %}
+                        <span style="color: var(--clr-taupe); font-style: italic; font-size: 13px;">Pendiente...</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 25px 30px; text-align: center;">
+                        <div style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: var(--clr-ink);">
+                            {{ "%.1f"|format(h.horas) if h.horas else '—' }}
+                            <span style="font-size: 0.8rem; font-weight: 400; color: var(--clr-taupe);">h</span>
+                        </div>
+                    </td>
+                    <td style="padding: 25px 30px; text-align: center;">
+                        {% if h.hora_salida %}
+                        <span class="badge badge-success" style="padding: 8px 15px; border-radius: 20px;">Finalizado</span>
+                        {% else %}
+                        <span class="badge" style="padding: 8px 15px; border-radius: 20px; background: rgba(140, 156, 142, 0.1); color: var(--clr-sage); border: 1px solid rgba(140, 156, 142, 0.2);">Activo</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<style>
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(140, 156, 142, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(140, 156, 142, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(140, 156, 142, 0); }
+}
+</style>
 {% endblock %}

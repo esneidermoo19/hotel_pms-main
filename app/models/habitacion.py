@@ -4,7 +4,7 @@ class Habitacion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     numero = db.Column(db.String(10), unique=True, nullable=False)
     tipo = db.Column(db.String(50))
-    precio_noche = db.Column(db.Float, nullable=False)
+    precio_noche = db.Column(db.Numeric(12, 2), nullable=False)
     estado = db.Column(db.String(20), default='Disponible')
     descripcion = db.Column(db.Text)
     cantidad_camas = db.Column(db.Integer, default=1)

@@ -15,7 +15,7 @@ def login():
         
         user = User.query.filter_by(username=username).first()
         
-        if user and user.check_password(password):
+        if user and user.activo and user.check_password(password):
             login_user(user)
             
             # Registrar hora de entrada si es empleado
@@ -55,7 +55,7 @@ def logout():
     if current_user.rol != 'admin':
         empleado = Empleado.query.filter_by(user_id=current_user.id).first()
         if empleado:
-            Empleado.hora_salida = now
+            empleado.hora_salida = now
             
             # Cerrar registro de turno
             turno = TurnoEmpleado.query.filter_by(

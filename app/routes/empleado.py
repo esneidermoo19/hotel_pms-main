@@ -32,7 +32,7 @@ def dashboard():
     from app.models import Reservacion
     from datetime import datetime
     
-    hoy = datetime.now(timezone.utc).date()
+    hoy = datetime.now().date()
     
     libres = Habitacion.query.filter_by(estado='Disponible').count()
     ocupadas = Habitacion.query.filter_by(estado='Ocupada').count()
@@ -85,7 +85,7 @@ def registrar_entrada():
     from datetime import datetime
     empleado = Empleado.query.filter_by(user_id=current_user.id).first()
     if empleado:
-        empleado.hora_entrada = datetime.utcnow()
+        empleado.hora_entrada = datetime.now()
         db.session.commit()
         flash('Entrada registrada. ¡Buen turno!', 'success')
     return redirect(url_for('empleado.dashboard'))
@@ -99,7 +99,7 @@ def registrar_salida():
     from datetime import datetime
     empleado = Empleado.query.filter_by(user_id=current_user.id).first()
     if empleado:
-        empleado.hora_salida = datetime.utcnow()
+        empleado.hora_salida = datetime.now()
         db.session.commit()
         flash('Salida registrada. ¡Hasta mañana!', 'success')
     return redirect(url_for('empleado.dashboard'))
@@ -232,13 +232,13 @@ def accion_reserva(reserva_id):
     
     if accion == 'checkin':
         reserva.estado = 'checkin'
-        reserva.fecha_checkin = datetime.now(timezone.utc)
+        reserva.fecha_checkin = datetime.now()
         flash(f'Check-in exitoso para {reserva.nombre_huesped}. ¡Bienvenidos!', 'success')
         return redirect(url_for('empleado.recepcion'))
 
     elif accion == 'checkout':
         reserva.estado = 'completada'
-        reserva.fecha_checkout = datetime.now(timezone.utc)
+        reserva.fecha_checkout = datetime.now()
         # Al salir el huésped, la habitación queda disponible inmediatamente
         habitacion = Habitacion.query.get(reserva.habitacion_id)
         if habitacion:
@@ -477,12 +477,7 @@ def imprimir_factura(factura_id):
     
     return render_template('empleado/factura_imprimir.html',
                          factura=factura, reserva=reserva, habitacion=habitacion, config=config)
-    factura = Factura.query.get_or_404(factura_id)
-    reserva = Reservacion.query.get(factura.reservacion_id)
-    habitacion = Habitacion.query.get(reserva.habitacion_id) if reserva else None
-    
-    return render_template('empleado/factura_imprimir.html',
-                         factura=factura, reserva=reserva, habitacion=habitacion)
+
 
 
 @empleado_bp.route('/facturas')

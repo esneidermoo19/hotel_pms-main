@@ -1,98 +1,504 @@
 {% extends "base.html" %}
 
-{% block title %}Resumen Diario - La Orquídea{% endblock %}
+{% block title %}Resumen Diario — La Orquídea{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── Page Title ──────────────────────────────────────────── */
+  .pg-title {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+
+  .pg-title-left h1 {
+    font-family: var(--font-serif);
+    font-size: 2.8rem;
+    font-weight: 400;
+    color: var(--clr-ink);
+    margin: 0 0 6px;
+    line-height: 1.15;
+  }
+
+  .pg-title-left .subtitle {
+    font-size: 14px;
+    color: #999;
+  }
+
+  /* Date picker inline */
+  .date-picker-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .date-picker-row .dp-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .date-picker-row label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #AAA;
+    font-weight: 700;
+    font-family: var(--font-ui);
+  }
+
+  .date-picker-row input[type="date"] {
+    padding: 10px 14px;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 6px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: var(--clr-ink);
+    transition: border-color 0.2s ease;
+    min-width: 170px;
+  }
+
+  .date-picker-row input[type="date"]:focus {
+    outline: none;
+    border-color: var(--clr-taupe);
+  }
+
+  .btn-go {
+    padding: 10px 20px;
+    background: var(--clr-ink);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .btn-go:hover {
+    background: #2a2a2a;
+  }
+
+  /* ── Revenue Bar ─────────────────────────────────────────── */
+  .rev-bar {
+    display: flex;
+    border-top: 1px solid var(--clr-border);
+    border-bottom: 1px solid var(--clr-border);
+    padding: 36px 0;
+    margin-bottom: 52px;
+    gap: 0;
+  }
+
+  .rev-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 32px;
+    position: relative;
+  }
+
+  .rev-col:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 10%;
+    bottom: 10%;
+    width: 1px;
+    background: var(--clr-border);
+  }
+
+  .rev-col:first-child {
+    padding-left: 0;
+  }
+
+  .rev-col:last-child {
+    padding-right: 0;
+  }
+
+  .rev-col .rv-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #AAA;
+    font-weight: 700;
+    font-family: var(--font-ui);
+    margin-bottom: 10px;
+  }
+
+  .rev-col .rv-amount {
+    font-family: var(--font-heading);
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--clr-ink);
+    line-height: 1;
+  }
+
+  .rev-col.main .rv-amount {
+    color: var(--clr-ink);
+    font-size: 2.8rem;
+  }
+
+  .rev-col .rv-note {
+    font-size: 12px;
+    color: #CCC;
+    margin-top: 6px;
+  }
+
+  /* ── Section Heading ─────────────────────────────────────── */
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .sec-head h2 {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--clr-ink);
+    margin: 0;
+  }
+
+  .sec-head .sec-meta {
+    font-size: 13px;
+    color: #BBB;
+    font-family: var(--font-ui);
+  }
+
+  /* ── Room Cards ──────────────────────────────────────────── */
+  .rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 20px;
+  }
+
+  .room-card {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .room-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-elegant);
+  }
+
+  /* Card head */
+  .rc-head {
+    padding: 22px 26px 18px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--clr-border);
+  }
+
+  .rc-head-left h3 {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--clr-ink);
+    margin: 0 0 3px;
+  }
+
+  .rc-head-left .rc-type {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    color: var(--clr-taupe);
+    font-family: var(--font-ui);
+  }
+
+  .rc-total {
+    text-align: right;
+  }
+
+  .rc-total .amt {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--clr-sage);
+    display: block;
+    line-height: 1;
+  }
+
+  .rc-total .amt-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #CCC;
+    font-family: var(--font-ui);
+    margin-top: 3px;
+    display: block;
+  }
+
+  /* Card body */
+  .rc-body {
+    padding: 18px 26px 22px;
+  }
+
+  .rc-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    gap: 12px;
+  }
+
+  .rc-line:last-child {
+    border-bottom: none;
+  }
+
+  .rc-line-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .rc-line-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--clr-ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rc-line-tag {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    font-family: var(--font-ui);
+  }
+
+  .rc-line-tag.aloj {
+    background: #F0F4F0;
+    color: var(--clr-sage);
+  }
+
+  .rc-line-tag.pos {
+    background: #FBF8F4;
+    color: #8a7560;
+  }
+
+  .rc-line-detail {
+    font-size: 12px;
+    color: #AAA;
+    margin-top: 2px;
+  }
+
+  .rc-line-amount {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--clr-ink);
+    white-space: nowrap;
+  }
+
+  .rc-empty-note {
+    text-align: center;
+    color: #CCC;
+    font-size: 13px;
+    padding: 24px 0;
+    font-style: italic;
+  }
+
+  /* ── Empty State ─────────────────────────────────────────── */
+  .empty-block {
+    text-align: center;
+    padding: 90px 40px;
+    border: 1px dashed rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius-md);
+    background: var(--clr-surface);
+  }
+
+  .empty-block .em-icon {
+    font-size: 42px;
+    margin-bottom: 18px;
+    opacity: 0.2;
+    display: block;
+  }
+
+  .empty-block h3 {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    font-weight: 400;
+  }
+
+  .empty-block p {
+    color: #AAA;
+    font-size: 14px;
+  }
+
+  /* ── Responsive ──────────────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .rev-bar {
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .rev-col:not(:last-child)::after {
+      display: none;
+    }
+
+    .rev-col {
+      padding: 0 !important;
+    }
+
+    .rooms-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .pg-title {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .pg-title-left h1 {
+      font-size: 2rem;
+    }
+
+    .rev-col .rv-amount {
+      font-size: 1.8rem;
+    }
+
+    .rev-col.main .rv-amount {
+      font-size: 2rem;
+    }
+
+    .date-picker-row {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    .date-picker-row input[type="date"] {
+      min-width: auto;
+    }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>📉 Resumen Diario</h1>
-</div>
 
-<div class="elegant-card animated stagger-3" style="margin-bottom: 30px;">
-    <form method="GET" style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
-        <div class="form-group" style="margin: 0; min-width: 240px; flex: 1;">
-            <label for="fecha">Seleccionar Fecha de Consulta</label>
-            <input type="date" id="fecha" name="fecha" value="{{ fecha }}">
-        </div>
-        <button type="submit" class="btn-gold" style="padding: 14px 40px;">Consultar</button>
-    </form>
-</div>
+<!-- Header + Date -->
+<div class="pg-title">
+  <div class="pg-title-left">
+    <h1>Resumen Diario</h1>
+    <span class="subtitle">Ingresos y movimientos del día</span>
+  </div>
 
-<div class="grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 40px;">
-    <!-- Stats Card -->
-    <div class="elegant-card animated stagger-4" style="grid-column: 1 / -1; background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-mid) 100%); color: white; border: none;">
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: center;">
-            <div style="border-right: 1px solid rgba(255,255,255,0.1);">
-                <p style="margin: 0; opacity: 0.6; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Alojamiento</p>
-                <p style="margin: 8px 0 0 0; font-size: 28px; font-weight: 700; color: var(--accent-gold-light);">${{ ingresos_noches|currency }}</p>
-            </div>
-            <div style="border-right: 1px solid rgba(255,255,255,0.1);">
-                <p style="margin: 0; opacity: 0.6; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Extras / POS</p>
-                <p style="margin: 8px 0 0 0; font-size: 28px; font-weight: 700; color: var(--accent-gold-light);">${{ ingresos_pos|currency }}</p>
-            </div>
-            <div>
-                <p style="margin: 0; opacity: 0.6; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Total Ingresos</p>
-                <p style="margin: 8px 0 0 0; font-size: 32px; font-weight: 800; color: var(--accent-gold);">${{ total_dia|currency }}</p>
-            </div>
-        </div>
+  <form method="GET" class="date-picker-row">
+    <div class="dp-wrap">
+      <label for="fecha">Fecha</label>
+      <input type="date" id="fecha" name="fecha" value="{{ fecha }}">
     </div>
+    <button type="submit" class="btn-go" id="btn-consultar">Consultar</button>
+  </form>
 </div>
 
-<h2 class="section-title animated stagger-5" style="margin-bottom: 25px; display: flex; align-items: center; gap: 15px;">
-    <span style="background: rgba(197, 160, 89, 0.1); padding: 8px; border-radius: 10px;">📋</span>
-    Detalle por Habitación
-</h2>
+<!-- Revenue Summary -->
+<div class="rev-bar">
+  <div class="rev-col">
+    <span class="rv-label">Alojamiento</span>
+    <span class="rv-amount">${{ ingresos_noches|currency }}</span>
+    <span class="rv-note">Noches facturadas</span>
+  </div>
+  <div class="rev-col">
+    <span class="rv-label">Extras / POS</span>
+    <span class="rv-amount">${{ ingresos_pos|currency }}</span>
+    <span class="rv-note">Consumos adicionales</span>
+  </div>
+  <div class="rev-col main">
+    <span class="rv-label">Total del día</span>
+    <span class="rv-amount">${{ total_dia|currency }}</span>
+    <span class="rv-note">Ingresos consolidados</span>
+  </div>
+</div>
+
+<!-- Room Detail -->
+<div class="sec-head">
+  <h2>Detalle por Habitación</h2>
+  <span class="sec-meta">{{ fecha }}</span>
+</div>
 
 {% if detalle_habitaciones %}
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 25px;">
-    {% for item in detalle_habitaciones %}
-    <div class="elegant-card animated stagger-{{ loop.index if loop.index <= 6 else 6 }}">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
-            <div>
-                <h3 style="font-size: 20px; margin: 0;">Habitación {{ item.habitacion.numero }}</h3>
-                <p style="color: var(--text-light); font-size: 13px;">{{ item.habitacion.tipo }}</p>
-            </div>
-            <div style="text-align: right;">
-                <p style="margin: 0; font-size: 22px; font-weight: 800; color: var(--success);">${{ item.total|currency }}</p>
-                <p style="margin: 0; font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Subtotal Hab</p>
-            </div>
-        </div>
-        
-        {% if item.reservas or item.consumos %}
-        <div style="background: #F9FAFB; padding: 18px; border-radius: 16px; border: 1px solid #F3F4F6;">
-            {% if item.reservas %}
-                {% for r in item.reservas %}
-                <div style="display: flex; justify-content: space-between; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px dashed rgba(0,0,0,0.05); font-size: 14px;">
-                    <div style="color: var(--text-light);">
-                        <span style="display: block; font-weight: 600; color: var(--primary-mid);">🏨 Alojamiento</span>
-                        <span style="font-size: 12px; opacity: 0.8;">Huésped: {{ r.nombre_huesped }}</span>
-                    </div>
-                    <span style="font-weight: 700; color: var(--primary-dark);">${{ r.total_pago|currency }}</span>
-                </div>
-                {% endfor %}
-            {% endif %}
-            
-            {% if item.consumos %}
-                {% for c in item.consumos %}
-                <div style="display: flex; justify-content: space-between; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px dashed rgba(0,0,0,0.03); font-size: 14px;">
-                    <div style="color: var(--text-light);">
-                        <span style="display: block;">🍰 {{ c.producto }}</span>
-                        <span style="font-size: 11px; opacity: 0.7;">Hora: {{ c.fecha.strftime('%H:%M') }}</span>
-                    </div>
-                    <span style="font-weight: 600;">${{ c.monto|currency }}</span>
-                </div>
-                {% endfor %}
-            {% endif %}
-        </div>
-        {% else %}
-        <p style="text-align: center; color: var(--text-muted); font-size: 13px; font-style: italic;">Sin movimientos en esta fecha.</p>
-        {% endif %}
+<div class="rooms-grid">
+  {% for item in detalle_habitaciones %}
+  <div class="room-card">
+    <div class="rc-head">
+      <div class="rc-head-left">
+        <h3>Habitación {{ item.habitacion.numero }}</h3>
+        <span class="rc-type">{{ item.habitacion.tipo }}</span>
+      </div>
+      <div class="rc-total">
+        <span class="amt">${{ item.total|currency }}</span>
+        <span class="amt-label">Subtotal</span>
+      </div>
     </div>
-    {% endfor %}
+
+    <div class="rc-body">
+      {% if item.reservas or item.consumos %}
+
+      {% for r in item.reservas %}
+      <div class="rc-line">
+        <div class="rc-line-info">
+          <div class="rc-line-name">
+            <span class="rc-line-tag aloj">Aloj.</span>
+            {{ r.nombre_huesped }}
+          </div>
+          <div class="rc-line-detail">{{ r.fecha_ingreso.strftime('%d/%m') }} → {{ r.fecha_salida.strftime('%d/%m/%Y')
+            }}</div>
+        </div>
+        <span class="rc-line-amount">${{ r.total_pago|currency }}</span>
+      </div>
+      {% endfor %}
+
+      {% for c in item.consumos %}
+      <div class="rc-line">
+        <div class="rc-line-info">
+          <div class="rc-line-name">
+            <span class="rc-line-tag pos">POS</span>
+            {{ c.producto }}
+          </div>
+          <div class="rc-line-detail">{{ c.fecha.strftime('%H:%M') }}</div>
+        </div>
+        <span class="rc-line-amount">${{ c.monto|currency }}</span>
+      </div>
+      {% endfor %}
+
+      {% else %}
+      <p class="rc-empty-note">Sin movimientos.</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
 </div>
+
 {% else %}
-<div class="elegant-card animated stagger-5" style="text-align: center; padding: 60px 20px; border-style: dashed;">
-    <div style="font-size: 48px; margin-bottom: 20px;">📅</div>
-    <p style="color: var(--text-light);">No se encontraron ingresos para la fecha seleccionada.</p>
+<div class="empty-block">
+  <span class="em-icon">📅</span>
+  <h3>Sin movimientos</h3>
+  <p>No se registraron ingresos para esta fecha.</p>
 </div>
 {% endif %}
 

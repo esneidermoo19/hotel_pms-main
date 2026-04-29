@@ -4,8 +4,8 @@ from app import db, mail
 from flask_mail import Message
 from datetime import datetime, timedelta
 from flask_login import login_required, current_user
+from app.helpers.rbac import admin_required
 from sqlalchemy import func
-from functools import wraps
 
 reportes_bp = Blueprint('reportes', __name__)
 
@@ -79,15 +79,7 @@ def enviar_factura_email(factura, reserva, habitacion, config):
         print(f"Error enviando correo: {e}")
         return False
 
-def admin_required(f):
-    @wraps(f)
-    @login_required
-    def decorated_function(*args, **kwargs):
-        if current_user.rol != 'admin':
-            flash('Acceso restringido solo para administradores.', 'danger')
-            return redirect(url_for('recep.dashboard'))
-        return f(*args, **kwargs)
-    return decorated_function
+
 
 @reportes_bp.route('/historial')
 @login_required

@@ -15,7 +15,7 @@
 <div class="grid-rooms">
     {% for hab in habitaciones %}
     <div class="elegant-card animated stagger-{{ loop.index if loop.index <= 6 else 6 }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
         
         <div class="room-image-container" style="position: relative; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 16px;">
             {% if hab.imagen %}
@@ -44,7 +44,10 @@
             <div style="display: flex; gap: 8px;">
                 <a href="{{ url_for('admin.editar_habitacion', id=hab.id) }}" class="btn-purple" style="padding: 10px; border-radius: 10px;" title="Editar">✏️</a>
                 {% if hab.estado != 'Ocupada' %}
-                <a href="{{ url_for('admin.eliminar_habitacion', id=hab.id) }}" class="btn-gold" style="padding: 10px; border-radius: 10px; background: #EF4444; border-color: #EF4444;" onclick="return confirm('¿Eliminar esta habitación?')" title="Eliminar">🗑️</a>
+                <form action="{{ url_for('admin.eliminar_habitacion', id=hab.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Eliminar esta habitación?')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn-gold" style="padding: 10px; border-radius: 10px; background: #EF4444; border-color: #EF4444; cursor: pointer;" title="Eliminar">🗑️</button>
+                </form>
                 {% endif %}
             </div>
         </div>

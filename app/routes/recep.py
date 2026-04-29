@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from app.models import Habitacion, Reservacion
+from app.models import Habitacion, Reservacion, Empleado
 from app import db
 from datetime import datetime
 from flask_login import login_required, current_user
@@ -30,14 +30,6 @@ def dashboard():
                 ocupadas_pagadas.append(item)
             else:
                 ocupadas_pendientes.append(item)
-    
-    return render_template(
-        'recepcion/dashboard.html', 
-       libres=habitaciones_libres, 
-        occupations_no_pagadas=ocupadas_pendientes,
-        occupations_pagadas=ocupadas_pagadas,
-        mantenimiento=habitaciones_mantenimiento
-    )
     
     return render_template(
         'recepcion/dashboard.html', 
@@ -127,6 +119,9 @@ def hacer_reserva(habitacion_id):
                 
             total_pago = dias_estadia * habitacion.precio_noche
             
+            # Look up the actual Empleado record for this user
+            empleado = Empleado.query.filter_by(user_id=current_user.id).first()
+            
             nueva_reserva = Reservacion(
                 huesped_id=current_user.id,
                 habitacion_id=habitacion.id,
@@ -141,7 +136,7 @@ def hacer_reserva(habitacion_id):
                 num_personas=num_personas,
                 menores=menores,
                 datos_menores=datos_menores_json,
-                empleado_id=current_user.id
+                empleado_id=empleado.id if empleado else None
             )
             db.session.add(nueva_reserva)
             

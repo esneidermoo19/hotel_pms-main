@@ -1,64 +1,67 @@
 {% extends "base.html" %}
 
-{% block title %}{{ 'Editar' if empleado else 'Nuevo' }} Empleado - La Orquidea{% endblock %}
+{% block title %}{{ 'Editar' if empleado else 'Nuevo' }} Empleado - Hotel La Orquídea{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>👨‍💼 {{ 'Editar' if empleado else 'Nuevo' }} Empleado</h1>
+<div class="page-header animated">
+    <h1 style="font-family: var(--font-serif); font-size: 3rem; margin-bottom: 10px;">{{ 'Editar' if empleado else 'Nuevo' }} Colaborador</h1>
+    <p class="text-muted" style="letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.8rem;">Complete la información del personal</p>
 </div>
 
-<div style="max-width: 600px; margin: 0 auto;">
-    <a href="{{ url_for('admin.gestionar_empleados') }}" class="btn-outline" style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 25px;">
-        ← Volver
+<div style="max-width: 800px; margin: 0 auto;">
+    <a href="{{ url_for('admin.gestionar_empleados') }}" class="btn-liberar animated stagger-1" style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 30px; width: auto; padding: 10px 20px; border: none; background: var(--clr-bone); color: var(--clr-ink);">
+        ← Volver al Listado
     </a>
     
-    <div class="elegant-card">
+    <div class="elegant-card animated stagger-2" style="padding: 50px; border: none; box-shadow: var(--shadow-elegant);">
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
-            <div class="form-group">
-                <label for="nombre">Nombre Completo *</label>
-                <input type="text" id="nombre" name="nombre" value="{{ empleado.nombre if empleado else '' }}" required>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="nombre" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Nombre Completo *</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" value="{{ empleado.nombre if empleado else '' }}" required placeholder="Ej: Juan Pérez" style="font-size: 1.1rem; border-bottom-width: 2px;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cargo" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Cargo / Posición</label>
+                    <select id="cargo" name="cargo" class="form-control" style="background: transparent; -webkit-appearance: none; cursor: pointer;">
+                        <option value="Empleado" {{ 'selected' if empleado and empleado.cargo == 'Empleado' else '' }}>Empleado</option>
+                        <option value="Recepcionista" {{ 'selected' if empleado and empleado.cargo == 'Recepcionista' else '' }}>Recepcionista</option>
+                        <option value="Camarero" {{ 'selected' if empleado and empleado.cargo == 'Camarero' else '' }}>Camarero</option>
+                        <option value="Cocinero" {{ 'selected' if empleado and empleado.cargo == 'Cocinero' else '' }}>Cocinero</option>
+                        <option value="Gerente" {{ 'selected' if empleado and empleado.cargo == 'Gerente' else '' }}>Gerente</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="telefono" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Teléfono de Contacto</label>
+                    <input type="text" id="telefono" name="telefono" class="form-control" value="{{ empleado.telefono if empleado else '' }}" placeholder="+57 300 000 0000">
+                </div>
+                
+                {% if not empleado %}
+                <div class="form-group">
+                    <label for="username" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Usuario (Login) *</label>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Ej: juan.p" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Contraseña *</label>
+                    <input type="password" id="password" name="password" class="form-control" required placeholder="••••••••">
+                </div>
+                {% endif %}
+                
+                <div class="form-group" style="grid-column: span 2;">
+                    <label for="email" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Correo Electrónico</label>
+                    <input type="email" id="email" name="email" class="form-control" value="{{ empleado.email if empleado else '' }}" placeholder="juan.perez@hotel.com">
+                </div>
             </div>
             
-            <div class="form-group">
-                <label for="cargo">Cargo</label>
-                <select id="cargo" name="cargo">
-                    <option value="Empleado" {{ 'selected' if empleado and empleado.cargo == 'Empleado' else '' }}>Empleado</option>
-                    <option value="Recepcionista" {{ 'selected' if empleado and empleado.cargo == 'Recepcionista' else '' }}>Recepcionista</option>
-                    <option value="Camarero" {{ 'selected' if empleado and empleado.cargo == 'Camarero' else '' }}>Camarero</option>
-                    <option value="Cocinero" {{ 'selected' if empleado and empleado.cargo == 'Cocinero' else '' }}>Cocinero</option>
-                    <option value="Gerente" {{ 'selected' if empleado and empleado.cargo == 'Gerente' else '' }}>Gerente</option>
-                </select>
-            </div>
-            
-            {% if not empleado %}
-            <div class="form-group">
-                <label for="username">Usuario (Login) *</label>
-                <input type="text" id="username" name="username" placeholder="Ej: jhonny" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Contraseña *</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            {% endif %}
-            
-            <div class="form-group">
-                <label for="telefono">Teléfono</label>
-                <input type="text" id="telefono" name="telefono" value="{{ empleado.telefono if empleado else '' }}">
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" value="{{ empleado.email if empleado else '' }}">
-            </div>
-            
-            <div style="display: flex; gap: 15px; margin-top: 30px;">
-                <button type="submit" class="btn-gold" style="flex: 2; justify-content: center; padding: 18px;">
-                    💾 {{ 'Guardar Cambios' if empleado else 'Crear Empleado' }}
+            <div style="display: flex; gap: 20px; margin-top: 50px;">
+                <button type="submit" class="btn-primary" style="flex: 2; padding: 20px; font-size: 12px;">
+                    {{ 'Guardar Cambios' if empleado else 'Registrar Colaborador' }}
                 </button>
-                <a href="{{ url_for('admin.gestionar_empleados') }}" class="btn-outline" style="flex: 1; justify-content: center; padding: 18px;">
+                <a href="{{ url_for('admin.gestionar_empleados') }}" class="btn-liberar" style="flex: 1; padding: 20px; display: flex; align-items: center; justify-content: center;">
                     Cancelar
                 </a>
             </div>

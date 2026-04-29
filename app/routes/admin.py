@@ -3,7 +3,7 @@ from app.models import Habitacion, User, Empleado, ConsumoPOS, TurnoEmpleado
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, current_user
-from functools import wraps
+from app.helpers.rbac import admin_required
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
@@ -17,15 +17,7 @@ def allowed_file(filename):
 
 admin_bp = Blueprint('admin', __name__)
 
-def admin_required(f):
-    @wraps(f)
-    @login_required
-    def decorated_function(*args, **kwargs):
-        if current_user.rol != 'admin':
-            flash('Acceso restringido solo para administradores.', 'danger')
-            return redirect(url_for('recep.dashboard'))
-        return f(*args, **kwargs)
-    return decorated_function
+
 
 @admin_bp.route('/')
 @admin_required
@@ -169,7 +161,7 @@ def editar_habitacion(id):
             flash(f'Error: {str(e)}', 'danger')
     return render_template('admin/form_habitacion.html', habitacion=habitacion)
 
-@admin_bp.route('/habitaciones/eliminar/<int:id>')
+@admin_bp.route('/habitaciones/eliminar/<int:id>', methods=['POST'])
 @admin_required
 def eliminar_habitacion(id):
     habitacion = Habitacion.query.get_or_404(id)
@@ -237,7 +229,7 @@ def editar_usuario(id):
             flash(f'Error: {str(e)}', 'danger')
     return render_template('admin/form_usuario.html', usuario=usuario)
 
-@admin_bp.route('/usuarios/eliminar/<int:id>')
+@admin_bp.route('/usuarios/eliminar/<int:id>', methods=['POST'])
 @admin_required
 def eliminar_usuario(id):
     usuario = User.query.get_or_404(id)
@@ -357,7 +349,7 @@ def editar_empleado(id):
     
     return render_template('admin/form_empleado.html', empleado=empleado)
 
-@admin_bp.route('/empleados/eliminar/<int:id>')
+@admin_bp.route('/empleados/eliminar/<int:id>', methods=['POST'])
 @admin_required
 def eliminar_empleado(id):
     empleado = Empleado.query.get_or_404(id)
