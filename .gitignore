@@ -1,7 +1,37 @@
+# Entornos virtuales
 venv/
+.venv/
+env/
+ENV/
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.toast
+.build
+.pytest_cache/
+
+# Datos y base de datos
 instance/
-.env
 *.db
 *.sqlite3
+*.log
+
+# Variables de entorno
+.env
+.env.local
+.env.*
+!.env.example
+
+# IDEs y Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
