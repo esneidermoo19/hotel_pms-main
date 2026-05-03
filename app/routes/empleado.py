@@ -39,13 +39,13 @@ def dashboard():
     
     # Check-ins hoy
     checkins_hoy = Reservacion.query.filter(
-        Reservacion.fecha_ingreso == hoy,
+        Reservacion.fecha_inicio == hoy,
         Reservacion.estado == 'activa'
     ).count()
     
     # Check-outs hoy
     checkouts_hoy = Reservacion.query.filter(
-        Reservacion.fecha_salida == hoy,
+        Reservacion.fecha_fin == hoy,
         Reservacion.estado == 'checkin'
     ).count()
     
@@ -160,9 +160,9 @@ def nueva_reserva(habitacion_id):
     if request.method == 'POST':
         nombre = request.form.get('nombre', '').strip()
         telefono = request.form.get('telefono', '').strip()
-        email_huesped = request.form.get('email_huesped', '').strip()
-        fecha_ingreso = request.form.get('fecha_ingreso', '')
-        fecha_salida = request.form.get('fecha_salida', '')
+        email_cliente = request.form.get('email_huesped', '').strip()
+        fecha_inicio = request.form.get('fecha_ingreso', '')
+        fecha_fin = request.form.get('fecha_salida', '')
         tipo_doc = request.form.get('tipo_documento', 'cedula')
         cedula = request.form.get('cedula', '').strip()
         
@@ -181,8 +181,8 @@ def nueva_reserva(habitacion_id):
                     })
         
         try:
-            fecha_in = datetime.strptime(fecha_ingreso, '%Y-%m-%d').date()
-            fecha_out = datetime.strptime(fecha_salida, '%Y-%m-%d').date()
+            fecha_in = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
+            fecha_out = datetime.strptime(fecha_fin, '%Y-%m-%d').date()
             dias = (fecha_out - fecha_in).days
             
             if dias <= 0:
@@ -196,18 +196,19 @@ def nueva_reserva(habitacion_id):
             
             reserva = Reservacion(
                 habitacion_id=habitacion_id,
-                nombre_huesped=nombre,
-                telefono_huesped=telefono,
-                email_huesped=email_huesped,
+                nombre_cliente=nombre,
+                telefono_cliente=telefono,
+                email_cliente=email_cliente,
                 tipo_documento=tipo_doc,
                 cedula_nit=cedula,
-                fecha_ingreso=fecha_in,
-                fecha_salida=fecha_out,
+                fecha_inicio=fecha_in,
+                fecha_fin=fecha_out,
                 total_pago=dias * habitacion.precio_noche,
                 estado='activa',
                 menores=len(lista_menores),
                 datos_menores=datos_menores_json if lista_menores else None,
-                empleado_id=current_user.id
+                empleado_id=current_user.id,
+                codigo=Reservacion.generar_codigo()
             )
             db.session.add(reserva)
             habitacion.estado = 'Ocupada'
@@ -233,7 +234,7 @@ def accion_reserva(reserva_id):
     if accion == 'checkin':
         reserva.estado = 'checkin'
         reserva.fecha_checkin = datetime.now()
-        flash(f'Check-in exitoso para {reserva.nombre_huesped}. ¡Bienvenidos!', 'success')
+        flash(f'Check-in exitoso para {reserva.nombre_cliente}. ¡Bienvenidos!', 'success')
         return redirect(url_for('empleado.recepcion'))
 
     elif accion == 'checkout':
@@ -245,7 +246,7 @@ def accion_reserva(reserva_id):
             habitacion.estado = 'Disponible'
         
         db.session.commit()
-        flash(f'Check-out de {reserva.nombre_huesped} completado. La Habitación #{habitacion.numero} ahora está disponible.', 'success')
+        flash(f'Check-out de {reserva.nombre_cliente} completado. La Habitación #{habitacion.numero} ahora está disponible.', 'success')
         return redirect(url_for('empleado.recepcion'))
 
     elif accion == 'pagar':
@@ -387,8 +388,8 @@ def cobrar_reserva(reserva_id):
     try:
         reserva = Reservacion.query.get_or_404(reserva_id)
         reserva_id_value = reserva.id
-        nombre_huesped = reserva.nombre_huesped
-        email_huesped = reserva.email_huesped
+        nombre_cliente = reserva.nombre_cliente
+        email_cliente = reserva.email_cliente
         total_pago = reserva.total_pago
     except Exception as e:
         flash(f'Error: Reserva no encontrada', 'danger')
@@ -419,7 +420,7 @@ def cobrar_reserva(reserva_id):
         subtotal=reserva.total_pago,
         impuesto=0,
         total=reserva.total_pago,
-        nombre_cliente=reserva.nombre_huesped,
+        nombre_cliente=reserva.nombre_cliente,
         nit_cliente=reserva.cedula_nit,
         tipo_documento=reserva.tipo_documento,
         metodo_pago='Efectivo',
@@ -432,12 +433,12 @@ def cobrar_reserva(reserva_id):
     correo_enviado = False
     msg_factura = ''
     
-    if factura_electronica and email_huesped:
+    if factura_electronica and email_cliente:
         try:
             from app.services.email_service import EmailService
             habitacion = Habitacion.query.get(reserva.habitacion_id)
             config = ConfigHotel.query.first()
-            print(f"[DEBUG] Email: {email_huesped}")
+            print(f"[DEBUG] Email: {email_cliente}")
             print(f"[DEBUG] Habitacion: {habitacion}")
             print(f"[DEBUG] Config: {config}")
             if habitacion and config:
@@ -506,7 +507,7 @@ def enviar_factura(factura_id):
     habitacion = db.session.get(Habitacion, reserva.habitacion_id) if reserva else None
     config = ConfigHotel.query.first()
     
-    if not reserva or not reserva.email_huesped:
+    if not reserva or not reserva.email_cliente:
         flash('La reserva no tiene email registrado', 'danger')
         return redirect(url_for('empleado.lista_facturas'))
     
@@ -514,7 +515,7 @@ def enviar_factura(factura_id):
         from app.services.email_service import EmailService
         resultado = EmailService.enviar_factura(factura, reserva, habitacion, config)
         if resultado:
-            flash(f'Factura reenviada a {reserva.email_huesped}', 'success')
+            flash(f'Factura reenviada a {reserva.email_cliente}', 'success')
         else:
             flash('No se pudo enviar el correo. Verifique la configuración SMTP.', 'danger')
     except Exception as e:

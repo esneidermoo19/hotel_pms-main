@@ -7,7 +7,7 @@
     <div class="pos-header">
         <div>
             <h1>Punto de Venta</h1>
-            <p>Gestiona consumos adicionales</p>
+            <p>Gestiona consumos adicionales para los huéspedes</p>
         </div>
     </div>
 
@@ -29,12 +29,12 @@
                 </div>
                 
                 <div class="habitacion-consumo">
-                    <span class="label">Gestión</span>
+                    <span class="label"><i class="fas fa-receipt" style="margin-right: 5px;"></i> Gestión</span>
                     <span class="value">Registro de Consumo</span>
                 </div>
                 
                 <a href="{{ url_for('pos.cargar_consumo', reserva_id=item.reserva_id) }}" class="btn-agregar">
-                    + Registrar Consumo
+                    <i class="fas fa-plus-circle" style="margin-right: 8px;"></i> Registrar Consumo
                 </a>
             </div>
             {% endfor %}
@@ -42,7 +42,9 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <div class="empty-icon">🛎️</div>
+        <div class="empty-icon">
+            <i class="fas fa-concierge-bell" style="opacity: 0.2; font-size: 64px;"></i>
+        </div>
         <h3>Sin ocupantes activos</h3>
         <p>No hay habitaciones ocupadas en este momento.</p>
     </div>
@@ -74,14 +76,14 @@
 .reserva-id { padding: 4px 10px; background: #F3F4F6; border-radius: 6px; font-size: 11px; font-weight: 600; color: var(--clr-text-light); }
 
 .habitacion-consumo { padding: 15px; background: #F0F9FF; border-radius: 10px; margin-bottom: 20px; }
-.habitacion-consumo .label { display: block; font-size: 10px; color: #0369A1; text-transform: uppercase; margin-bottom: 4px; }
+.habitacion-consumo .label { display: block; font-size: 10px; color: #0369A1; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; }
 .habitacion-consumo .value { font-size: 14px; font-weight: 600; color: #0369A1; }
 
-.btn-agregar { display: block; width: 100%; padding: 14px; background: var(--clr-accent); color: var(--clr-primary); text-align: center; border-radius: 10px; text-decoration: none; font-weight: 600; }
+.btn-agregar { display: block; width: 100%; padding: 14px; background: var(--clr-accent); color: var(--clr-primary); text-align: center; border-radius: 10px; text-decoration: none; font-weight: 600; display: flex; align-items: center; justify-content: center; }
 .btn-agregar:hover { background: #D97706; }
 
 .empty-state { padding: 80px; text-align: center; background: white; border-radius: 16px; border: 2px dashed #E5E7EB; }
-.empty-icon { font-size: 48px; opacity: 0.2; margin-bottom: 20px; }
+.empty-icon { margin-bottom: 20px; }
 .empty-state h3 { margin: 0 0 10px; color: var(--clr-ink); }
 .empty-state p { color: var(--clr-text-light); font-size: 14px; }
 </style>

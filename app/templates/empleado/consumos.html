@@ -18,7 +18,7 @@
         <div class="card" style="margin-bottom: 0; background: var(--bg); border: 1px dashed var(--border);">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                 <strong style="font-size: 18px;">Hab # {{ a.habitacion.numero }}</strong>
-                <span class="badge badge-warning">{{ a.reserva.nombre_huesped }}</span>
+                <span class="badge badge-warning">{{ a.reserva.nombre_cliente }}</span>
             </div>
             
             <form action="{{ url_for('empleado.agregar_consumo', reserva_id=a.reserva_id) }}" method="POST">

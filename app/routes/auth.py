@@ -4,16 +4,18 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User, Empleado, TurnoEmpleado
 from app import db
 from datetime import datetime, date
+from sqlalchemy import func
 
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
         
-        user = User.query.filter_by(username=username).first()
+        # Búsqueda insensible a mayúsculas/minúsculas
+        user = User.query.filter(func.lower(User.username) == func.lower(username)).first()
         
         if user and user.activo and user.check_password(password):
             login_user(user)

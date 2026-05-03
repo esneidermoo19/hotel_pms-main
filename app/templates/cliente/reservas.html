@@ -1,0 +1,234 @@
+{% extends "cliente/base_cliente.html" %}
+
+{% block title %}Mis Reservas - La Orquídea{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reservas-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding-bottom: 5rem;
+    }
+
+    .reserva-item {
+        background: var(--clr-surface);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--clr-border);
+        padding: 3rem;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 3rem;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .reserva-item:hover {
+        box-shadow: var(--shadow-elegant);
+        transform: translateX(10px);
+    }
+
+    .reserva-status {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 0.8rem 2rem;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-weight: 700;
+        background: var(--clr-sage);
+        color: white;
+    }
+
+    .reserva-status.cancelada { background: var(--clr-rose); }
+    .reserva-status.pendiente { background: var(--clr-taupe); }
+
+    .reserva-info {
+        flex: 1;
+    }
+
+    .reserva-code {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        color: #AAA;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .reserva-room {
+        font-family: var(--font-serif);
+        font-size: 2rem;
+        color: var(--clr-ink);
+        margin-bottom: 1.5rem;
+    }
+
+    .reserva-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .detail-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .detail-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #AAA;
+        font-weight: 600;
+    }
+
+    .detail-value {
+        font-size: 1rem;
+        color: var(--clr-ink);
+        font-weight: 500;
+    }
+
+    .reserva-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--clr-ink);
+    }
+
+    .btn-cancel-reserva {
+        display: inline-block;
+        padding: 1rem 2.5rem;
+        border: 1px solid var(--clr-rose);
+        color: var(--clr-rose);
+        text-decoration: none;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        font-weight: 700;
+        border-radius: var(--radius-sm);
+        transition: all 0.3s;
+    }
+
+    .btn-cancel-reserva:hover {
+        background: var(--clr-rose);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 8rem 2rem;
+        background: white;
+        border-radius: var(--radius-md);
+        border: 1px dashed var(--clr-border);
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 2rem;
+        display: block;
+        opacity: 0.3;
+    }
+
+    .btn-primary-action {
+        display: inline-block;
+        margin-top: 2rem;
+        background: var(--clr-ink);
+        color: white;
+        padding: 1.2rem 3rem;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-size: 0.8rem;
+        font-weight: 700;
+        border-radius: var(--radius-sm);
+        transition: all 0.3s;
+    }
+
+    .btn-primary-action:hover {
+        background: var(--clr-taupe);
+    }
+
+    @media (max-width: 768px) {
+        .reserva-item { 
+            flex-direction: column; 
+            padding: 2.5rem 1.5rem; 
+            gap: 1.5rem; 
+            border-radius: 12px;
+        }
+        .reserva-room { font-size: 1.6rem; margin-top: 1.5rem; }
+        .reserva-status { 
+            position: relative; 
+            display: inline-block; 
+            width: fit-content;
+            padding: 0.5rem 1.2rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .reserva-details {
+            grid-template-columns: 1fr;
+            gap: 1.2rem;
+        }
+        .btn-cancel-reserva {
+            display: block;
+            text-align: center;
+            width: 100%;
+            padding: 1.2rem;
+        }
+        .empty-state { padding: 4rem 1.5rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1 class="page-title">Mis Reservas</h1>
+    <p class="page-subtitle">Gestione sus estancias y detalles de reserva</p>
+</header>
+
+<div class="reservas-container">
+    {% if reservas %}
+        {% for reserva in reservas %}
+        <div class="reserva-item animated stagger-{{ loop.index % 4 }}">
+            <div class="reserva-status {{ reserva.estado.lower() }}">{{ reserva.estado|title }}</div>
+            
+            <div class="reserva-info">
+                <span class="reserva-code">Código: {{ reserva.codigo }}</span>
+                <h2 class="reserva-room">{{ reserva.habitacion.tipo }} <small style="font-size: 1rem; color: #888;">(N° {{ reserva.habitacion.numero }})</small></h2>
+                
+                <div class="reserva-details">
+                    <div class="detail-group">
+                        <span class="detail-label">Entrada</span>
+                        <span class="detail-value">{{ reserva.fecha_inicio.strftime('%d %b, %Y') }}</span>
+                    </div>
+                    <div class="detail-group">
+                        <span class="detail-label">Salida</span>
+                        <span class="detail-value">{{ reserva.fecha_fin.strftime('%d %b, %Y') }}</span>
+                    </div>
+                    <div class="detail-group">
+                        <span class="detail-label">Total Estancia</span>
+                        <span class="reserva-price">${{ (reserva.habitacion.precio_noche * (reserva.fecha_fin - reserva.fecha_inicio).days) }}</span>
+                    </div>
+                </div>
+
+                {% if reserva.estado.lower() != 'cancelada' %}
+                <a href="{{ url_for('cliente.cancelar', reserva_id=reserva.id) }}" 
+                   class="btn-cancel-reserva" 
+                   onclick="return confirm('¿Está seguro de que desea cancelar esta reserva?')">
+                    Cancelar Reserva
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <span class="empty-icon">📅</span>
+            <h3 class="info-title">No hay reservas activas</h3>
+            <p class="info-text">Actualmente no tiene ninguna estancia programada con nosotros.</p>
+            <a href="{{ url_for('cliente.home') }}" class="btn-primary-action">Explorar Habitaciones</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,458 @@
+{% extends "cliente/base_cliente.html" %}
+
+{% block title %}La Orquídea - Habitaciones Disponibles{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        margin-bottom: 5rem;
+        text-align: center;
+    }
+
+    .rooms-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+        gap: 3.5rem;
+        padding-bottom: 5rem;
+    }
+
+    .room-card {
+        background: var(--clr-surface);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        border: 1px solid var(--clr-border);
+        transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .room-card:hover {
+        transform: translateY(-12px);
+        box-shadow: var(--shadow-elegant);
+    }
+
+    .room-tier-badge {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 10;
+        background: var(--clr-taupe);
+        color: white;
+        padding: 0.5rem 1rem;
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        border-radius: 2px;
+        backdrop-filter: blur(10px);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .tier-suite { background: var(--clr-ink); color: #D4AF37; border: 1px solid #D4AF37; }
+
+    .room-media {
+        position: relative;
+        height: 320px;
+        overflow: hidden;
+    }
+
+    .room-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 1s ease;
+    }
+
+    .room-card:hover .room-media img {
+        transform: scale(1.08);
+    }
+
+    .room-price-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: var(--radius-sm);
+        font-weight: 700;
+        font-size: 0.95rem;
+        box-shadow: var(--shadow-soft);
+        color: var(--clr-ink);
+        letter-spacing: 0.05em;
+        z-index: 5;
+    }
+
+    .room-content {
+        padding: 3rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .room-type {
+        font-family: var(--font-serif);
+        font-size: 2.2rem;
+        margin-bottom: 0.8rem;
+        color: var(--clr-ink);
+        line-height: 1.2;
+    }
+
+    .room-description {
+        font-size: 0.95rem;
+        color: #666;
+        line-height: 1.7;
+        margin-bottom: 2rem;
+        font-weight: 300;
+    }
+
+    .room-amenities {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.2rem;
+        margin-bottom: 2.5rem;
+        padding: 1.5rem 0;
+        border-top: 1px solid #f0f0f0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .amenity-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.8rem;
+        color: #888;
+        font-weight: 500;
+    }
+
+    .amenity-icon {
+        opacity: 0.7;
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .exclusive-benefit {
+        color: var(--clr-taupe);
+        font-weight: 700;
+        border-bottom: 1px dashed var(--clr-taupe);
+    }
+
+    .room-specs {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2.5rem;
+        font-size: 0.85rem;
+        color: var(--clr-ink);
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    .room-spec-item {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .room-form {
+        margin-top: auto;
+        padding-top: 1rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+
+    .form-group label {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: #BBB;
+        font-weight: 800;
+    }
+
+    .form-input {
+        border: none;
+        border-bottom: 1px solid #EEE;
+        background: transparent;
+        padding: 1rem 0;
+        font-family: var(--font-ui);
+        font-size: 0.95rem;
+        transition: all 0.3s;
+        outline: none;
+        color: var(--clr-ink);
+    }
+
+    .form-input:focus {
+        border-bottom-color: var(--clr-taupe);
+    }
+
+    .btn-book {
+        width: 100%;
+        background: var(--clr-ink);
+        color: white;
+        border: none;
+        padding: 1.4rem;
+        border-radius: var(--radius-sm);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.25em;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.4s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .btn-book:hover {
+        background: var(--clr-taupe);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .personal-info-section {
+        background: #f9f9f9;
+        padding: 2.5rem;
+        border-radius: var(--radius-md);
+        margin: 3.5rem 0;
+        border: 1px solid var(--clr-border);
+    }
+
+    .personal-info-title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.35em;
+        color: var(--clr-ink);
+        font-weight: 800;
+        margin-bottom: 3.5rem;
+        display: block;
+        text-align: center;
+        position: relative;
+    }
+
+    .personal-info-title::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 1px;
+        background: var(--clr-taupe);
+    }
+
+    .loading-spinner {
+        display: none;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 992px) {
+        .rooms-grid { grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); }
+    }
+
+    @media (max-width: 768px) {
+        .page-header { margin-bottom: 3rem; }
+        .page-header h1 { font-size: 2.4rem; }
+        .rooms-grid { 
+            grid-template-columns: 1fr; 
+            gap: 2.5rem; 
+        }
+        .room-media { height: 280px; }
+        .room-content { padding: 2rem 1.5rem; }
+        .room-type { font-size: 1.8rem; }
+        .room-description { font-size: 0.9rem; }
+        .form-row { grid-template-columns: 1fr; gap: 1.5rem; }
+        .personal-info-section { padding: 1.5rem; }
+        .btn-book { padding: 1.2rem; font-size: 0.75rem; }
+    }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1 class="page-title">Habitaciones & Suites</h1>
+    <p class="page-subtitle">Experiencias de alojamiento diseñadas para el viajero contemporáneo</p>
+</header>
+
+<div class="rooms-grid">
+    {% for habitacion in habitaciones %}
+    <article class="room-card animated stagger-{{ loop.index % 4 }}">
+        {% if 'Suite' in habitacion.tipo %}
+        <div class="room-tier-badge tier-suite">Experiencia Élite</div>
+        {% elif 'Superior' in habitacion.tipo %}
+        <div class="room-tier-badge">Nivel Superior</div>
+        {% else %}
+        <div class="room-tier-badge" style="background: #eee; color: #888;">Colección Base</div>
+        {% endif %}
+
+        <div class="room-media">
+            {% if habitacion.imagen %}
+                <img src="{{ url_for('static', filename=habitacion.imagen) }}" alt="{{ habitacion.tipo }}">
+            {% else %}
+                <img src="{{ url_for('static', filename='img/room_placeholder.png') }}" alt="Habitación Boutique">
+            {% endif %}
+            <div class="room-price-badge">${{ "{:,.0f}".format(habitacion.precio_noche) }} COP / NOCHE</div>
+        </div>
+        
+        <div class="room-content">
+            <h2 class="room-type">{{ habitacion.tipo }}</h2>
+            
+            {% if habitacion.descripcion %}
+            <p class="room-description">{{ habitacion.descripcion }}</p>
+            {% endif %}
+            
+            <div class="room-amenities">
+                {% if 'Suite' in habitacion.tipo or 'Superior' in habitacion.tipo %}
+                <div class="amenity-item exclusive-benefit">
+                    <span class="amenity-icon"><i class="fas fa-wifi"></i></span> Wi-Fi 6G (Ultra)
+                </div>
+                {% else %}
+                <div class="amenity-item">
+                    <span class="amenity-icon"><i class="fas fa-wifi"></i></span> Wi-Fi 5G
+                </div>
+                {% endif %}
+                
+                <div class="amenity-item">
+                    <span class="amenity-icon"><i class="fas fa-snowflake"></i></span> A/C
+                </div>
+                <div class="amenity-item">
+                    <span class="amenity-icon"><i class="fas fa-tv"></i></span> Smart TV
+                </div>
+                
+                {% if habitacion.tiene_frigobar %}
+                <div class="amenity-item exclusive-benefit">
+                    <span class="amenity-icon"><i class="fas fa-wine-bottle"></i></span> Minibar Inc.
+                </div>
+                {% endif %}
+                
+                {% if habitacion.tiene_terraza %}
+                <div class="amenity-item exclusive-benefit">
+                    <span class="amenity-icon"><i class="fas fa-sun"></i></span> Terraza Privada
+                </div>
+                <div class="amenity-item exclusive-benefit">
+                    <span class="amenity-icon"><i class="fas fa-user-tie"></i></span> Concierge 24/7
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="room-specs">
+                <div class="room-spec-item">
+                    <span class="spec-icon"><i class="fas fa-bed"></i></span> {{ habitacion.cantidad_camas }} {{ habitacion.tipo_camas }}
+                </div>
+                <div class="room-spec-item">
+                    <span class="spec-icon"><i class="fas fa-user-friends"></i></span> Máx. {{ habitacion.capacidad_max }} Huéspedes
+                </div>
+            </div>
+            
+            <form method="POST" action="{{ url_for('cliente.habitaciones') }}" class="room-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="habitacion_id" value="{{ habitacion.id }}">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Llegada</label>
+                        <input type="date" name="fecha_inicio" required class="form-input fecha-inicio" onchange="updateMinFin(this)">
+                    </div>
+                    <div class="form-group">
+                        <label>Salida</label>
+                        <input type="date" name="fecha_fin" required class="form-input fecha-fin">
+                    </div>
+                </div>
+                
+                {% if not current_user.is_authenticated %}
+                <div class="personal-info-section">
+                    <span class="personal-info-title">Registro de Huésped</span>
+                    
+                    <div class="personal-info-grid">
+                        <div class="form-group">
+                            <label>Nombre Completo</label>
+                            <input type="text" name="nombre" placeholder="Nombre y Apellidos" required class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Correo de Confirmación</label>
+                            <input type="email" name="email" placeholder="usuario@ejemplo.com" required class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Teléfono Móvil</label>
+                            <input type="tel" name="telefono" placeholder="+57 300 000 0000" required class="form-input">
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <button type="submit" class="btn-book">
+                    <span class="loading-spinner"></span>
+                    <span class="btn-text">Reservar Estancia</span>
+                </button>
+            </form>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        const fechaInicioInputs = document.querySelectorAll('.fecha-inicio');
+        const fechaFinInputs = document.querySelectorAll('.fecha-fin');
+        
+        fechaInicioInputs.forEach(input => {
+            input.setAttribute('min', today);
+            input.value = today;
+        });
+        
+        fechaFinInputs.forEach(input => {
+            input.setAttribute('min', today);
+        });
+
+        document.querySelectorAll('.room-form').forEach(form => {
+            form.addEventListener('submit', function() {
+                const btn = this.querySelector('.btn-book');
+                const spinner = btn.querySelector('.loading-spinner');
+                const text = btn.querySelector('.btn-text');
+                
+                spinner.style.display = 'inline-block';
+                text.innerText = 'Procesando...';
+                btn.style.opacity = '0.7';
+                btn.style.pointerEvents = 'none';
+            });
+        });
+    });
+    
+    function updateMinFin(input) {
+        const form = input.closest('.room-form');
+        const fechaFin = form.querySelector('.fecha-fin');
+        if (input.value) {
+            fechaFin.setAttribute('min', input.value);
+            if (!fechaFin.value || fechaFin.value < input.value) {
+                fechaFin.value = input.value;
+            }
+        }
+    }
+</script>
+{% endblock %}

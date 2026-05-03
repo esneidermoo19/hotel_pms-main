@@ -61,7 +61,7 @@
         <div class="datos-grid">
             <div class="datos-box">
                 <h4>Datos del Cliente</h4>
-                <p><strong>Nombre:</strong> {{ reserva.nombre_huesped }}</p>
+                <p><strong>Nombre:</strong> {{ reserva.nombre_cliente }}</p>
                 <p><strong>Tipo Documento:</strong> 
                     {% if reserva.tipo_documento == 'cedula' %}Cédula
                     {% elif reserva.tipo_documento == 'nit' %}NIT
@@ -69,14 +69,14 @@
                     {% else %}Otro{% endif %}
                 </p>
                 <p><strong>No. Identificación:</strong> {{ reserva.cedula_nit }}</p>
-                <p><strong>Teléfono:</strong> {{ reserva.telefono_huesped }}</p>
+                <p><strong>Teléfono:</strong> {{ reserva.telefono_cliente }}</p>
             </div>
             <div class="datos-box">
                 <h4>Datos de la Reserva</h4>
                 <p><strong>Habitación:</strong> {{ habitacion.numero }} - {{ habitacion.tipo }}</p>
-                <p><strong>Fecha Ingreso:</strong> {{ reserva.fecha_ingreso.strftime('%Y-%m-%d') }}</p>
-                <p><strong>Fecha Salida:</strong> {{ reserva.fecha_salida.strftime('%Y-%m-%d') }}</p>
-                <p><strong>Noches:</strong> {{ ((reserva.fecha_salida - reserva.fecha_ingreso).days) }}</p>
+                <p><strong>Fecha Ingreso:</strong> {{ reserva.fecha_inicio.strftime('%Y-%m-%d') }}</p>
+                <p><strong>Fecha Salida:</strong> {{ reserva.fecha_fin.strftime('%Y-%m-%d') }}</p>
+                <p><strong>Noches:</strong> {{ ((reserva.fecha_fin - reserva.fecha_inicio).days) }}</p>
             </div>
         </div>
         
@@ -89,7 +89,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>Alojamiento ({{ ((reserva.fecha_salida - reserva.fecha_ingreso).days) }} noches) - Hab. {{ habitacion.numero }}</td>
+                    <td>Alojamiento ({{ ((reserva.fecha_fin - reserva.fecha_inicio).days) }} noches) - Hab. {{ habitacion.numero }}</td>
                     <td>${{ costo_noches|currency }} COP</td>
                 </tr>
                 {% for consumo in consumos %}

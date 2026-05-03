@@ -75,8 +75,8 @@
                 <div class="action-btn" style="border-color: var(--accent); background: var(--accent); color: var(--primary);">👤</div>
             </div>
             <div style="margin-bottom: 20px;">
-                <div style="font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.reserva.nombre_huesped }}</div>
-                <div style="font-size: 0.7rem; color: var(--text-dim);">Finaliza: {{ item.reserva.fecha_salida.strftime('%d %b') }}</div>
+                <div style="font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.reserva.nombre_cliente }}</div>
+                <div style="font-size: 0.7rem; color: var(--text-dim);">Finaliza: {{ item.reserva.fecha_fin.strftime('%d %b') }}</div>
             </div>
             
             <div style="margin-bottom: 12px;">
@@ -156,11 +156,11 @@
                 {% for item in pendientes + pagadas %}
                 <tr class="table-row">
                     <td style="padding: 24px 32px;">
-                        <div style="font-weight: 800; font-size: 0.95rem;">{{ item.reserva.nombre_huesped }}</div>
+                        <div style="font-weight: 800; font-size: 0.95rem;">{{ item.reserva.nombre_cliente }}</div>
                         <div style="font-size: 0.7rem; color: var(--text-dim);">ID: {{ item.reserva.cedula_nit }}</div>
                     </td>
                     <td style="font-weight: 700;">#{{ item.habitacion.numero }}</td>
-                    <td style="font-size: 0.85rem; color: var(--text-muted);">{{ item.reserva.fecha_ingreso.strftime('%d/%m') }} - {{ item.reserva.fecha_salida.strftime('%d/%m/%Y') }}</td>
+                    <td style="font-size: 0.85rem; color: var(--text-muted);">{{ item.reserva.fecha_inicio.strftime('%d/%m') }} - {{ item.reserva.fecha_fin.strftime('%d/%m/%Y') }}</td>
                     <td>
                         <div style="font-weight: 800; color: var(--accent); font-family: var(--font-sans);">$ {{ "{:,}".format(item.reserva.total_pago|int) }}</div>
                         <div style="font-size: 0.65rem; color: {% if item.reserva.pagado %}var(--success){% else %}var(--warning){% endif %}; font-weight: 700; text-transform: uppercase;">

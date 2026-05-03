@@ -19,7 +19,7 @@
             <select id="reservacion_id" name="reservacion_id" required>
                 <option value="">Seleccionar...</option>
                 {% for r in reservas_activas %}
-                <option value="{{ r.id }}">Hab. {{ r.habitacion.numero }} - {{ r.nombre_huesped }} (${{ r.total_pago|currency }})</option>
+                <option value="{{ r.id }}">Hab. {{ r.habitacion.numero }} - {{ r.nombre_cliente }} (${{ r.total_pago|currency }})</option>
                 {% endfor %}
             </select>
         </div>

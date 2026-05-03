@@ -40,12 +40,12 @@ class FacturacionService:
                 numero_factura=nuevo_numero,
                 subtotal=reserva.total_pago,
                 total=reserva.total_pago,
-                nombre_cliente=reserva.nombre_huesped,
+                nombre_cliente=reserva.nombre_cliente,
                 nit_cliente=reserva.cedula_nit,
                 tipo_documento=reserva.tipo_documento,
                 metodo_pago=metodo_pago,
                 estado='pagada',
-                email_cliente=reserva.email_huesped
+                email_cliente=reserva.email_cliente
             )
             db.session.add(nueva_factura)
             db.session.flush()
@@ -57,7 +57,7 @@ class FacturacionService:
             db.session.commit()
             
             # Enviar correo si tiene email
-            if reserva.email_huesped:
+            if reserva.email_cliente:
                 enviado = EmailService.enviar_factura(nueva_factura, reserva, habitacion, config)
                 if enviado:
                     nueva_factura.correo_enviado = True

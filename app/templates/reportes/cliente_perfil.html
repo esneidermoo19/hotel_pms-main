@@ -86,8 +86,8 @@
                     {% for r in reservas %}
                     <tr class="table-row">
                         <td style="padding: 20px 30px;">
-                            <div style="font-weight: 700;">{{ r.fecha_ingreso.strftime('%d %b, %Y') }}</div>
-                            <div style="font-size: 0.7rem; color: var(--text-dim);">Check-out: {{ r.fecha_salida.strftime('%d %b') }}</div>
+                            <div style="font-weight: 700;">{{ r.fecha_inicio.strftime('%d %b, %Y') }}</div>
+                            <div style="font-size: 0.7rem; color: var(--text-dim);">Check-out: {{ r.fecha_fin.strftime('%d %b') }}</div>
                         </td>
                         <td>
                             <span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.1);">#{{ r.habitacion.numero }}</span>

@@ -333,6 +333,7 @@
     margin-bottom: 18px;
     opacity: 0.2;
     display: block;
+    color: var(--clr-ink);
   }
 
   .empty-block h3 {
@@ -464,9 +465,9 @@
         <div class="rc-line-info">
           <div class="rc-line-name">
             <span class="rc-line-tag aloj">Aloj.</span>
-            {{ r.nombre_huesped }}
+            {{ r.nombre_cliente }}
           </div>
-          <div class="rc-line-detail">{{ r.fecha_ingreso.strftime('%d/%m') }} → {{ r.fecha_salida.strftime('%d/%m/%Y')
+          <div class="rc-line-detail">{{ r.fecha_inicio.strftime('%d/%m') }} → {{ r.fecha_fin.strftime('%d/%m/%Y')
             }}</div>
         </div>
         <span class="rc-line-amount">${{ r.total_pago|currency }}</span>
@@ -496,7 +497,9 @@
 
 {% else %}
 <div class="empty-block">
-  <span class="em-icon">📅</span>
+  <span class="em-icon">
+    <i class="fas fa-calendar-times"></i>
+  </span>
   <h3>Sin movimientos</h3>
   <p>No se registraron ingresos para esta fecha.</p>
 </div>

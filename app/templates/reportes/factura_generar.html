@@ -8,10 +8,10 @@
     <a href="{{ url_for('recep.dashboard') }}" class="btn-purple">← Volver a Recepción</a>
 </div>
 
-{% if reserva.email_huesped %}
+{% if reserva.email_cliente %}
 <div class="no-print elegant-card" style="max-width: 800px; margin: 20px auto; background: #e8f5e9; border: 2px solid var(--success-green);">
     <h3 style="margin: 0 0 15px 0;">📧 Enviar Factura Electrónica</h3>
-    <p style="margin: 0 0 15px 0;">El cliente <strong>{{ reserva.email_huesped }}</strong> tiene correo registrado.</p>
+    <p style="margin: 0 0 15px 0;">El cliente <strong>{{ reserva.email_cliente }}</strong> tiene correo registrado.</p>
     <form method="POST" action="{{ url_for('reportes.generar_factura') }}" style="display: inline;">
         <input type="hidden" name="reservacion_id" value="{{ reserva.id }}">
         <input type="hidden" name="enviar_email" value="si">
@@ -54,7 +54,7 @@
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
         <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
             <p style="margin: 5px 0; font-size: 12px; color: #666;">DATOS DEL CLIENTE</p>
-            <p style="margin: 5px 0;"><strong>Nombre:</strong> {{ reserva.nombre_huesped }}</p>
+            <p style="margin: 5px 0;"><strong>Nombre:</strong> {{ reserva.nombre_cliente }}</p>
             <p style="margin: 5px 0;"><strong>Tipo Documento:</strong> 
                 {% if reserva.tipo_documento == 'cedula' %}Cédula
                 {% elif reserva.tipo_documento == 'nit' %}NIT
@@ -62,14 +62,14 @@
                 {% else %}Otro{% endif %}
             </p>
             <p style="margin: 5px 0;"><strong>No. Identificación:</strong> {{ reserva.cedula_nit }}</p>
-            <p style="margin: 5px 0;"><strong>Teléfono:</strong> {{ reserva.telefono_huesped }}</p>
+            <p style="margin: 5px 0;"><strong>Teléfono:</strong> {{ reserva.telefono_cliente }}</p>
         </div>
         <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
             <p style="margin: 5px 0; font-size: 12px; color: #666;">DATOS DE LA RESERVA</p>
             <p style="margin: 5px 0;"><strong>Habitación:</strong> {{ habitacion.numero }} - {{ habitacion.tipo }}</p>
-            <p style="margin: 5px 0;"><strong>Fecha Ingreso:</strong> {{ reserva.fecha_ingreso.strftime('%Y-%m-%d') }}</p>
-            <p style="margin: 5px 0;"><strong>Fecha Salida:</strong> {{ reserva.fecha_salida.strftime('%Y-%m-%d') }}</p>
-            <p style="margin: 5px 0;"><strong>Noches:</strong> {{ ((reserva.fecha_salida - reserva.fecha_ingreso).days) }}</p>
+            <p style="margin: 5px 0;"><strong>Fecha Ingreso:</strong> {{ reserva.fecha_inicio.strftime('%Y-%m-%d') }}</p>
+            <p style="margin: 5px 0;"><strong>Fecha Salida:</strong> {{ reserva.fecha_fin.strftime('%Y-%m-%d') }}</p>
+            <p style="margin: 5px 0;"><strong>Noches:</strong> {{ ((reserva.fecha_fin - reserva.fecha_inicio).days) }}</p>
         </div>
     </div>
     
@@ -83,7 +83,7 @@
         <tbody>
             <tr style="border-bottom: 1px solid #ddd;">
                 <td style="padding: 12px;">
-                    Alojamiento ({{ ((reserva.fecha_salida - reserva.fecha_ingreso).days) }} noches) - Hab. {{ habitacion.numero }}
+                    Alojamiento ({{ ((reserva.fecha_fin - reserva.fecha_inicio).days) }} noches) - Hab. {{ habitacion.numero }}
                 </td>
                 <td style="text-align: right; padding: 12px;">${{ "%.0f"|format(costo_noches) }} COP</td>
             </tr>

@@ -9,11 +9,11 @@
 </div>
 
 <div class="animated stagger-1" style="display: flex; gap: 15px; margin-bottom: 40px;">
-    <a href="{{ url_for('admin.nuevo_empleado') }}" class="btn-primary" style="width: auto; padding: 14px 25px; display: flex; align-items: center; gap: 10px;">
-        <span style="font-size: 1.2rem;">+</span> Añadir Empleado
+    <a href="{{ url_for('admin.nuevo_empleado') }}" class="btn-primary" style="width: auto; padding: 14px 25px; display: flex; align-items: center; gap: 10px; text-decoration: none;">
+        <i class="fas fa-plus"></i> Añadir Empleado
     </a>
-    <a href="{{ url_for('admin.reportes_empleados') }}" class="btn-liberar" style="width: auto; padding: 14px 25px; display: flex; align-items: center; gap: 10px; border-color: var(--clr-taupe); color: var(--clr-taupe);">
-        <span style="font-size: 1rem;">📊</span> Ver Reportes
+    <a href="{{ url_for('admin.reportes_empleados') }}" class="btn-liberar" style="width: auto; padding: 14px 25px; display: flex; align-items: center; gap: 10px; border-color: var(--clr-taupe); color: var(--clr-taupe); text-decoration: none;">
+        <i class="fas fa-chart-bar"></i> Ver Reportes
     </a>
 </div>
 
@@ -63,13 +63,13 @@
                     </td>
                     <td style="padding: 25px 30px; text-align: right;">
                         <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                            <a href="{{ url_for('admin.editar_empleado', id=emp.id) }}" class="btn-liberar" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; border-color: #EEE;" title="Editar">
-                                <span style="font-size: 1rem;">✎</span>
+                            <a href="{{ url_for('admin.editar_empleado', id=emp.id) }}" class="btn-liberar" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; border-color: #EEE; color: var(--clr-ink); text-decoration: none;" title="Editar">
+                                <i class="fas fa-pen"></i>
                             </a>
                             <form action="{{ url_for('admin.eliminar_empleado', id=emp.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Está seguro de eliminar a {{ emp.nombre }}? Esta acción no se puede deshacer.')">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn-liberar" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; border-color: rgba(178, 142, 142, 0.2); color: var(--clr-rose);" title="Eliminar">
-                                    <span style="font-size: 1rem;">✕</span>
+                                <button type="submit" class="btn-liberar" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; border-color: rgba(178, 142, 142, 0.2); color: var(--clr-rose); cursor: pointer;" title="Eliminar">
+                                    <i class="fas fa-times"></i>
                                 </button>
                             </form>
                         </div>
@@ -82,10 +82,12 @@
 </div>
 {% else %}
 <div class="elegant-card animated stagger-2" style="text-align: center; padding: 80px 40px; border: 2px dashed var(--clr-border); background: transparent; box-shadow: none;">
-    <div style="font-size: 4rem; margin-bottom: 25px; opacity: 0.2;">𓁿</div>
+    <div style="font-size: 4rem; margin-bottom: 25px; opacity: 0.2;">
+        <i class="fas fa-user-friends"></i>
+    </div>
     <h3 style="font-family: var(--font-serif); font-size: 1.8rem; margin-bottom: 10px;">Nómina Vacía</h3>
     <p class="text-muted" style="max-width: 400px; margin: 0 auto 30px;">Comience registrando a su equipo de trabajo para gestionar sus accesos y reportes.</p>
-    <a href="{{ url_for('admin.nuevo_empleado') }}" class="btn-primary" style="width: auto; padding: 15px 40px;">Registrar Primer Empleado</a>
+    <a href="{{ url_for('admin.nuevo_empleado') }}" class="btn-primary" style="width: auto; padding: 15px 40px; text-decoration: none;">Registrar Primer Empleado</a>
 </div>
 {% endif %}
 {% endblock %}

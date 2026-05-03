@@ -62,12 +62,12 @@
                 
                 <div class="reserva-huesped">
                     <span class="label">Huésped</span>
-                    <span class="value">{{ r.nombre_huesped }}</span>
+                    <span class="value">{{ r.nombre_cliente }}</span>
                 </div>
                 
                 <div class="reserva-fechas">
                     <span class="label">Fechas</span>
-                    <span class="value">{{ r.fecha_ingreso.strftime('%d %b') }} - {{ r.fecha_salida.strftime('%d %b') }}</span>
+                    <span class="value">{{ r.fecha_inicio.strftime('%d %b') }} - {{ r.fecha_fin.strftime('%d %b') }}</span>
                 </div>
                 
                 <div class="reserva-total">
@@ -77,10 +77,10 @@
                 
                 <div class="reserva-email">
                     <span class="label">Email registrado</span>
-                    <span class="value">{{ r.email_huesped or 'No registrado' }}</span>
+                    <span class="value">{{ r.email_cliente or 'No registrado' }}</span>
                 </div>
                 
-                <button type="button" class="btn-cobrar" onclick="abrirModalPago({{ r.id }}, {{ r.total_pago }}, '{{ r.nombre_huesped|e }}', '{{ r.email_huesped|e }}')">
+                <button type="button" class="btn-cobrar" onclick="abrirModalPago({{ r.id }}, {{ r.total_pago }}, '{{ r.nombre_cliente|e }}', '{{ r.email_cliente|e }}')">
                     <span>$</span> Cobrar ${{ "{:,}".format(r.total_pago) }}
                 </button>
             </div>

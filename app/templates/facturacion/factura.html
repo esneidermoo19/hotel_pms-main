@@ -98,11 +98,11 @@
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 50px;">
         <div style="background: rgba(15, 5, 29, 0.02); padding: 25px; border-radius: 16px; border-left: 5px solid var(--primary-dark);">
             <h4 style="margin: 0 0 15px 0; text-transform: uppercase; font-size: 11px; color: var(--text-muted); letter-spacing: 1px; font-weight: 700;">Huésped Titular</h4>
-            <p style="margin: 5px 0; font-weight: 700; font-size: 18px; color: var(--primary-dark);">{{ reserva.nombre_huesped }}</p>
+            <p style="margin: 5px 0; font-weight: 700; font-size: 18px; color: var(--primary-dark);">{{ reserva.nombre_cliente }}</p>
             <p style="margin: 2px 0; color: var(--text-light); font-size: 14px;">{{ reserva.tipo_documento|capitalize }}: {{ reserva.cedula_nit }}</p>
-            <p style="margin: 2px 0; color: var(--text-light); font-size: 14px;">Contacto: {{ reserva.telefono_huesped }}</p>
-            {% if reserva.email_huesped %}
-            <p style="margin: 2px 0; color: var(--text-light); font-size: 14px;">Email: {{ reserva.email_huesped }}</p>
+            <p style="margin: 2px 0; color: var(--text-light); font-size: 14px;">Contacto: {{ reserva.telefono_cliente }}</p>
+            {% if reserva.email_cliente %}
+            <p style="margin: 2px 0; color: var(--text-light); font-size: 14px;">Email: {{ reserva.email_cliente }}</p>
             {% endif %}
         </div>
         
@@ -112,10 +112,10 @@
                 <span>Habitación:</span> <strong style="color: var(--primary-dark);">{{ habitacion.numero }} ({{ habitacion.tipo }})</strong>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
-                <span>Check-in:</span> <strong style="color: var(--primary-dark);">{{ reserva.fecha_ingreso.strftime('%d/%m/%Y') }}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 14px;">
-                <span>Check-out:</span> <strong style="color: var(--primary-dark);">{{ reserva.fecha_salida.strftime('%d/%m/%Y') }}</strong>
+                <span>Check-in:</span> <strong style="color: var(--primary-dark);">{{ reserva.fecha_inicio.strftime('%d/%m/%Y') }}</strong>
+                </div>
+                <div class="detail-item" style="flex: 1;">
+                    <span>Check-out:</span> <strong style="color: var(--primary-dark);">{{ reserva.fecha_fin.strftime('%d/%m/%Y') }}</strong>
             </div>
         </div>
     </div>
@@ -132,7 +132,7 @@
         <tbody>
             <tr class="animated stagger-4">
                 <td style="padding: 20px 15px; border-bottom: 1px solid rgba(0,0,0,0.05);">
-                    <div style="font-weight: 700; color: var(--primary-mid);">Alojamiento en Suite - {{ ((reserva.fecha_salida - reserva.fecha_ingreso).days) }} Noches</div>
+                    <div style="font-weight: 700; color: var(--primary-mid);">Alojamiento en Suite - {{ ((reserva.fecha_fin - reserva.fecha_inicio).days) }} Noches</div>
                     <small style="color: var(--text-muted);">Tarifa base: ${{ habitacion.precio_noche|currency }} / noche</small>
                 </td>
                 <td style="text-align: right; padding: 20px 15px; border-bottom: 1px solid rgba(0,0,0,0.05); font-weight: 700; font-size: 16px; color: var(--primary-dark);">${{ costo_noches|currency }}</td>

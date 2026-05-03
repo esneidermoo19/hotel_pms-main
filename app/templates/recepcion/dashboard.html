@@ -6,15 +6,15 @@
 <div class="dashboard-container">
     <div class="dashboard-header">
         <div>
-            <h1>Panel de Recepcion</h1>
+            <h1>Panel de Recepción</h1>
             <p>Bienvenido, {{ current_user.nombre }}</p>
         </div>
         <div class="header-actions">
             <a href="{{ url_for('empleado.nuevo_cliente') }}" class="btn btn-primary">
-                <span>+</span> Nuevo Cliente
+                <i class="fas fa-user-plus"></i> Nuevo Cliente
             </a>
             <a href="{{ url_for('empleado.facturacion') }}" class="btn btn-success">
-                <span>$</span> Caja
+                <i class="fas fa-cash-register"></i> Caja
             </a>
         </div>
     </div>
@@ -22,7 +22,7 @@
     <!-- Stats Cards -->
     <div class="stats-row">
         <div class="stat-card stat-libre">
-            <div class="stat-icon">L</div>
+            <div class="stat-icon"><i class="fas fa-key"></i></div>
             <div class="stat-content">
                 <span class="stat-value">{{ libres|length }}</span>
                 <span class="stat-label">Habitaciones Libres</span>
@@ -30,7 +30,7 @@
         </div>
         
         <div class="stat-card stat-ocupada">
-            <div class="stat-icon">O</div>
+            <div class="stat-icon"><i class="fas fa-door-closed"></i></div>
             <div class="stat-content">
                 <span class="stat-value">{{ (occupations_no_pagadas|length) + (occupations_pagadas|length) }}</span>
                 <span class="stat-label">Ocupadas</span>
@@ -38,7 +38,7 @@
         </div>
         
         <div class="stat-card stat-pendiente">
-            <div class="stat-icon">P</div>
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
             <div class="stat-content">
                 <span class="stat-value">{{ occupations_no_pagadas|length }}</span>
                 <span class="stat-label">Por Cobrar</span>
@@ -46,7 +46,7 @@
         </div>
         
         <div class="stat-card stat-mantenimiento">
-            <div class="stat-icon">M</div>
+            <div class="stat-icon"><i class="fas fa-tools"></i></div>
             <div class="stat-content">
                 <span class="stat-value">{{ mantenimiento|length }}</span>
                 <span class="stat-label">Mantenimiento</span>
@@ -72,7 +72,9 @@
                     <form method="POST" action="{{ url_for('recep.cambiar_estado_habitacion', habitacion_id=hab.id) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="estado" value="Mantenimiento">
-                        <button type="submit" class="btn-mant" title="Poner en Mantenimiento">🔧 Mantenimiento</button>
+                        <button type="submit" class="btn-mant" title="Poner en Mantenimiento">
+                            <i class="fas fa-wrench" style="margin-right: 5px;"></i> Mantenimiento
+                        </button>
                     </form>
                 </div>
             </div>
@@ -94,7 +96,7 @@
             {% for item in occupations_no_pagadas %}
             <div class="habitacion-card pendiente">
                 <div class="habitacion-numero">{{ item.habitacion.numero }}</div>
-                <div class="habitacion-huesped">{{ item.reserva.nombre_huesped }}</div>
+                <div class="habitacion-huesped">{{ item.reserva.nombre_cliente }}</div>
                 <div class="habitacion-precio">${{ "{:,}".format(item.reserva.total_pago) }}</div>
                 <form method="POST" action="{{ url_for('recep.actualizar_pago', reservacion_id=item.reserva.id) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -121,7 +123,7 @@
             {% for item in occupations_pagadas %}
             <div class="habitacion-card pagada">
                 <div class="habitacion-numero">{{ item.habitacion.numero }}</div>
-                <div class="habitacion-huesped">{{ item.reserva.nombre_huesped }}</div>
+                <div class="habitacion-huesped">{{ item.reserva.nombre_cliente }}</div>
                 <div class="habitacion-precio">${{ "{:,}".format(item.reserva.total_pago) }}</div>
                 <form method="POST" action="{{ url_for('recep.cambiar_estado_habitacion', habitacion_id=item.habitacion.id) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -207,7 +209,7 @@
 
 .btn-reservar { display: block; width: 100%; padding: 12px; background: var(--clr-accent); color: var(--clr-primary); text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
 .habitacion-acciones { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-.btn-mant { width: 100%; padding: 10px; background: #6366F1; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 12px; }
+.btn-mant { width: 100%; padding: 10px; background: #6366F1; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
 .btn-cobrar { width: 100%; padding: 10px; background: #10B981; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
 .btn-liberar { width: 100%; padding: 10px; background: #3B82F6; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .btn-actualizar { width: 100%; padding: 10px; background: #6366F1; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }

@@ -1,0 +1,164 @@
+{% extends "cliente/base_cliente.html" %}
+
+{% block title %}Cancelar Reserva - La Orquídea{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cancel-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding-bottom: 8rem;
+    }
+
+    .elegant-form-card {
+        background: var(--clr-surface);
+        padding: 4rem;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-elegant);
+        border: 1px solid var(--clr-border);
+        text-align: center;
+    }
+
+    .form-icon {
+        font-size: 3rem;
+        margin-bottom: 2rem;
+        display: block;
+        color: var(--clr-rose);
+    }
+
+    .cancel-input {
+        width: 100%;
+        padding: 1.5rem;
+        font-size: 2rem;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.4em;
+        border: none;
+        border-bottom: 2px solid var(--clr-border);
+        background: transparent;
+        font-family: var(--font-heading);
+        font-weight: 700;
+        margin-bottom: 3rem;
+        outline: none;
+        transition: border-color 0.4s;
+        color: var(--clr-ink);
+    }
+
+    .cancel-input:focus {
+        border-bottom-color: var(--clr-rose);
+    }
+
+    .btn-cancel-submit {
+        width: 100%;
+        background: var(--clr-ink);
+        color: white;
+        border: none;
+        padding: 1.5rem;
+        border-radius: var(--radius-sm);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.4s;
+    }
+
+    .btn-cancel-submit:hover {
+        background: var(--clr-rose);
+        transform: translateY(-2px);
+    }
+
+    .help-section {
+        margin-top: 4rem;
+        text-align: center;
+    }
+
+    .help-card {
+        background: white;
+        padding: 2rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--clr-border);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        text-align: left;
+    }
+
+    .help-info {
+        flex: 1;
+    }
+
+    .help-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.3rem;
+        display: block;
+    }
+
+    .help-text {
+        font-size: 0.9rem;
+        color: #888;
+    }
+
+    .help-link {
+        color: var(--clr-ink);
+        font-weight: 700;
+        text-decoration: none;
+        border-bottom: 1px solid var(--clr-taupe);
+    }
+
+    @media (max-width: 768px) {
+        .elegant-form-card { padding: 3rem 1.5rem; }
+        .cancel-input { font-size: 1.5rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <h1 class="page-title">Cancelar Reserva</h1>
+    <p class="page-subtitle">Ingrese su código único para gestionar su cancelación</p>
+</header>
+
+<div class="cancel-container animated">
+    <div class="elegant-form-card">
+        <span class="form-icon">🎫</span>
+        
+        <form method="POST" action="{{ url_for('cliente.cancelar_codigo') }}">
+            <input type="text" 
+                   name="codigo" 
+                   placeholder="CÓDIGO" 
+                   required 
+                   class="cancel-input"
+                   maxlength="6" 
+                   autocomplete="off"
+                   oninput="this.value = this.value.toUpperCase()">
+            
+            <button type="submit" class="btn-cancel-submit">Validar y Cancelar</button>
+        </form>
+    </div>
+
+    <div class="help-section">
+        <div class="help-card">
+            <span style="font-size: 1.5rem;">📧</span>
+            <div class="help-info">
+                <span class="help-title">¿Olvidó su código?</span>
+                <p class="help-text">El código de 6 caracteres fue enviado a su correo electrónico al confirmar la reserva.</p>
+            </div>
+        </div>
+
+        {% if current_user.is_authenticated %}
+        <div class="help-card">
+            <span style="font-size: 1.5rem;">👤</span>
+            <div class="help-info">
+                <span class="help-title">Acceso Directo</span>
+                <p class="help-text">Como usuario registrado, puede gestionar todas sus estancias desde <a href="{{ url_for('cliente.mis_reservas') }}" class="help-link">Mis Reservas</a>.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -38,19 +38,21 @@
         .login-hero {
             flex: 1.2;
             position: relative;
-            background-image: url("{{ url_for('static', filename='img/login_bg.png') }}");
-            background-size: cover;
-            background-position: center;
+            background-color: #1a1a1a;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
-        .login-hero::after {
-            content: '';
+        .login-hero-bg {
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+            background-image: url("{{ url_for('static', filename='img/hero_lobby.png') }}");
+            background-size: cover;
+            background-position: center;
+            filter: blur(15px) brightness(0.4); /* Stronger blur and darker to hide original text */
+            transform: scale(1.1);
         }
 
         .hero-overlay {
@@ -59,32 +61,32 @@
             color: white;
             text-align: center;
             padding: 40px;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
 
         .hero-title {
             font-family: 'Playfair Display', serif;
-            font-size: 5rem;
+            font-size: 8rem;
             margin: 0;
-            line-height: 1;
-            letter-spacing: -0.02em;
+            line-height: 0.75;
+            letter-spacing: -0.05em;
             color: #FFFFFF;
-            animation: fadeInHero 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            text-shadow: 0 30px 60px rgba(0,0,0,0.9);
+            animation: fadeInHero 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
         .hero-subtitle {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.6em;
-            margin-top: 25px;
+            letter-spacing: 0.8em;
+            margin-top: 50px;
             color: var(--login-accent);
-            font-weight: 600;
+            font-weight: 700;
             opacity: 0.9;
-            animation: fadeInHero 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s backwards;
+            animation: fadeInHero 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.8s backwards;
         }
 
         @keyframes fadeInHero {
-            from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
+            from { opacity: 0; transform: translateY(60px); filter: blur(30px); }
             to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
 
@@ -101,32 +103,28 @@
         }
 
         .login-header {
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
 
         .role-selector {
             display: flex;
-            gap: 20px;
-            margin-bottom: 40px;
+            gap: 25px;
+            margin-bottom: 45px;
             border-bottom: 1px solid #EEE;
-            padding-bottom: 15px;
+            padding-bottom: 20px;
         }
 
         .role-tab {
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.2em;
             color: #AAA;
             cursor: pointer;
-            font-weight: 700;
-            transition: all 0.3s;
+            font-weight: 800;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
             position: relative;
-            padding-bottom: 15px;
-            margin-bottom: -16px;
-        }
-
-        .role-tab:hover {
-            color: var(--login-primary);
+            padding-bottom: 20px;
+            margin-bottom: -21px;
         }
 
         .role-tab.active {
@@ -139,23 +137,25 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 2px;
+            height: 3px;
             background: var(--login-primary);
         }
 
         .orchid-mini-logo {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 30px;
-            opacity: 0.8;
+            width: 50px;
+            height: 50px;
+            margin-bottom: 35px;
+            object-fit: contain;
+            border-radius: 50%;
+            border: 1px solid var(--clr-border);
         }
 
         .login-brand {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.01em;
+            font-size: 28px;
+            font-weight: 800;
             color: var(--login-primary);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            font-family: var(--font-heading);
         }
 
         .login-tagline {
@@ -165,22 +165,22 @@
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .form-group label {
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-weight: 700;
+            letter-spacing: 0.15em;
+            font-weight: 800;
             color: #AAA;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             display: block;
         }
 
         .form-group input {
             width: 100%;
-            padding: 15px 0;
+            padding: 18px 0;
             background: transparent;
             border: none;
             border-bottom: 1px solid #EEE;
@@ -197,41 +197,44 @@
 
         .btn-login {
             width: 100%;
-            padding: 20px;
+            padding: 22px;
             background: var(--login-primary);
             color: white;
             border: none;
-            border-radius: 4px;
-            font-size: 13px;
-            font-weight: 700;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.25em;
             cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s;
+            margin-top: 25px;
+            transition: all 0.4s;
         }
 
         .btn-login:hover {
-            letter-spacing: 0.25em;
-            background: #333;
+            letter-spacing: 0.3em;
+            background: #000;
+            transform: translateY(-2px);
         }
 
         .flash-message {
-            padding: 15px;
-            margin-bottom: 30px;
-            border-radius: 4px;
+            padding: 18px;
+            margin-bottom: 35px;
+            border-radius: var(--radius-sm);
             font-size: 13px;
             text-align: left;
         }
 
-        .danger { background: #FFF5F5; color: #C53030; border-left: 3px solid #FC8181; }
+        .danger { background: #FFF5F5; color: #C53030; border-left: 4px solid #FC8181; }
         .success { background: #F0FFF4; color: #2F855A; border-left: 3px solid #68D391; }
 
         .login-footer {
-            margin-top: 60px;
-            font-size: 11px;
-            color: #CCC;
-            letter-spacing: 0.05em;
+            margin-top: auto;
+            padding-top: 60px;
+            font-size: 10px;
+            color: #BBB;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
         }
 
         @media (max-width: 1024px) {
@@ -243,8 +246,9 @@
 <body>
     <div class="login-wrapper">
         <div class="login-hero">
+            <div class="login-hero-bg"></div>
             <div class="hero-overlay">
-                <h1 class="hero-title">La Orquídea</h1>
+                <h1 class="hero-title">Orquídea</h1>
                 <p class="hero-subtitle">Boutique & Luxury Experience</p>
             </div>
         </div>
@@ -294,14 +298,9 @@
 
     <script>
         function selectRole(role, element) {
-            // Update UI
             document.querySelectorAll('.role-tab').forEach(tab => tab.classList.remove('active'));
             element.classList.add('active');
-            
-            // Update Hidden Input (for potential backend use)
             document.getElementById('login-context').value = role;
-            
-            // Subtle UI feedback
             const btn = document.getElementById('login-button');
             if(role === 'admin') {
                 btn.innerText = 'Ingresar al Recinto';

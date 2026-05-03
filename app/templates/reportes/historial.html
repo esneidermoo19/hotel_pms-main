@@ -328,6 +328,7 @@
     margin-bottom: 18px;
     opacity: 0.2;
     display: block;
+    color: var(--clr-ink);
   }
 
   .empty-block h3 {
@@ -489,14 +490,14 @@
         </td>
         <td>
           <div class="cell-stack">
-            <span class="cell-main">{{ r.nombre_huesped }}</span>
+            <span class="cell-main">{{ r.nombre_cliente }}</span>
             <span class="cell-sub">{{ r.cedula_nit }}</span>
           </div>
         </td>
         <td class="cell-stay">
-          {{ r.fecha_ingreso.strftime('%d/%m') }}
+          {{ r.fecha_inicio.strftime('%d/%m') }}
           <span class="arr">→</span>
-          {{ r.fecha_salida.strftime('%d/%m/%Y') }}
+          {{ r.fecha_fin.strftime('%d/%m/%Y') }}
         </td>
         <td class="cell-money">${{ r.total_pago|currency }}</td>
         <td style="text-align:center">
@@ -510,7 +511,9 @@
 
 {% else %}
 <div class="empty-block">
-  <span class="em-icon">📋</span>
+  <span class="em-icon">
+    <i class="fas fa-history"></i>
+  </span>
   <h3>Sin resultados</h3>
   <p>Ajuste los filtros o consulte todo el historial.</p>
   <a href="{{ url_for('reportes.historial') }}" class="btn-back-all" id="btn-ver-todas">Ver todo</a>
