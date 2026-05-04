@@ -5,3 +5,4 @@ Flask-Mail==0.9.1
 python-dotenv
 Flask-Migrate
 Flask-WTF
+psycopg2-binary
