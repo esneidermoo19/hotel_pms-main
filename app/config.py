@@ -1,6 +1,12 @@
 import os
 from dotenv import load_dotenv
+import os
 
+uri = os.getenv("DATABASE_URL")  # O el nombre que uses en Coolify
+if uri and uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = uri
 load_dotenv()
 
 class Config:
@@ -15,3 +21,4 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'Hotel Boutique La Orquidea <laorquideahotel45@gmail.com>')
+    
