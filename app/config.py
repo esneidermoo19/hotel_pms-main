@@ -8,7 +8,7 @@ if uri and uri.startswith("postgres://"):
 
 app.config["SQLALCHEMY_DATABASE_URI"] = uri
 load_dotenv()
-
+print(f"DEBUG: La URL de la base de datos es: {os.getenv('DATABASE_URL')}")
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-key-2024-change-in-production')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///hotel.db')
