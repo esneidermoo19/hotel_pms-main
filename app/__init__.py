@@ -6,7 +6,31 @@ from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 import os
+import os
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy()
+
+def create_app():
+    app = Flask(__name__)
+
+    # 1. Obtener la URL con un valor por defecto (ej. un sqlite local) para que no falle el parseo
+    # si la variable de entorno de Coolify tarda un segundo en cargar.
+    database_url = os.getenv('DATABASE_URL', 'sqlite:///fallback.db')
+
+    # 2. Corregir el protocolo para SQLAlchemy 1.4+
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    db.init_app(app)
+
+    # ... resto de tus registros de blueprints (auth, admin, cliente, etc.)[cite: 1]
+    
+    return app
 load_dotenv()
 
 db = SQLAlchemy()
