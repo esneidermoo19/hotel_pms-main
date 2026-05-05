@@ -5,10 +5,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    # 1. Obtener la URI y aplicar el parche de compatibilidad para PostgreSQL
+    # 1. Obtener la URI y aplicar parches de compatibilidad
     _uri = os.getenv("DATABASE_URL")
-    if _uri and _uri.startswith("postgres://"):
-        _uri = _uri.replace("postgres://", "postgresql://", 1)
+    
+    if _uri:
+        # Parche para Heroku/Coolify (cambiar postgres:// por postgresql://)
+        if _uri.startswith("postgres://"):
+            _uri = _uri.replace("postgres://", "postgresql://", 1)
+        
+        # Parche de seguridad: asegurar que existan las barras // después del esquema
+        # Si la URI tiene ':' pero no '://', se las agregamos
+        if "postgresql" in _uri and "://" not in _uri:
+            _uri = _uri.replace("postgresql:", "postgresql://", 1)
+        elif "postgres" in _uri and "://" not in _uri:
+            _uri = _uri.replace("postgres:", "postgresql://", 1)
 
     # 2. Configuración de Base de Datos
     SQLALCHEMY_DATABASE_URI = _uri or 'sqlite:///hotel.db'
@@ -27,4 +37,6 @@ class Config:
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'Hotel Boutique La Orquidea <laorquideahotel45@gmail.com>')
 
 # Print de depuración (esto saldrá en los logs de Coolify)
-print(f"DEBUG: SQLALCHEMY_DATABASE_URI cargada: {Config.SQLALCHEMY_DATABASE_URI}")
+# Ocultamos la contraseña por seguridad en el log real si fuera necesario, 
+# pero aquí lo dejamos para verificar el formato.
+print(f"DEBUG: SQLALCHEMY_DATABASE_URI procesada")
