@@ -16,11 +16,23 @@ import os
 
 from app import create_app, db
 from app.models import User, Habitacion, ConfigHotel
+from app.config import Config
 
 app = create_app()
 
 with app.app_context():
     db.create_all()
+    
+    # Parche para PostgreSQL: Asegurar que la columna password tenga el tamaño correcto
+    if Config.SQLALCHEMY_DATABASE_URI.startswith('postgresql'):
+        try:
+            db.session.execute(db.text('ALTER TABLE "user" ALTER COLUMN password TYPE VARCHAR(256)'))
+            db.session.commit()
+            print("Columna password actualizada a 256 caracteres en PostgreSQL")
+        except Exception as e:
+            db.session.rollback()
+            print(f"Nota: No se pudo alterar la tabla (probablemente ya está actualizada): {e}")
+
     print("Base de datos verificada: hotel.db")
     
     hotel_config = ConfigHotel.query.first()
