@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Facturación Electrónica - La Orquídea{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🧾 Facturación Electrónica</h1>
+    <p>Genere facturas oficiales para las reservaciones activas.</p>
+</div>
+
+<div class="elegant-card animated stagger-3" style="max-width: 600px; margin: 0 auto 30px;">
+    <h3 style="margin-bottom: 25px; display: flex; align-items: center; gap: 12px;">
+        <span style="background: rgba(197, 160, 89, 0.1); padding: 8px; border-radius: 12px;">📑</span>
+        Seleccionar Reservación
+    </h3>
+    <form method="GET">
+        <div class="form-group">
+            <label for="reservacion_id">Reservación activa pendiente</label>
+            <select id="reservacion_id" name="reservacion_id" required>
+                <option value="">Seleccionar...</option>
+                {% for r in reservas_activas %}
+                <option value="{{ r.id }}">Hab. {{ r.habitacion.numero }} - {{ r.nombre_cliente }} (${{ r.total_pago|currency }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn-gold" style="width: 100%; justify-content: center; margin-top: 10px;">
+            Siguiente Paso →
+        </button>
+    </form>
+</div>
+
+{% if reservas_activas %}
+<div class="animated stagger-4" style="text-align: center; color: var(--text-muted); font-size: 13px;">
+    <p>Hay <strong>{{ reservas_activas|length }}</strong> reservación(es) lista(s) para ser facturada(s).</p>
+</div>
+{% else %}
+<div class="elegant-card animated stagger-4" style="text-align: center; padding: 40px; border-style: dashed; opacity: 0.7;">
+    <p>No hay reservaciones activas pendientes de facturar en este momento.</p>
+</div>
+{% endif %}
+
+{% endblock %}

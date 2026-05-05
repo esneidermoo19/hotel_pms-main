@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Empleados - Hotel La Orquídea{% endblock %}
+
+{% block content %}
+<div class="page-header animated">
+    <h1 style="font-family: var(--font-serif); font-size: 3rem; margin-bottom: 10px;">Gestión de Personal</h1>
+    <p class="text-muted" style="letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.8rem;">Administración y Control de Colaboradores</p>
+</div>
+
+<div class="animated stagger-1" style="display: flex; gap: 15px; margin-bottom: 40px;">
+    <a href="{{ url_for('admin.nuevo_empleado') }}" class="btn-primary" style="width: auto; padding: 14px 25px; display: flex; align-items: center; gap: 10px; text-decoration: none;">
+        <i class="fas fa-plus"></i> Añadir Empleado
+    </a>
+    <a href="{{ url_for('admin.reportes_empleados') }}" class="btn-liberar" style="width: auto; padding: 14px 25px; display: flex; align-items: center; gap: 10px; border-color: var(--clr-taupe); color: var(--clr-taupe); text-decoration: none;">
+        <i class="fas fa-chart-bar"></i> Ver Reportes
+    </a>
+</div>
+
+{% if empleados %}
+<div class="elegant-card animated stagger-2" style="padding: 0; overflow: hidden; border: none; box-shadow: var(--shadow-elegant);">
+    <div class="table-wrapper" style="margin-top: 0; border: none; padding: 0;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: var(--clr-ink); color: white;">
+                    <th style="padding: 25px 30px; font-weight: 700; color: rgba(255,255,255,0.6);">Colaborador</th>
+                    <th style="padding: 25px 30px; font-weight: 700; color: rgba(255,255,255,0.6);">Acceso / Cargo</th>
+                    <th style="padding: 25px 30px; font-weight: 700; color: rgba(255,255,255,0.6);">Contacto</th>
+                    <th style="padding: 25px 30px; text-align: center; font-weight: 700; color: rgba(255,255,255,0.6);">Estado</th>
+                    <th style="padding: 25px 30px; text-align: right; font-weight: 700; color: rgba(255,255,255,0.6);">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in empleados %}
+                <tr style="transition: all 0.3s ease;">
+                    <td style="padding: 25px 30px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 45px; height: 45px; background: var(--clr-bone); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 1.2rem; color: var(--clr-taupe); border: 1px solid var(--clr-border);">
+                                {{ emp.nombre[0] | upper }}
+                            </div>
+                            <div>
+                                <strong style="display: block; font-size: 16px; color: var(--clr-ink);">{{ emp.nombre }}</strong>
+                                <span style="font-size: 12px; color: var(--clr-taupe); text-transform: uppercase; letter-spacing: 0.05em;">ID: #{{ emp.id }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding: 25px 30px;">
+                        <div style="margin-bottom: 5px;">
+                            <span class="badge" style="background: rgba(197, 180, 165, 0.1); color: var(--clr-taupe); border: 1px solid rgba(197, 180, 165, 0.2);">
+                                @{{ usuarios[emp.user_id] if emp.user_id else 'sin_usuario' }}
+                            </span>
+                        </div>
+                        <div style="font-size: 13px; color: #777;">{{ emp.cargo }}</div>
+                    </td>
+                    <td style="padding: 25px 30px;">
+                        <div style="font-size: 14px; color: var(--clr-ink);">{{ emp.telefono or '—' }}</div>
+                        <div style="font-size: 12px; color: #999;">{{ emp.email or '—' }}</div>
+                    </td>
+                    <td style="padding: 25px 30px; text-align: center;">
+                        <span class="badge {{ 'badge-success' if emp.activo else 'badge-danger' }}" style="padding: 8px 15px; border-radius: 20px;">
+                            {{ 'Activo' if emp.activo else 'Inactivo' }}
+                        </span>
+                    </td>
+                    <td style="padding: 25px 30px; text-align: right;">
+                        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <a href="{{ url_for('admin.editar_empleado', id=emp.id) }}" class="btn-liberar" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; border-color: #EEE; color: var(--clr-ink); text-decoration: none;" title="Editar">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                            <form action="{{ url_for('admin.eliminar_empleado', id=emp.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Está seguro de eliminar a {{ emp.nombre }}? Esta acción no se puede deshacer.')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn-liberar" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; border-color: rgba(178, 142, 142, 0.2); color: var(--clr-rose); cursor: pointer;" title="Eliminar">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="elegant-card animated stagger-2" style="text-align: center; padding: 80px 40px; border: 2px dashed var(--clr-border); background: transparent; box-shadow: none;">
+    <div style="font-size: 4rem; margin-bottom: 25px; opacity: 0.2;">
+        <i class="fas fa-user-friends"></i>
+    </div>
+    <h3 style="font-family: var(--font-serif); font-size: 1.8rem; margin-bottom: 10px;">Nómina Vacía</h3>
+    <p class="text-muted" style="max-width: 400px; margin: 0 auto 30px;">Comience registrando a su equipo de trabajo para gestionar sus accesos y reportes.</p>
+    <a href="{{ url_for('admin.nuevo_empleado') }}" class="btn-primary" style="width: auto; padding: 15px 40px; text-decoration: none;">Registrar Primer Empleado</a>
+</div>
+{% endif %}
+{% endblock %}

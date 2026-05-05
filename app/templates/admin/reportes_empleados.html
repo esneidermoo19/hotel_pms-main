@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes de Ventas - Hotel La Orquídea{% endblock %}
+
+{% block content %}
+<div class="page-header animated">
+    <h1 style="font-family: var(--font-serif); font-size: 3rem; margin-bottom: 10px;">Rendimiento Comercial</h1>
+    <p class="text-muted" style="letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.8rem;">Corte de ventas: {{ hoy.strftime('%d/%m/%Y') }}</p>
+</div>
+
+<div class="animated stagger-1" style="display: flex; gap: 15px; margin-bottom: 40px;">
+    <a href="{{ url_for('admin.gestionar_empleados') }}" class="btn-liberar" style="width: auto; padding: 12px 25px; display: flex; align-items: center; gap: 10px; border: none; background: var(--clr-bone); color: var(--clr-ink);">
+        ← Volver al Listado
+    </a>
+</div>
+
+{% if ventas %}
+<div class="elegant-card animated stagger-2" style="padding: 0; overflow: hidden; border: none; box-shadow: var(--shadow-elegant);">
+    <div class="table-wrapper" style="margin-top: 0; border: none; padding: 0;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: var(--clr-ink); color: white;">
+                    <th style="padding: 25px 30px; font-weight: 700; color: rgba(255,255,255,0.6);">Colaborador</th>
+                    <th style="padding: 25px 30px; font-weight: 700; color: rgba(255,255,255,0.6);">Posición</th>
+                    <th style="padding: 25px 30px; text-align: right; font-weight: 700; color: rgba(255,255,255,0.6);">Venta Hoy</th>
+                    <th style="padding: 25px 30px; text-align: right; font-weight: 700; color: rgba(255,255,255,0.6);">Acum. Quincena</th>
+                    <th style="padding: 25px 30px; text-align: right; font-weight: 700; color: rgba(255,255,255,0.6);">Acum. Mensual</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in ventas %}
+                <tr style="transition: all 0.3s ease; border-bottom: 1px solid var(--clr-border);">
+                    <td style="padding: 25px 30px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 40px; height: 40px; background: var(--clr-bone); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 1.1rem; color: var(--clr-taupe);">
+                                {{ v.empleado.nombre[0] | upper }}
+                            </div>
+                            <strong style="font-size: 15px; color: var(--clr-ink);">{{ v.empleado.nombre }}</strong>
+                        </div>
+                    </td>
+                    <td style="padding: 25px 30px;">
+                        <span style="font-size: 13px; color: var(--clr-taupe); text-transform: uppercase; letter-spacing: 0.05em;">{{ v.empleado.cargo }}</span>
+                    </td>
+                    <td style="padding: 25px 30px; text-align: right;">
+                        <div style="font-size: 15px; font-weight: 700; color: var(--clr-sage);">${{ "{:,}".format(v.diario) }}</div>
+                    </td>
+                    <td style="padding: 25px 30px; text-align: right;">
+                        <div style="font-size: 15px; font-weight: 600; color: var(--clr-ink); opacity: 0.8;">${{ "{:,}".format(v.quincenal) }}</div>
+                    </td>
+                    <td style="padding: 25px 30px; text-align: right;">
+                        <div style="font-size: 15px; font-weight: 600; color: var(--clr-ink);">${{ "{:,}".format(v.mensual) }}</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot style="background: var(--clr-bone); color: var(--clr-ink);">
+                <tr>
+                    <td colspan="2" style="padding: 30px; font-family: var(--font-serif); font-size: 1.2rem;">TOTAL GENERAL</td>
+                    <td style="padding: 30px; text-align: right;">
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--clr-taupe); margin-bottom: 5px;">Hoy</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: var(--clr-sage);">${{ "{:,}".format(ventas|sum(attribute='diario')|default(0)) }}</div>
+                    </td>
+                    <td style="padding: 30px; text-align: right;">
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--clr-taupe); margin-bottom: 5px;">Quincena</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: var(--clr-ink); opacity: 0.7;">${{ "{:,}".format(ventas|sum(attribute='quincenal')|default(0)) }}</div>
+                    </td>
+                    <td style="padding: 30px; text-align: right;">
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--clr-taupe); margin-bottom: 5px;">Mes</div>
+                        <div style="font-size: 1.4rem; font-weight: 800; color: var(--clr-ink);">${{ "{:,}".format(ventas|sum(attribute='mensual')|default(0)) }}</div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="elegant-card animated stagger-2" style="text-align: center; padding: 80px 40px; border: 2px dashed var(--clr-border); background: transparent; box-shadow: none;">
+    <div style="font-size: 4rem; margin-bottom: 25px; opacity: 0.2;">📈</div>
+    <h3 style="font-family: var(--font-serif); font-size: 1.8rem; margin-bottom: 10px;">Sin Datos de Ventas</h3>
+    <p class="text-muted" style="max-width: 400px; margin: 0 auto;">No se han registrado transacciones para el personal en el período seleccionado.</p>
+</div>
+{% endif %}
+{% endblock %}

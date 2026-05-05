@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+
+{% block title %}Registro de Admisión - La Orquídea{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admission-container {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 40px;
+        align-items: start;
+        max-width: 1300px;
+        margin: 0 auto;
+        padding-bottom: 60px;
+    }
+
+    /* Left Panel: Luxury Room Card */
+    .room-luxury-card {
+        background: var(--clr-ink);
+        color: white;
+        border-radius: 30px;
+        padding: 50px;
+        position: sticky;
+        top: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+
+    .room-luxury-card::before {
+        content: '';
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 150px;
+        height: 150px;
+        background: var(--accent-gold);
+        opacity: 0.1;
+        border-radius: 50%;
+    }
+
+    .room-number-display {
+        font-family: var(--font-serif);
+        font-size: 5rem;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, white 0%, #D1D5DB 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .amenity-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.05);
+        padding: 8px 15px;
+        border-radius: 12px;
+        font-size: 12px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Right Panel: Form Styling */
+    .form-panel-elegant {
+        background: white;
+        border-radius: 30px;
+        padding: 60px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .section-divider {
+        margin: 40px 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
+    }
+
+    .premium-input-group {
+        margin-bottom: 25px;
+    }
+
+    .label-gold {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--primary-mid);
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        margin-bottom: 10px;
+    }
+
+    .input-elegant {
+        width: 100%;
+        padding: 15px 20px;
+        border-radius: 14px;
+        border: 1px solid #E5E7EB;
+        background: #F9FAFB;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+
+    .input-elegant:focus {
+        background: white;
+        border-color: var(--primary-mid);
+        box-shadow: 0 0 0 4px rgba(162, 116, 184, 0.1);
+        outline: none;
+    }
+
+    .client-search-box {
+        display: flex;
+        gap: 12px;
+        background: #F3F4F6;
+        padding: 20px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        border: 1px solid #E5E7EB;
+    }
+
+    .btn-search-trigger {
+        padding: 0 25px;
+        background: var(--primary-dark);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-search-trigger:hover {
+        background: var(--clr-ink);
+        transform: translateY(-1px);
+    }
+
+    .found-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 15px;
+        background: #D1FAE5;
+        color: #065F46;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-top: 15px;
+    }
+
+    @media (max-width: 1024px) {
+        .admission-container { grid-template-columns: 1fr; }
+        .room-luxury-card { position: static; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admission-container">
+    
+    <!-- Room Info -->
+    <div class="animated stagger-1">
+        <div class="room-luxury-card">
+            <div style="text-align: center;">
+                <span style="color: var(--accent-gold); text-transform: uppercase; letter-spacing: 0.3em; font-size: 0.7rem; font-weight: 800;">Experiencia La Orquídea</span>
+                <div class="room-number-display">{{ habitacion.numero }}</div>
+                <div style="font-size: 1.2rem; color: #9CA3AF; margin-bottom: 30px;">{{ habitacion.tipo }}</div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                    <span style="color: #6B7280; font-size: 0.9rem;">Tarifa por noche</span>
+                    <span style="font-size: 1.8rem; font-weight: 700; color: var(--accent-gold);">${{ "{:,}".format(habitacion.precio_noche) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: #6B7280; font-size: 0.9rem;">Capacidad máxima</span>
+                    <span style="font-weight: 600;">{{ habitacion.capacidad_max }} Personas</span>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                {% if habitacion.wifi %}<div class="amenity-chip"><i class="fas fa-wifi"></i> Wi-Fi 6G</div>{% endif %}
+                {% if habitacion.tiene_aire %}<div class="amenity-chip"><i class="fas fa-snowflake"></i> A/C</div>{% endif %}
+                {% if habitacion.tiene_television %}<div class="amenity-chip"><i class="fas fa-tv"></i> Smart TV</div>{% endif %}
+                {% if habitacion.tiene_frigobar %}<div class="amenity-chip"><i class="fas fa-wine-bottle"></i> Minibar</div>{% endif %}
+            </div>
+
+            <div style="margin-top: 50px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; color: #4B5563; font-size: 0.8rem;">
+                <p><i class="fas fa-shield-alt" style="margin-right: 8px;"></i> Protocolo de seguridad y privacidad garantizado.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Form -->
+    <div class="animated stagger-2">
+        <div class="form-panel-elegant">
+            <h2 style="font-family: var(--font-serif); font-size: 2.2rem; color: var(--primary-dark); margin-bottom: 10px;">Registro de Admisión</h2>
+            <p style="color: #6B7280; margin-bottom: 40px;">Complete los datos del huésped titular para formalizar el Check-In.</p>
+
+            <form method="POST" id="reservationForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Client Lookup -->
+                <div class="client-search-box">
+                    <div style="flex: 1;">
+                        <label class="label-gold" style="color: var(--primary-dark);">Búsqueda de Cliente</label>
+                        <div style="display: flex; gap: 10px;">
+                            <select name="tipo_documento" id="tipo_documento" class="input-elegant" style="width: 140px; padding: 12px; font-size: 0.85rem;">
+                                <option value="cedula">Cédula</option>
+                                <option value="nit">NIT</option>
+                                <option value="pasaporte">Pasaporte</option>
+                            </select>
+                            <input type="text" id="cedula_nit" name="cedula_nit" class="input-elegant" style="padding: 12px;" required placeholder="Identificación..." onblur="buscarCliente()">
+                        </div>
+                    </div>
+                    <button type="button" class="btn-search-trigger" onclick="buscarCliente()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+
+                <div id="cliente_encontrado_div" style="display:none; margin-bottom: 30px;">
+                    <div class="found-badge">
+                        <i class="fas fa-check-circle"></i> CLIENTE RECONOCIDO: <span id="nombre_encontrado"></span>
+                    </div>
+                </div>
+
+                <!-- Personal Info -->
+                <div class="premium-input-group">
+                    <label class="label-gold" for="nombre_huesped">Nombre Completo / Razón Social *</label>
+                    <input type="text" id="nombre_huesped" name="nombre_huesped" class="input-elegant" required placeholder="Nombre legal para facturación">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div class="premium-input-group">
+                        <label class="label-gold" for="telefono_huesped">Teléfono de Contacto</label>
+                        <input type="tel" id="telefono_huesped" name="telefono_huesped" class="input-elegant" placeholder="+57 3xx xxx xxxx">
+                    </div>
+                    <div class="premium-input-group">
+                        <label class="label-gold" for="email_huesped">Email de Facturación</label>
+                        <input type="email" id="email_huesped" name="email_huesped" class="input-elegant" placeholder="huesped@ejemplo.com">
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Stay Info -->
+                <h3 style="font-size: 1.1rem; color: var(--primary-dark); margin-bottom: 25px; font-weight: 700;">Detalles de Estancia</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div class="premium-input-group">
+                        <label class="label-gold" for="fecha_ingreso">Fecha de Ingreso</label>
+                        <input type="date" id="fecha_ingreso" name="fecha_ingreso" class="input-elegant" required value="{{ hoy if hoy else '' }}">
+                    </div>
+                    <div class="premium-input-group">
+                        <label class="label-gold" for="fecha_salida">Fecha de Salida</label>
+                        <input type="date" id="fecha_salida" name="fecha_salida" class="input-elegant" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div class="premium-input-group">
+                        <label class="label-gold" for="num_personas">Número de Huéspedes</label>
+                        <input type="number" id="num_personas" name="num_personas" class="input-elegant" min="1" max="{{ habitacion.capacidad_max }}" value="1">
+                    </div>
+                    <div class="premium-input-group">
+                        <label class="label-gold" for="hay_menores">¿Viaja con menores?</label>
+                        <select id="hay_menores" name="hay_menores" class="input-elegant" onchange="toggleMenores()">
+                            <option value="no">No</option>
+                            <option value="si">Sí, registrar menores</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Menores Section -->
+                <div id="menores_div" style="display: none; padding: 30px; background: #F9FAFB; border-radius: 20px; border: 1px solid #E5E7EB; margin-top: 10px;">
+                    <label class="label-gold">Cantidad de menores</label>
+                    <input type="number" id="menores" name="menores" class="input-elegant" min="1" max="5" value="1" style="background: white;" onchange="renderMenoresFields()">
+                    
+                    <div id="menores_container" style="margin-top: 25px;"></div>
+                </div>
+
+                <button type="submit" class="btn-gold" style="width: 100%; margin-top: 50px; padding: 20px; border-radius: 16px; font-size: 1.1rem; box-shadow: 0 10px 30px rgba(197, 160, 89, 0.3);">
+                    Confirmar Admisión y Check-In
+                </button>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="{{ url_for('recep.dashboard') }}" style="color: #9CA3AF; text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+                        <i class="fas fa-arrow-left"></i> Cancelar y volver
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function buscarCliente() {
+        const nit = document.getElementById('cedula_nit').value.trim();
+        if (nit.length < 3) return;
+        
+        fetch('/reportes/clientes/buscar/' + encodeURIComponent(nit))
+        .then(r => r.json())
+        .then(data => {
+            const foundDiv = document.getElementById('cliente_encontrado_div');
+            const foundName = document.getElementById('nombre_encontrado');
+            
+            if (data.encontrado) {
+                foundDiv.style.display = 'block';
+                foundName.textContent = data.nombre;
+                
+                document.getElementById('nombre_huesped').value = data.nombre;
+                if (data.email) document.getElementById('email_huesped').value = data.email;
+                if (data.telefono) document.getElementById('telefono_huesped').value = data.telefono;
+                if (data.tipo_documento) document.getElementById('tipo_documento').value = data.tipo_documento;
+            } else {
+                foundDiv.style.display = 'none';
+            }
+        });
+    }
+
+    function toggleMenores() {
+        const div = document.getElementById('menores_div');
+        div.style.display = document.getElementById('hay_menores').value === 'si' ? 'block' : 'none';
+        if (div.style.display === 'block') renderMenoresFields();
+    }
+
+    function renderMenoresFields() {
+        const count = parseInt(document.getElementById('menores').value) || 0;
+        const container = document.getElementById('menores_container');
+        container.innerHTML = '';
+        
+        for (let i = 1; i <= count; i++) {
+            container.innerHTML += `
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 15px; background: white; padding: 15px; border-radius: 12px; border: 1px solid #EEE;">
+                    <div>
+                        <label class="label-gold" style="font-size: 0.65rem;">Nombre Menor #${i}</label>
+                        <input type="text" name="menor_nombre_${i}" class="input-elegant" style="padding: 10px;" required placeholder="Nombre completo">
+                    </div>
+                    <div>
+                        <label class="label-gold" style="font-size: 0.65rem;">Edad</label>
+                        <input type="number" name="menor_edad_${i}" class="input-elegant" style="padding: 10px;" required min="0" max="17" placeholder="Años">
+                    </div>
+                </div>
+            `;
+        }
+    }
+</script>
+{% endblock %}

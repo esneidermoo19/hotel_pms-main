@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Facturas - La Orquidea{% endblock %}
+
+{% block content %}
+<div class="historial-container">
+    <div class="historial-header">
+        <div>
+            <h1>Historial de Facturas</h1>
+            <p>Registro completo de facturas emitidas</p>
+        </div>
+        <a href="{{ url_for('empleado.facturacion') }}" class="btn-volver">
+            ← Volver a Caja
+        </a>
+    </div>
+
+    <!-- Buscador -->
+    <div class="buscador-box">
+        <form method="GET" class="buscador-form">
+            <input type="text" name="buscar" placeholder="Buscar por número o cliente..." value="{{ buscar or '' }}">
+            <button type="submit">🔍 Buscar</button>
+        </form>
+    </div>
+
+    <!-- Lista de Facturas -->
+    {% if facturas %}
+    <div class="facturas-grid">
+        {% for f in facturas %}
+        <div class="factura-card">
+            <div class="factura-cabecera">
+                <span class="factura-num">{{ f.numero_factura }}</span>
+                <span class="factura-estado">{{ f.estado }}</span>
+            </div>
+            
+            <div class="factura-cliente">
+                <span class="label">Cliente</span>
+                <span class="value">{{ f.nombre_cliente }}</span>
+            </div>
+            
+            <div class="factura-fecha">
+                <span class="label">Fecha</span>
+                <span class="value">{{ f.fecha_emision.strftime('%d/%m/%Y %H:%M') if f.fecha_emision else '-' }}</span>
+            </div>
+            
+            <div class="factura-total">
+                <span class="label">Total</span>
+                <span class="monto">${{ "{:,}".format(f.total) }}</span>
+            </div>
+            
+            <div class="factura-acciones">
+                <a href="{{ url_for('empleado.imprimir_factura', factura_id=f.id) }}" class="btn-accion" title="Imprimir">
+                    🖨️ Imprimir
+                </a>
+                <form method="POST" action="{{ url_for('empleado.enviar_factura', factura_id=f.id) }}" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn-accion btn-enviar" title="Reenviar">
+                        📧 Reenviar
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icono">🧾</div>
+        <p>No hay facturas registradas</p>
+    </div>
+    {% endif %}
+
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+</div>
+
+<style>
+.historial-container { padding: 30px; max-width: 1200px; margin: 0 auto; }
+.historial-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.historial-header h1 { margin: 0; font-size: 28px; color: var(--clr-ink); }
+.historial-header p { margin: 5px 0 0; color: var(--clr-text-light); }
+.btn-volver { padding: 12px 20px; background: #F3F4F6; color: var(--clr-ink); text-decoration: none; border-radius: 8px; font-weight: 600; }
+
+.buscador-box { margin-bottom: 30px; }
+.buscador-form { display: flex; gap: 10px; }
+.buscador-form input { flex: 1; padding: 14px; border: 1px solid #E5E7EB; border-radius: 10px; font-size: 15px; }
+.buscador-form button { padding: 14px 24px; background: #7C3AED; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
+
+.facturas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+.factura-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+.factura-cabecera { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.factura-num { font-size: 20px; font-weight: 700; color: #7C3AED; }
+.factura-estado { padding: 4px 12px; background: #D1FAE5; color: #059669; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+
+.factura-cliente, .factura-fecha, .factura-total { margin-bottom: 12px; }
+.factura-cliente .label, .factura-fecha .label, .factura-total .label { display: block; font-size: 10px; color: var(--clr-text-light); text-transform: uppercase; }
+.factura-cliente .value { font-size: 16px; font-weight: 600; color: var(--clr-ink); }
+.factura-fecha .value { font-size: 14px; color: var(--clr-text-light); }
+.factura-total .monto { font-size: 24px; font-weight: 700; color: #059669; }
+
+.factura-acciones { display: flex; gap: 10px; margin-top: 20px; }
+.btn-accion { flex: 1; padding: 12px; background: #F3F4F6; color: var(--clr-ink); text-align: center; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; }
+.btn-accion:hover { background: #E5E7EB; }
+.btn-enviar { background: #DBEAFE; color: #2563EB; }
+.btn-enviar:hover { background: #BFDBFE; }
+
+.empty-state { padding: 60px; text-align: center; background: white; border-radius: 16px; }
+.empty-icono { font-size: 48px; opacity: 0.3; margin-bottom: 15px; }
+.empty-state p { color: var(--clr-text-light); }
+
+.flash-messages { margin-bottom: 20px; }
+.flash { padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+.flash.success { background: #D1FAE5; color: #059669; }
+.flash.danger { background: #FEE2E2; color: #DC2626; }
+</style>
+{% endblock %}

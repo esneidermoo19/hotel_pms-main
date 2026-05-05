@@ -1,0 +1,523 @@
+{% extends "base.html" %}
+
+{% block title %}Historial — La Orquídea{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── Page Title ──────────────────────────────────────────── */
+  .pg-title {
+    margin-bottom: 48px;
+  }
+
+  .pg-title h1 {
+    font-family: var(--font-serif);
+    font-size: 2.8rem;
+    font-weight: 400;
+    color: var(--clr-ink);
+    margin: 0 0 6px;
+    line-height: 1.15;
+  }
+
+  .pg-title .subtitle {
+    font-size: 14px;
+    color: #999;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Filters ─────────────────────────────────────────────── */
+  .filter-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+    flex-wrap: wrap;
+    padding: 28px 0;
+    margin-bottom: 40px;
+    border-top: 1px solid var(--clr-border);
+    border-bottom: 1px solid var(--clr-border);
+  }
+
+  .filter-bar .fg {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 160px;
+  }
+
+  .filter-bar .fg.grow {
+    flex: 1;
+  }
+
+  .filter-bar .fg label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #AAA;
+    font-weight: 700;
+    font-family: var(--font-ui);
+  }
+
+  .filter-bar .fg input,
+  .filter-bar .fg select {
+    padding: 11px 14px;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 6px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: var(--clr-ink);
+    transition: border-color 0.2s ease;
+  }
+
+  .filter-bar .fg input:focus,
+  .filter-bar .fg select:focus {
+    outline: none;
+    border-color: var(--clr-taupe);
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .btn-apply {
+    padding: 11px 22px;
+    background: var(--clr-ink);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .btn-apply:hover {
+    background: #2a2a2a;
+  }
+
+  .btn-clear {
+    padding: 11px 16px;
+    background: transparent;
+    color: #999;
+    border: 1px solid var(--clr-border);
+    border-radius: 6px;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .btn-clear:hover {
+    border-color: #BBB;
+    color: var(--clr-ink);
+  }
+
+  /* ── Overview Numbers ────────────────────────────────────── */
+  .overview-row {
+    display: flex;
+    gap: 60px;
+    margin-bottom: 48px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--clr-border);
+  }
+
+  .ov-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ov-item .ov-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #AAA;
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-family: var(--font-ui);
+  }
+
+  .ov-item .ov-value {
+    font-family: var(--font-heading);
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--clr-ink);
+    line-height: 1;
+  }
+
+  .ov-item.accent .ov-value {
+    color: var(--clr-sage);
+  }
+
+  .ov-item .ov-detail {
+    font-size: 12px;
+    color: #BBB;
+    margin-top: 6px;
+  }
+
+  /* ── Table ───────────────────────────────────────────────── */
+  .data-section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .data-section-head h2 {
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--clr-ink);
+    margin: 0;
+  }
+
+  .data-section-head .count {
+    font-size: 12px;
+    color: #BBB;
+    font-weight: 500;
+    font-family: var(--font-ui);
+  }
+
+  .tbl-wrap {
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .tbl-data {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .tbl-data thead th {
+    padding: 16px 22px;
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #AAA;
+    font-weight: 700;
+    font-family: var(--font-ui);
+    background: #FAFAFA;
+    border-bottom: 1px solid var(--clr-border);
+  }
+
+  .tbl-data tbody tr {
+    transition: background 0.15s ease;
+  }
+
+  .tbl-data tbody tr:hover {
+    background: rgba(197, 180, 165, 0.04);
+  }
+
+  .tbl-data tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .tbl-data td {
+    padding: 16px 22px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.035);
+    font-size: 14px;
+    color: var(--clr-ink);
+    vertical-align: middle;
+    font-family: var(--font-ui);
+  }
+
+  /* Cell helpers */
+  .cell-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .cell-main {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .cell-sub {
+    font-size: 12px;
+    color: #AAA;
+  }
+
+  .room-tag {
+    display: inline-block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    color: var(--clr-taupe);
+    background: rgba(197, 180, 165, 0.12);
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-top: 2px;
+  }
+
+  .cell-money {
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--clr-ink);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .cell-stay {
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+  }
+
+  .cell-stay .arr {
+    color: var(--clr-taupe);
+    margin: 0 3px;
+  }
+
+  /* Status pill */
+  .pill {
+    display: inline-block;
+    padding: 4px 11px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: var(--font-ui);
+  }
+
+  .pill.activa {
+    background: #F0F4F0;
+    color: var(--clr-sage);
+  }
+
+  .pill.facturada {
+    background: #EDF2ED;
+    color: #5a7a5c;
+  }
+
+  .pill.cancelada {
+    background: #FFF5F5;
+    color: var(--clr-rose);
+  }
+
+  .pill.pendiente {
+    background: #FBF8F4;
+    color: #8a7560;
+  }
+
+  /* ── Empty state ─────────────────────────────────────────── */
+  .empty-block {
+    text-align: center;
+    padding: 90px 40px;
+    border: 1px dashed rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius-md);
+    background: var(--clr-surface);
+  }
+
+  .empty-block .em-icon {
+    font-size: 42px;
+    margin-bottom: 18px;
+    opacity: 0.2;
+    display: block;
+    color: var(--clr-ink);
+  }
+
+  .empty-block h3 {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    font-weight: 400;
+  }
+
+  .empty-block p {
+    color: #AAA;
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  .btn-back-all {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--clr-ink);
+    color: white;
+    border-radius: 6px;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+
+  .btn-back-all:hover {
+    background: #2a2a2a;
+  }
+
+  /* ── Responsive ──────────────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .overview-row {
+      flex-wrap: wrap;
+      gap: 30px;
+    }
+
+    .filter-bar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .pg-title h1 {
+      font-size: 2rem;
+    }
+
+    .overview-row {
+      gap: 24px;
+    }
+
+    .ov-item .ov-value {
+      font-size: 1.8rem;
+    }
+
+    .tbl-wrap {
+      overflow-x: auto;
+    }
+
+    .tbl-data {
+      min-width: 620px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Title -->
+<div class="pg-title">
+  <h1>Historial de Reservaciones</h1>
+  <span class="subtitle">Consulte y analice el rendimiento de sus habitaciones</span>
+</div>
+
+<!-- Filters -->
+<form method="GET">
+  <div class="filter-bar">
+    <div class="fg">
+      <label for="fecha_inicio">Desde</label>
+      <input type="date" name="fecha_inicio" id="fecha_inicio" value="{{ fecha_inicio or '' }}">
+    </div>
+    <div class="fg">
+      <label for="fecha_fin">Hasta</label>
+      <input type="date" name="fecha_fin" id="fecha_fin" value="{{ fecha_fin or '' }}">
+    </div>
+    <div class="fg grow">
+      <label for="habitacion_filter">Habitación</label>
+      <select name="habitacion_id" id="habitacion_filter">
+        <option value="">Todas</option>
+        {% for hab in habitaciones %}
+        <option value="{{ hab.id }}" {{ 'selected' if habitacion_id==hab.id|string else '' }}>
+          {{ hab.numero }} · {{ hab.tipo }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-actions">
+      <button type="submit" class="btn-apply" id="btn-filtrar">Aplicar</button>
+      <a href="{{ url_for('reportes.historial') }}" class="btn-clear" id="btn-limpiar">Limpiar</a>
+    </div>
+  </div>
+</form>
+
+<!-- Numbers -->
+<div class="overview-row">
+  <div class="ov-item">
+    <span class="ov-label">Ingresos del período</span>
+    <span class="ov-value">${{ total_ingresos|currency }}</span>
+  </div>
+  <div class="ov-item">
+    <span class="ov-label">Reservaciones</span>
+    <span class="ov-value">{{ reservas|length }}</span>
+  </div>
+  <div class="ov-item accent">
+    <span class="ov-label">Facturadas</span>
+    <span class="ov-value">{{ reservas|selectattr('estado','equalto','facturada')|list|length }}</span>
+    <span class="ov-detail">de {{ reservas|length }} totales</span>
+  </div>
+</div>
+
+<!-- Table -->
+{% if reservas %}
+<div class="data-section-head">
+  <h2>Detalle</h2>
+  <span class="count">{{ reservas|length }} registros</span>
+</div>
+
+<div class="tbl-wrap">
+  <table class="tbl-data">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Habitación</th>
+        <th>Huésped</th>
+        <th>Estancia</th>
+        <th style="text-align:right">Total</th>
+        <th style="text-align:center">Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reservas %}
+      <tr>
+        <td>
+          <div class="cell-stack">
+            <span class="cell-main">{{ r.fecha_creacion.strftime('%d/%m/%Y') }}</span>
+            <span class="cell-sub">{{ r.fecha_creacion.strftime('%H:%M') }}</span>
+          </div>
+        </td>
+        <td>
+          <div class="cell-stack">
+            <span class="cell-main">{{ r.habitacion.numero }}</span>
+            <span class="room-tag">{{ r.habitacion.tipo }}</span>
+          </div>
+        </td>
+        <td>
+          <div class="cell-stack">
+            <span class="cell-main">{{ r.nombre_cliente }}</span>
+            <span class="cell-sub">{{ r.cedula_nit }}</span>
+          </div>
+        </td>
+        <td class="cell-stay">
+          {{ r.fecha_inicio.strftime('%d/%m') }}
+          <span class="arr">→</span>
+          {{ r.fecha_fin.strftime('%d/%m/%Y') }}
+        </td>
+        <td class="cell-money">${{ r.total_pago|currency }}</td>
+        <td style="text-align:center">
+          <span class="pill {{ r.estado }}">{{ r.estado }}</span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% else %}
+<div class="empty-block">
+  <span class="em-icon">
+    <i class="fas fa-history"></i>
+  </span>
+  <h3>Sin resultados</h3>
+  <p>Ajuste los filtros o consulte todo el historial.</p>
+  <a href="{{ url_for('reportes.historial') }}" class="btn-back-all" id="btn-ver-todas">Ver todo</a>
+</div>
+{% endif %}
+
+{% endblock %}

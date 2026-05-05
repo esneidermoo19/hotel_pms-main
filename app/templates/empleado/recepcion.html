@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Centro de Recepción - La Orquídea{% endblock %}
+
+{% block content %}
+<div class="header-editorial anim-stagger">
+    <h1 class="text-gold">Centro de Recepción</h1>
+    <p>Mapa de hospitalidad y gestión de unidades en tiempo real.</p>
+</div>
+
+<!-- KPIs Maestro -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px; margin-bottom: 60px;" class="anim-stagger">
+    <div class="elegant-card" style="padding: 32px; border-top: 4px solid var(--success);">
+        <p style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 3px; color: var(--text-dim); margin-bottom: 12px; font-weight: 800;">Disponibles</p>
+        <h3 style="margin: 0; font-size: 3rem; font-family: var(--font-serif); color: var(--text);">{{ libres|length }} <small style="font-size: 0.8rem; font-family: var(--font-sans); color: var(--success);">READY</small></h3>
+    </div>
+    <div class="elegant-card" style="padding: 32px; border-top: 4px solid var(--accent);">
+        <p style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 3px; color: var(--text-dim); margin-bottom: 12px; font-weight: 800;">Ocupación Actual</p>
+        <h3 style="margin: 0; font-size: 3rem; font-family: var(--font-serif); color: var(--text);">{{ (pendientes|length) + (pagadas|length) }} <small style="font-size: 0.8rem; font-family: var(--font-sans); color: var(--accent);">ACTIVE</small></h3>
+    </div>
+    <div class="elegant-card" style="padding: 32px; border-top: 4px solid var(--warning);">
+        <p style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 3px; color: var(--text-dim); margin-bottom: 12px; font-weight: 800;">Mantenimiento</p>
+        <h3 style="margin: 0; font-size: 3rem; font-family: var(--font-serif); color: var(--text);">{{ mantenimiento|length }} <small style="font-size: 0.8rem; font-family: var(--font-sans); color: var(--warning);">SERVICE</small></h3>
+    </div>
+</div>
+
+<!-- Mapa de Habitaciones (Grid Maestro) -->
+<div class="anim-stagger" style="margin-bottom: 80px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+        <h2 style="margin: 0; font-size: 1.25rem; font-family: var(--font-serif);">Mapa de <span class="text-gold">Unidades</span></h2>
+        <div style="display: flex; gap: 16px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">
+            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: var(--success); border-radius: 50%;"></span> Libre</span>
+            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: var(--accent); border-radius: 50%;"></span> Ocupada</span>
+            <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; background: var(--warning); border-radius: 50%;"></span> Mantenimiento</span>
+        </div>
+    </div>
+
+    <!-- El grid que une todo -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 32px;">
+        {% set todas = libres + mantenimiento %}
+        {# Nota: Las ocupadas se manejan por separado para vinculación con huéspedes, pero aquí las mostramos para el mapa #}
+        
+        <!-- LIBRES -->
+        {% for h in libres %}
+        <div class="elegant-card" style="padding: 32px; position: relative; border-bottom: 4px solid var(--success); transition: 0.5s;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                <div>
+                    <h4 style="margin: 0; font-size: 2.5rem; font-family: var(--font-serif); line-height: 1;">#{{ h.numero }}</h4>
+                    <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim);">{{ h.tipo }}</span>
+                </div>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <form method="POST" action="{{ url_for('empleado.cambiar_estado_habitacion', habitacion_id=h.id) }}" style="display: flex; gap: 8px;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <select name="estado" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 12px;">
+                        <option value="Disponible" selected>🟢 Libre</option>
+                        <option value="Ocupada">🔴 Ocupada</option>
+                        <option value="Mantenimiento">🟡 Mantenimiento</option>
+                    </select>
+                    <button type="submit" class="btn-premium" style="padding: 10px 16px; font-size: 12px;">✓</button>
+                </form>
+            </div>
+            <a href="{{ url_for('empleado.nueva_reserva', habitacion_id=h.id) }}" class="btn-premium" style="width: 100%; height: 50px; font-size: 0.8rem; border-radius: 8px;">RESERVAR 🛎️</a>
+        </div>
+        {% endfor %}
+
+        <!-- OCUPADAS -->
+        {% for item in (pendientes + pagadas) %}
+        <div class="elegant-card" style="padding: 32px; position: relative; border-bottom: 4px solid var(--accent); background: rgba(212, 175, 55, 0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <div>
+                    <h4 style="margin: 0; font-size: 2.5rem; font-family: var(--font-serif); line-height: 1; color: var(--accent-light);">#{{ item.habitacion.numero }}</h4>
+                    <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 800;">OCUPADA</span>
+                </div>
+                <div class="action-btn" style="border-color: var(--accent); background: var(--accent); color: var(--primary);">👤</div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <div style="font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.reserva.nombre_cliente }}</div>
+                <div style="font-size: 0.7rem; color: var(--text-dim);">Finaliza: {{ item.reserva.fecha_fin.strftime('%d %b') }}</div>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+                <form method="POST" action="{{ url_for('empleado.cambiar_estado_habitacion', habitacion_id=item.habitacion.id) }}" style="display: flex; gap: 8px;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <select name="estado" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 12px;">
+                        <option value="Disponible">🟢 Libre</option>
+                        <option value="Ocupada" selected>🔴 Ocupada</option>
+                        <option value="Mantenimiento">🟡 Mantenimiento</option>
+                    </select>
+                    <button type="submit" class="btn-premium" style="padding: 10px 16px; font-size: 12px;">✓</button>
+                </form>
+            </div>
+            
+            <div style="display: flex; gap: 8px;">
+                {% if item.reserva.estado == 'checkin' %}
+                <form method="POST" action="{{ url_for('empleado.accion_reserva', reserva_id=item.reserva.id) }}" style="flex: 1;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="accion" value="checkout">
+                    <button type="submit" class="btn-premium btn-outline" style="width: 100%; height: 44px; font-size: 0.7rem; border-color: rgba(239, 68, 68, 0.3); color: var(--danger);">CHECK-OUT 🚪</button>
+                </form>
+                {% else %}
+                <form method="POST" action="{{ url_for('empleado.accion_reserva', reserva_id=item.reserva.id) }}" style="flex: 1;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="accion" value="checkin">
+                    <button type="submit" class="btn-premium" style="width: 100%; height: 44px; font-size: 0.7rem;">CHECK-IN 🔑</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- MANTENIMIENTO -->
+        {% for h in mantenimiento %}
+        <div class="elegant-card" style="padding: 32px; position: relative; border-bottom: 4px solid var(--warning); background: rgba(245, 158, 11, 0.03); border: 1px dashed var(--warning);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                <div>
+                    <h4 style="margin: 0; font-size: 2.5rem; font-family: var(--font-serif); line-height: 1; opacity: 0.5;">#{{ h.numero }}</h4>
+                    <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--warning); font-weight: 800;">SERVICE</span>
+                </div>
+            </div>
+            <form method="POST" action="{{ url_for('empleado.cambiar_estado_habitacion', habitacion_id=h.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <select name="estado" style="flex: 1; padding: 10px; border-radius: 8px; font-size: 12px;">
+                        <option value="Disponible">🟢 Liberar</option>
+                        <option value="Ocupada">🔴 Ocupada</option>
+                        <option value="Mantenimiento" selected>🟡 Mantenimiento</option>
+                    </select>
+                    <button type="submit" class="btn-premium" style="padding: 10px 16px; font-size: 12px;">✓</button>
+                </div>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Bitácora Detallada de Operaciones (Tabla para auditoría rápida) -->
+{% if pendientes or pagadas %}
+<div class="anim-stagger">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; border-left: 4px solid var(--accent); padding-left: 20px;">
+        <h2 style="margin: 0; font-size: 1.5rem; letter-spacing: -1px;">Gestión de <span class="text-gold">Estancias</span></h2>
+    </div>
+
+    <div class="elegant-card" style="padding: 0; overflow: hidden; border-radius: 20px;">
+        <table class="editorial-table">
+            <thead>
+                <tr>
+                    <th style="padding: 24px 32px;">Huésped</th>
+                    <th>Unidad</th>
+                    <th>Periodo</th>
+                    <th>Finanzas</th>
+                    <th style="text-align: right; padding-right: 32px;">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in pendientes + pagadas %}
+                <tr class="table-row">
+                    <td style="padding: 24px 32px;">
+                        <div style="font-weight: 800; font-size: 0.95rem;">{{ item.reserva.nombre_cliente }}</div>
+                        <div style="font-size: 0.7rem; color: var(--text-dim);">ID: {{ item.reserva.cedula_nit }}</div>
+                    </td>
+                    <td style="font-weight: 700;">#{{ item.habitacion.numero }}</td>
+                    <td style="font-size: 0.85rem; color: var(--text-muted);">{{ item.reserva.fecha_inicio.strftime('%d/%m') }} - {{ item.reserva.fecha_fin.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                        <div style="font-weight: 800; color: var(--accent); font-family: var(--font-sans);">$ {{ "{:,}".format(item.reserva.total_pago|int) }}</div>
+                        <div style="font-size: 0.65rem; color: {% if item.reserva.pagado %}var(--success){% else %}var(--warning){% endif %}; font-weight: 700; text-transform: uppercase;">
+                            {{ 'Liquidado ✅' if item.reserva.pagado else 'Pendiente 💰' }}
+                        </div>
+                    </td>
+                    <td style="text-align: right; padding-right: 32px;">
+                        <span class="editorial-badge" style="
+                            {% if item.reserva.estado == 'checkin' %} background: rgba(16, 185, 129, 0.1); color: var(--success);
+                            {% else %} background: rgba(255, 255, 255, 0.05); color: var(--text-muted);
+                            {% endif %}
+                        ">
+                            {{ item.reserva.estado|upper }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Reserva - La Orquídea{% endblock %}
+
+{% block content %}
+<div class="header-editorial anim-stagger">
+    <h1 class="text-gold">Nueva Reservación</h1>
+    <p>Habitación #{{ habitacion.numero }} — {{ habitacion.tipo }}</p>
+</div>
+
+<div class="elegant-card anim-stagger" style="max-width: 800px; margin: 0 auto; padding: 48px;">
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+        <div style="margin-bottom: 40px;">
+            <h3 style="font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 24px;">Detalles del <span class="text-gold">Huésped Principal</span></h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px;">
+                <div class="form-group">
+                    <label>Nombre Completo *</label>
+                    <input type="text" name="nombre" class="form-control" placeholder="Ej: Juan Pérez" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono de Contacto *</label>
+                    <input type="text" name="telefono" class="form-control" placeholder="Celular / Fijo" required>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Identificación</label>
+                    <div style="display: flex; gap: 16px;">
+                        <select name="tipo_documento" class="form-control" style="flex: 0.3;">
+                            <option value="cedula">Cédula</option>
+                            <option value="nit">NIT</option>
+                            <option value="pasaporte">Pasaporte</option>
+                        </select>
+                        <input type="text" name="cedula" class="form-control" placeholder="Número de documento" style="flex: 1;">
+                    </div>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Correo Electrónico</label>
+                    <input type="email" name="email_cliente" class="form-control" placeholder="huesped@correo.com">
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 40px; padding-top: 32px; border-top: 1px solid var(--border);">
+            <h3 style="font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 24px;">Periodo de <span class="text-gold">Estancia</span></h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+                <div class="form-group">
+                    <label>Fecha de Ingreso *</label>
+                    <input type="date" name="fecha_inicio" class="form-control" required value="{{ now.strftime('%Y-%m-%d') if now else '' }}">
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Salida *</label>
+                    <input type="date" name="fecha_fin" class="form-control" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Menores -->
+        <div class="form-group" style="margin-top: 24px; padding: 32px; background: rgba(212, 175, 55, 0.05); border: 1px solid var(--accent); border-radius: 12px;">
+            <label style="display: flex; align-items: center; gap: 16px; cursor: pointer;">
+                <input type="checkbox" id="hay_menores" name="hay_menores" value="si" style="width: 20px; height: 20px;">
+                <span style="font-size: 1.1rem; color: var(--accent); font-weight: 800;">¿Huésped acompañado de menores?</span>
+            </label>
+            
+            <div id="seccion_menores" style="display: none; margin-top: 32px; border-top: 1px solid rgba(212, 175, 55, 0.2); padding-top: 32px;">
+                <div class="form-group">
+                    <label>Cantidad de menores</label>
+                    <input type="number" id="cantidad_menores" name="cantidad_menores" class="form-control" min="1" max="10" value="1" style="max-width: 120px;">
+                </div>
+                <div id="contenedor_detalles_menores" style="margin-top: 24px;">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 48px; border-top: 1px solid var(--border); padding-top: 48px; display: flex; gap: 24px;">
+            <button type="submit" class="btn-premium" style="flex: 2; height: 64px; font-size: 1rem; letter-spacing: 4px;">CONFIRMAR RESERVACIÓN 🛎️</button>
+            <a href="{{ url_for('empleado.recepcion') }}" class="btn-premium btn-outline" style="flex: 1; height: 64px; display: flex; align-items: center; justify-content: center;">CANCELAR</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    const checkMenores = document.getElementById('hay_menores');
+    const seccionMenores = document.getElementById('seccion_menores');
+    const inputCantidad = document.getElementById('cantidad_menores');
+    const contenedorDetalles = document.getElementById('contenedor_detalles_menores');
+
+    checkMenores.addEventListener('change', function() {
+        seccionMenores.style.display = this.checked ? 'block' : 'none';
+        if (this.checked) actualizarCamposMenores();
+    });
+
+    inputCantidad.addEventListener('change', actualizarCamposMenores);
+    inputCantidad.addEventListener('keyup', actualizarCamposMenores);
+
+    function actualizarCamposMenores() {
+        const cantidad = parseInt(inputCantidad.value) || 0;
+        contenedorDetalles.innerHTML = '';
+        
+        for (let i = 1; i <= cantidad; i++) {
+            const div = document.createElement('div');
+            div.style.padding = '24px';
+            div.style.marginBottom = '20px';
+            div.style.background = 'rgba(255,255,255,0.02)';
+            div.style.border = '1px solid var(--border)';
+            div.style.borderRadius = '8px';
+            
+            div.innerHTML = `
+                <h4 style="color: var(--accent); font-size: 0.7rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px;">Documentación Menor #${i}</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" name="nombre_menor_${i}" class="form-control" required placeholder="Nombre del menor">
+                    </div>
+                    <div class="form-group">
+                        <label>Identificación / NUIP</label>
+                        <input type="text" name="doc_menor_${i}" class="form-control" required placeholder="Número de documento">
+                    </div>
+                </div>
+            `;
+            contenedorDetalles.appendChild(div);
+        }
+    }
+</script>
+{% endblock %}

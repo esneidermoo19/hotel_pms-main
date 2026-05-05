@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Cliente{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Nuevo Cliente</h1>
+    <p>Registrar cliente para faktura electronica</p>
+</div>
+
+<div class="form-container">
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+        <div class="form-group">
+            <label>Tipo de Documento</label>
+            <select name="tipo_documento">
+                <option value="nit">NIT</option>
+                <option value="cedula">Cedula</option>
+                <option value="pasaporte">Pasaporte</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Numero de Documento (NIT/Cedula)</label>
+            <input type="text" name="nit" required placeholder="1099203509">
+        </div>
+        
+        <div class="form-group">
+            <label>Nombre Completo</label>
+            <input type="text" name="nombre" required placeholder="Nombre del cliente">
+        </div>
+        
+        <div class="form-group">
+            <label>Direccion</label>
+            <input type="text" name="direccion" placeholder="Direccion">
+        </div>
+        
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="correo@ejemplo.com">
+        </div>
+        
+        <div class="form-group">
+            <label>Telefono</label>
+            <input type="text" name="telefono" placeholder="3001234567">
+        </div>
+        
+        <button type="submit" class="btn-submit">Guardar Cliente</button>
+    </form>
+</div>
+
+<style>
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 40px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent-gold);
+    color: var(--primary-dark);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-submit:hover {
+    background: var(--accent-gold-hover);
+}
+</style>
+{% endblock %}

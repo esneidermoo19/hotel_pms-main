@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Cliente - La Orquídea{% endblock %}
+
+{% block extra_css %}
+<style>
+    .client-form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding-bottom: 80px;
+    }
+
+    .glass-header {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(197, 160, 89, 0.2);
+        border-radius: 24px;
+        padding: 40px;
+        margin-bottom: 40px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .header-icon-box {
+        width: 70px;
+        height: 70px;
+        background: var(--accent-gold-glow);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 1.8rem;
+        color: var(--primary-dark);
+        box-shadow: 0 8px 20px rgba(197, 160, 89, 0.2);
+    }
+
+    .registration-panel {
+        background: white;
+        border-radius: 24px;
+        padding: 45px;
+        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: 0 15px 45px rgba(0,0,0,0.06);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .registration-panel::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-mid), var(--accent-gold));
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .input-premium {
+        width: 100%;
+        padding: 14px 18px;
+        border-radius: 12px;
+        border: 1px solid #E5E7EB;
+        background: #F9FAFB;
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+        color: var(--primary-dark);
+    }
+
+    .input-premium:focus {
+        background: white;
+        border-color: var(--primary-light);
+        box-shadow: 0 0 0 4px rgba(162, 116, 184, 0.1);
+        outline: none;
+    }
+
+    .label-premium {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #6B7280;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 18px;
+        background: var(--accent-gold);
+        color: var(--primary-dark);
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 20px;
+        box-shadow: 0 8px 20px rgba(197, 160, 89, 0.2);
+    }
+
+    .btn-submit:hover {
+        background: #d4af37;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(197, 160, 89, 0.3);
+    }
+
+    @media (max-width: 600px) {
+        .form-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="client-form-container">
+    
+    <!-- Glass Header -->
+    <div class="glass-header animated stagger-1">
+        <div class="header-icon-box">
+            <i class="fas fa-user-plus"></i>
+        </div>
+        <h1 style="font-family: var(--font-serif); font-size: 2.5rem; color: var(--primary-dark); margin: 0;">Nuevo Cliente</h1>
+        <p style="color: var(--text-light); font-size: 1rem; margin-top: 10px;">
+            Complete los datos para habilitar la facturación electrónica.
+        </p>
+    </div>
+
+    <!-- Form Panel -->
+    <div class="registration-panel animated stagger-2">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="label-premium">Tipo de Documento</label>
+                    <select name="tipo_documento" class="input-premium">
+                        <option value="nit">NIT</option>
+                        <option value="cedula">Cédula</option>
+                        <option value="cedula_extranjeria">Cédula Extranjería</option>
+                        <option value="pasaporte">Pasaporte</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="label-premium">Número de Documento *</label>
+                    <input type="text" name="nit" required placeholder="Ej: 900123456" class="input-premium">
+                </div>
+                
+                <div class="form-group full-width">
+                    <label class="label-premium">Nombre Completo o Razón Social *</label>
+                    <input type="text" name="nombre" required placeholder="Nombre del cliente para factura" class="input-premium">
+                </div>
+                
+                <div class="form-group">
+                    <label class="label-premium">Email de Facturación</label>
+                    <input type="email" name="email" placeholder="correo@ejemplo.com" class="input-premium">
+                </div>
+                
+                <div class="form-group">
+                    <label class="label-premium">Teléfono</label>
+                    <input type="text" name="telefono" placeholder="300 000 0000" class="input-premium">
+                </div>
+                
+                <div class="form-group full-width">
+                    <label class="label-premium">Dirección</label>
+                    <input type="text" name="direccion" placeholder="Calle, Carrera, Ciudad" class="input-premium">
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-top: 40px;">
+                <a href="{{ url_for('empleado.lista_clientes') }}" class="btn-outline" style="flex: 1; justify-content: center; border-radius: 12px; text-decoration: none; padding: 18px; color: var(--primary-dark); border: 2px solid var(--primary-dark); display: flex; align-items: center; font-weight: 600;">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn-submit" style="flex: 2;">
+                    <i class="fas fa-save"></i> Guardar Cliente
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

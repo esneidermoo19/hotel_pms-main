@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Cargar Consumo - La Orquidea{% endblock %}
+
+{% block content %}
+<div class="consumo-container">
+    <div class="consumo-header">
+        <a href="{{ url_for('pos.caja_principal') }}" class="btn-volver">
+            ← Volver a Caja
+        </a>
+    </div>
+
+    <div class="consumo-layout">
+        <!-- Lado Izquierdo -->
+        <div class="panel-izquierdo">
+            <div class="resumen-habitacion">
+                <div class="resumen-header">
+                    <div>
+                        <h3>Habitación {{ habitacion.numero }}</h3>
+                        <span class="hab-tipo">{{ habitacion.tipo }}</span>
+                    </div>
+                    <span class="estado-badge">Activo</span>
+                </div>
+                
+                <div class="resumen-detalles">
+                    <div class="detalle"><span class="label">Reserva</span><span class="value">#{{ reserva.id }}</span></div>
+                    <div class="detalle"><span class="label">Huésped</span><span class="value">{{ reserva.nombre_cliente }}</span></div>
+                    <div class="detalle"><span class="label">Entrada</span><span class="value">{{ reserva.fecha_inicio.strftime('%d/%m/%Y') }}</span></div>
+                </div>
+                
+                <div class="resumen-total">
+                    <span class="label">Total en Cuenta</span>
+                    <span class="monto">${{ "{:,}".format(reserva.total_pago) }}</span>
+                </div>
+            </div>
+
+            <div class="formulario-cargo">
+                <h3><span class="icon-plus">+</span> Registrar Nuevo Cargo</h3>
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="form-group">
+                        <label>Atiende</label>
+                        <div class="empleado-actual">{{ current_user_nombre }}</div>
+                        <input type="hidden" name="empleado_id" value="{{ current_user_id }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="producto">Producto o Servicio</label>
+                        <input type="text" id="producto" name="producto" placeholder="Ej: Restaurante, Minibar, Spa..." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="monto">Valor ($)</label>
+                        <input type="number" id="monto" name="monto" step="100" min="0" placeholder="0" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-cargar">
+                        Cargar a la Habitación
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lado Derecho -->
+        <div class="panel-derecho">
+            <div class="historial-panel">
+                <h3>Historial de Consumos</h3>
+                
+                {% if historial %}
+                <div class="tabla-historial">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Servicio</th>
+                                <th>Fecha</th>
+                                <th style="text-align: right;">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for consumo in historial %}
+                            <tr>
+                                <td><span class="servicio">{{ consumo.producto }}</span></td>
+                                <td><span class="fecha">{{ consumo.fecha.strftime('%d/%m/%Y %H:%M') }}</span></td>
+                                <td style="text-align: right; font-weight: 700; color: #10B981;">${{ "{:,}".format(consumo.monto) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="historial-vacio">
+                    <div class="icono-vacio">🍽️</div>
+                    <p>No hay consumos registrados</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.consumo-container { padding: 30px; max-width: 1200px; margin: 0 auto; }
+.consumo-header { margin-bottom: 20px; }
+.btn-volver { display: inline-flex; align-items: center; gap: 8px; color: var(--clr-text-light); text-decoration: none; font-size: 14px; }
+.btn-volver:hover { color: var(--clr-ink); }
+
+.consumo-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+@media (max-width: 900px) { .consumo-layout { grid-template-columns: 1fr; } }
+
+.panel-izquierdo, .panel-derecho { display: flex; flex-direction: column; gap: 20px; }
+
+.resumen-habitacion { background: linear-gradient(135deg, #2D1540 0%, #4C1D95 100%); border-radius: 20px; padding: 30px; color: white; }
+.resumen-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; }
+.resumen-header h3 { margin: 0; font-size: 28px; }
+.hab-tipo { font-size: 12px; opacity: 0.7; text-transform: uppercase; }
+.estado-badge { padding: 6px 14px; background: rgba(255,255,255,0.15); border-radius: 20px; font-size: 12px; font-weight: 600; }
+
+.resumen-detalles { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+.detalle .label { display: block; font-size: 10px; opacity: 0.6; text-transform: uppercase; margin-bottom: 4px; }
+.detalle .value { font-size: 14px; font-weight: 600; }
+
+.resumen-total { padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.15); }
+.resumen-total .label { display: block; font-size: 11px; opacity: 0.6; text-transform: uppercase; margin-bottom: 5px; }
+.resumen-total .monto { font-size: 36px; font-weight: 700; color: #FFD700; }
+
+.formulario-cargo { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.formulario-cargo h3 { margin: 0 0 25px; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+.icon-plus { width: 32px; height: 32px; background: #10B981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--clr-text-light); margin-bottom: 8px; text-transform: uppercase; }
+.form-group select, .form-group input { width: 100%; padding: 14px; border: 1px solid #E5E7EB; border-radius: 10px; font-size: 14px; }
+.form-group select:focus, .form-group input:focus { outline: none; border-color: #10B981; }
+.empleado-actual { padding: 14px; background: #10B981; color: white; border-radius: 10px; font-size: 16px; font-weight: 700; text-align: center; }
+
+.btn-cargar { width: 100%; padding: 16px; background: #10B981; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; }
+.btn-cargar:hover { background: #059669; }
+
+.historial-panel { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); height: 100%; }
+.historial-panel h3 { margin: 0 0 25px; font-size: 18px; }
+
+.tabla-historial table { width: 100%; border-collapse: collapse; }
+.tabla-historial th { text-align: left; font-size: 11px; color: var(--clr-text-light); text-transform: uppercase; padding: 10px 0; border-bottom: 1px solid #E5E7EB; }
+.tabla-historial td { padding: 15px 0; border-bottom: 1px solid #F3F4F6; }
+.servicio { font-weight: 600; color: var(--clr-ink); }
+.fecha { font-size: 13px; color: var(--clr-text-light); }
+
+.historial-vacio { text-align: center; padding: 60px 20px; }
+.icono-vacio { font-size: 42px; opacity: 0.3; margin-bottom: 15px; }
+.historial-vacio p { color: var(--clr-text-light); font-size: 14px; }
+</style>
+{% endblock %}

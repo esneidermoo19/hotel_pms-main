@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Recepcion - La Orquidea{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <div>
+            <h1>Panel de Recepción</h1>
+            <p>Bienvenido, {{ current_user.nombre }}</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('empleado.nuevo_cliente') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i> Nuevo Cliente
+            </a>
+            <a href="{{ url_for('empleado.facturacion') }}" class="btn btn-success">
+                <i class="fas fa-cash-register"></i> Caja
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-row">
+        <div class="stat-card stat-libre">
+            <div class="stat-icon"><i class="fas fa-key"></i></div>
+            <div class="stat-content">
+                <span class="stat-value">{{ libres|length }}</span>
+                <span class="stat-label">Habitaciones Libres</span>
+            </div>
+        </div>
+        
+        <div class="stat-card stat-ocupada">
+            <div class="stat-icon"><i class="fas fa-door-closed"></i></div>
+            <div class="stat-content">
+                <span class="stat-value">{{ (occupations_no_pagadas|length) + (occupations_pagadas|length) }}</span>
+                <span class="stat-label">Ocupadas</span>
+            </div>
+        </div>
+        
+        <div class="stat-card stat-pendiente">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="stat-content">
+                <span class="stat-value">{{ occupations_no_pagadas|length }}</span>
+                <span class="stat-label">Por Cobrar</span>
+            </div>
+        </div>
+        
+        <div class="stat-card stat-mantenimiento">
+            <div class="stat-icon"><i class="fas fa-tools"></i></div>
+            <div class="stat-content">
+                <span class="stat-value">{{ mantenimiento|length }}</span>
+                <span class="stat-label">Mantenimiento</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Habitaciones Disponibles -->
+    <div class="section">
+        <div class="section-header">
+            <h2><span class="dot dot-libre"></span> Habitaciones Disponibles</h2>
+            <span class="badge badge-libre">{{ libres|length }}</span>
+        </div>
+        {% if libres %}
+        <div class="habitacion-grid">
+            {% for hab in libres %}
+            <div class="habitacion-card disponible">
+                <div class="habitacion-numero">{{ hab.numero }}</div>
+                <div class="habitacion-tipo">{{ hab.tipo }}</div>
+                <div class="habitacion-precio">${{ "{:,}".format(hab.precio_noche) }}</div>
+                <div class="habitacion-acciones">
+                    <a href="{{ url_for('recep.hacer_reserva', habitacion_id=hab.id) }}" class="btn-reservar">Reservar</a>
+                    <form method="POST" action="{{ url_for('recep.cambiar_estado_habitacion', habitacion_id=hab.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="estado" value="Mantenimiento">
+                        <button type="submit" class="btn-mant" title="Poner en Mantenimiento">
+                            <i class="fas fa-wrench" style="margin-right: 5px;"></i> Mantenimiento
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">No hay habitaciones disponibles</div>
+        {% endif %}
+    </div>
+
+    <!-- Pendientes de Pago -->
+    {% if occupations_no_pagadas %}
+    <div class="section">
+        <div class="section-header">
+            <h2><span class="dot dot-pendiente"></span> Pendientes de Pago</h2>
+            <span class="badge badge-pendiente">{{ occupations_no_pagadas|length }}</span>
+        </div>
+        <div class="habitacion-grid">
+            {% for item in occupations_no_pagadas %}
+            <div class="habitacion-card pendiente">
+                <div class="habitacion-numero">{{ item.habitacion.numero }}</div>
+                <div class="habitacion-huesped">{{ item.reserva.nombre_cliente }}</div>
+                <div class="habitacion-precio">${{ "{:,}".format(item.reserva.total_pago) }}</div>
+                <form method="POST" action="{{ url_for('recep.actualizar_pago', reservacion_id=item.reserva.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <select name="pagado" class="input-select">
+                        <option value="no" selected>No Pagado</option>
+                        <option value="si">Pagado</option>
+                    </select>
+                    <button type="submit" class="btn-cobrar">Cobrar</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pagadas -->
+    {% if occupations_pagadas %}
+    <div class="section">
+        <div class="section-header">
+            <h2><span class="dot dot-pagada"></span> Habitaciones Pagadas</h2>
+            <span class="badge badge-pagada">{{ occupations_pagadas|length }}</span>
+        </div>
+        <div class="habitacion-grid">
+            {% for item in occupations_pagadas %}
+            <div class="habitacion-card pagada">
+                <div class="habitacion-numero">{{ item.habitacion.numero }}</div>
+                <div class="habitacion-huesped">{{ item.reserva.nombre_cliente }}</div>
+                <div class="habitacion-precio">${{ "{:,}".format(item.reserva.total_pago) }}</div>
+                <form method="POST" action="{{ url_for('recep.cambiar_estado_habitacion', habitacion_id=item.habitacion.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="estado" value="Disponible">
+                    <button type="submit" class="btn-liberar">Liberar Habitacion</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Mantenimiento -->
+    {% if mantenimiento %}
+    <div class="section">
+        <div class="section-header">
+            <h2><span class="dot dot-mantenimiento"></span> Mantenimiento</h2>
+        </div>
+        <div class="habitacion-grid">
+            {% for hab in mantenimiento %}
+            <div class="habitacion-card mantenimiento">
+                <div class="habitacion-numero">{{ hab.numero }}</div>
+                <div class="habitacion-tipo">{{ hab.tipo }}</div>
+                <form method="POST" action="{{ url_for('recep.cambiar_estado_habitacion', habitacion_id=hab.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <select name="estado" class="input-select">
+                        <option value="Disponible">Liberar</option>
+                        <option value="Mantenimiento" selected>Mantenimiento</option>
+                    </select>
+                    <button type="submit" class="btn-actualizar">Actualizar</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.dashboard-container { padding: 30px; max-width: 1400px; margin: 0 auto; }
+.dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.dashboard-header h1 { margin: 0; font-size: 28px; color: var(--clr-ink); }
+.dashboard-header p { margin: 5px 0 0; color: var(--clr-text-light); font-size: 14px; }
+.header-actions { display: flex; gap: 10px; }
+.btn { padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: var(--clr-accent); color: var(--clr-primary); }
+.btn-success { background: #10B981; color: white; }
+
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+.stat-card { background: white; border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; }
+.stat-libre .stat-icon { background: #D1FAE5; color: #059669; }
+.stat-ocupada .stat-icon { background: #FEE2E2; color: #DC2626; }
+.stat-pendiente .stat-icon { background: #FEF3C7; color: #D97706; }
+.stat-mantenimiento .stat-icon { background: #E0E7FF; color: #4F46E5; }
+.stat-content { display: flex; flex-direction: column; }
+.stat-value { font-size: 28px; font-weight: 700; color: var(--clr-ink); }
+.stat-label { font-size: 12px; color: var(--clr-text-light); text-transform: uppercase; }
+
+.section { margin-bottom: 40px; }
+.section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+.section-header h2 { margin: 0; font-size: 20px; color: var(--clr-ink); display: flex; align-items: center; gap: 10px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.dot-libre { background: #10B981; }
+.dot-pendiente { background: #F59E0B; }
+.dot-pagada { background: #3B82F6; }
+.dot-mantenimiento { background: #6366F1; }
+.badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.badge-libre { background: #D1FAE5; color: #059669; }
+.badge-pendiente { background: #FEF3C7; color: #D97706; }
+.badge-pagada { background: #DBEAFE; color: #2563EB; }
+
+.habitacion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+.habitacion-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.habitacion-card.disponible { border-left: 4px solid #10B981; }
+.habitacion-card.pendiente { border-left: 4px solid #F59E0B; }
+.habitacion-card.pagada { border-left: 4px solid #3B82F6; }
+.habitacion-card.mantenimiento { border-left: 4px solid #6366F1; }
+.habitacion-numero { font-size: 32px; font-weight: 700; color: var(--clr-ink); }
+.habitacion-tipo { font-size: 12px; color: var(--clr-text-light); text-transform: uppercase; margin-bottom: 10px; }
+.habitacion-huesped { font-size: 14px; color: var(--clr-ink); margin-bottom: 5px; }
+.habitacion-precio { font-size: 22px; font-weight: 700; color: var(--clr-accent); margin: 10px 0; }
+
+.btn-reservar { display: block; width: 100%; padding: 12px; background: var(--clr-accent); color: var(--clr-primary); text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
+.habitacion-acciones { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.btn-mant { width: 100%; padding: 10px; background: #6366F1; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+.btn-cobrar { width: 100%; padding: 10px; background: #10B981; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+.btn-liberar { width: 100%; padding: 10px; background: #3B82F6; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.btn-actualizar { width: 100%; padding: 10px; background: #6366F1; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+.input-select { width: 100%; padding: 10px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 14px; }
+.empty-state { padding: 40px; text-align: center; color: var(--clr-text-light); background: white; border-radius: 16px; }
+</style>
+{% endblock %}

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}La Orquídea PMS{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <div class="app-wrapper">
+        <aside class="sidebar">
+            <div class="hotel-logo-container">
+                <div class="orchid-wrapper">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="La Orquídea" class="orchid-graphic">
+                </div>
+                <div class="hotel-logo-text">La Orquídea</div>
+            </div>
+            
+            <nav>
+                <div class="nav-section-label">Operaciones</div>
+                <a href="{{ url_for('recep.dashboard') }}" class="{{ 'active' if 'recep' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-concierge-bell"></i></span> <span>Recepción</span>
+                </a>
+                <a href="{{ url_for('empleado.facturacion') }}" class="{{ 'active' if 'facturacion' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-cash-register"></i></span> <span>Caja</span>
+                </a>
+                <a href="{{ url_for('empleado.lista_clientes') }}" class="{{ 'active' if 'clientes' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-users"></i></span> <span>Clientes</span>
+                </a>
+                <a href="{{ url_for('empleado.lista_facturas') }}" class="{{ 'active' if 'empleado.lista_facturas' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span> <span>Facturas</span>
+                </a>
+                <a href="{{ url_for('pos.caja_principal') }}" class="{{ 'active' if 'pos' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-store"></i></span> <span>Punto de Venta</span>
+                </a>
+                
+                {% if current_user.rol == 'admin' %}
+                <div class="nav-section-label">Administración</div>
+                
+                <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if request.endpoint == 'admin.dashboard' else '' }}">
+                    <span class="nav-icon"><i class="fas fa-chart-line"></i></span> <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('reportes.historial') }}" class="{{ 'active' if 'historial' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-history"></i></span> <span>Historial</span>
+                </a>
+                <a href="{{ url_for('reportes.resumen_diario') }}" class="{{ 'active' if 'resumen' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-calendar-day"></i></span> <span>Resumen</span>
+                </a>
+                <a href="{{ url_for('reportes.lista_facturas') }}" class="{{ 'active' if 'facturas' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-file-invoice"></i></span> <span>Facturas</span>
+                </a>
+                <a href="{{ url_for('reportes.lista_clientes') }}" class="{{ 'active' if 'clientes' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-address-book"></i></span> <span>Clientes</span>
+                </a>
+                <a href="{{ url_for('admin.gestionar_habitaciones') }}" class="{{ 'active' if 'habitacion' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-bed"></i></span> <span>Habitaciones</span>
+                </a>
+                <a href="{{ url_for('admin.gestionar_usuarios') }}" class="{{ 'active' if 'usuario' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-user-shield"></i></span> <span>Usuarios</span>
+                </a>
+                <a href="{{ url_for('admin.gestionar_empleados') }}" class="{{ 'active' if 'empleado' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-id-badge"></i></span> <span>Empleados</span>
+                </a>
+                <a href="{{ url_for('admin.horarios_empleados') }}" class="{{ 'active' if 'horarios' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-clock"></i></span> <span>Horarios</span>
+                </a>
+                <a href="{{ url_for('reportes.config_hotel') }}" class="{{ 'active' if 'config' in request.endpoint else '' }}">
+                    <span class="nav-icon"><i class="fas fa-cog"></i></span> <span>Configuración</span>
+                </a>
+                {% endif %}
+                
+                <div class="nav-footer">
+                    <a href="{{ url_for('auth.logout') }}" class="logout-link">
+                        <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span> <span>Cerrar Sesión</span>
+                    </a>
+                    
+                    <div class="ui-speed-control">
+                        <label>Velocidad de Interfaz</label>
+                        <input type="range" min="0.1" max="1.9" step="0.1" value="1" oninput="updateAmbientSpeed(this.value)">
+                    </div>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <div class="mobile-menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('mobile-open')">
+                <span style="font-size: 20px; font-weight: bold;">☰</span>
+            </div>
+            <div class="dashboard-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                <span class="alert-icon"><i class="fas {{ 'fa-check-circle' if category == 'success' else 'fa-exclamation-triangle' }}"></i></span>
+                                <span class="alert-message">{{ message }}</span>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    {% else %}
+    <div class="login-wrapper">
+        {% block login_content %}{% endblock %}
+    </div>
+    {% endif %}
+    
+    <script>
+        function updateAmbientSpeed(value) {
+            const speedRatio = 2 - value;
+            document.documentElement.style.setProperty('--speed-ratio', speedRatio);
+        }
+
+        // Sidebar Scroll Persistence
+        document.addEventListener("DOMContentLoaded", function() {
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+                // Restore scroll position
+                const scrollPos = localStorage.getItem('sidebarScrollPos');
+                if (scrollPos) {
+                    sidebar.scrollTop = scrollPos;
+                }
+
+                // Save scroll position on link click
+                const links = sidebar.querySelectorAll('a');
+                links.forEach(link => {
+                    link.addEventListener('click', () => {
+                        localStorage.setItem('sidebarScrollPos', sidebar.scrollTop);
+                    });
+                });
+            }
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
