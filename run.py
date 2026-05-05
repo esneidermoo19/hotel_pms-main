@@ -2,17 +2,17 @@ import sys
 import os
 
 # Verificar si el entorno virtual está activo
-if sys.prefix == getattr(sys, 'base_prefix', sys.prefix):
-    print("\n" + "!"*60)
-    print(" ERROR: EL ENTORNO VIRTUAL NO ESTÁ ACTIVADO ".center(60))
-    print("!"*60)
-    print("\nPara proteger la estabilidad del sistema, este debe ejecutarse")
-    print("dentro de su entorno virtual (venv).")
-    print("\nPASOS PARA ACTIVAR:")
-    print("1. En la terminal escribe: .\\venv\\Scripts\\activate")
-    print("2. Luego corre el programa: python run.py")
-    print("!"*60 + "\n")
-    sys.exit(1)
+# if sys.prefix == getattr(sys, 'base_prefix', sys.prefix):
+#     print("\n" + "!"*60)
+#     print(" ERROR: EL ENTORNO VIRTUAL NO ESTÁ ACTIVADO ".center(60))
+#     print("!"*60)
+#     print("\nPara proteger la estabilidad del sistema, este debe ejecutarse")
+#     print("dentro de su entorno virtual (venv).")
+#     print("\nPASOS PARA ACTIVAR:")
+#     print("1. En la terminal escribe: .\\venv\\Scripts\\activate")
+#     print("2. Luego corre el programa: python run.py")
+#     print("!"*60 + "\n")
+#     sys.exit(1)
 
 from app import create_app, db
 from app.models import User, Habitacion, ConfigHotel
