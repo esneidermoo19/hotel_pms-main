@@ -1,5 +1,5 @@
 import os
-from urllib.parse import urlparse, urlunparse
+import re
 from dotenv import load_dotenv
 
 # Cargar variables de entorno si existe un archivo .env
@@ -10,38 +10,33 @@ class Config:
     raw_uri = os.getenv("DATABASE_URL", "").strip().replace('\r', '').replace('\n', '')
     
     if raw_uri:
-        # Si no tiene esquema (://), le agregamos uno temporal para poder parsearla
-        if "://" not in raw_uri:
-            # Si empieza con postgres, lo usamos, si no, asumimos postgresql
-            if raw_uri.startswith("postgres"):
-                raw_uri = raw_uri.replace("postgres", "postgresql://", 1) if not raw_uri.startswith("postgres:") else raw_uri.replace("postgres:", "postgresql://", 1)
-            else:
-                raw_uri = "postgresql://" + raw_uri
-
-        # Parsear la URL para limpiar sus partes
-        parsed = urlparse(raw_uri)
-        
-        # Corregir esquema
-        scheme = "postgresql"
-        
-        # Corregir usuario y contraseña
-        netloc = parsed.netloc
-        if "@" in netloc:
-            user_pass, host_port = netloc.split("@", 1)
-            if ":" in user_pass:
-                user, pw = user_pass.split(":", 1)
-            else:
-                # Si no hay :, asumimos que lo que hay es el password y el user es postgres
-                user = "postgres"
-                pw = user_pass
-            netloc = f"{user}:{pw}@{host_port}"
+        # Extraer el 'resto' después del esquema (después de : o ://)
+        if "://" in raw_uri:
+            rest = raw_uri.split("://", 1)[1]
+        elif ":" in raw_uri:
+            rest = raw_uri.split(":", 1)[1]
         else:
-            # Si no hay @, es que solo viene el host o algo raro. 
-            # En Coolify esto no debería pasar con DATABASE_URL, pero por si acaso:
-            netloc = f"postgres@{netloc}"
+            rest = raw_uri
+        
+        # Limpiar barras iniciales del resto para evitar /////
+        rest = rest.lstrip("/")
 
-        # Reconstruir
-        SQLALCHEMY_DATABASE_URI = urlunparse((scheme, netloc, parsed.path, parsed.params, parsed.query, parsed.fragment))
+        # Si en 'rest' no hay un '@', es probable que falte el usuario 'postgres'
+        if "@" in rest:
+            user_pass_part = rest.split("@", 1)[0]
+            host_part = rest.split("@", 1)[1]
+            
+            if ":" in user_pass_part:
+                # Ya tiene usuario:password
+                final_netloc = rest
+            else:
+                # Solo tiene password, le agregamos el usuario postgres
+                final_netloc = f"postgres:{user_pass_part}@{host_part}"
+        else:
+            # No hay @, algo raro. Intentamos usarlo como host o fallback
+            final_netloc = rest
+
+        SQLALCHEMY_DATABASE_URI = f"postgresql://{final_netloc}"
     else:
         SQLALCHEMY_DATABASE_URI = 'sqlite:///hotel.db'
 
@@ -58,4 +53,4 @@ class Config:
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'Hotel Boutique La Orquidea <laorquideahotel45@gmail.com>')
 
 # Log de verificación
-print(f"DEBUG: Configuración de base de datos finalizada ({Config.SQLALCHEMY_DATABASE_URI.split(':')[0]}://...)")
+print(f"DEBUG: URI final lista")
