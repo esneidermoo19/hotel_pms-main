@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
-from flask_login import login_required, current_user
-from app.models import Habitacion, Reservacion, ConfigHotel
+from flask_login import login_user, logout_user, current_user
+from werkzeug.security import generate_password_hash
+from app.models import User, Habitacion, Reservacion, ConfigHotel
 from app.services.email_service import EmailService
 from app import db
 from datetime import datetime, timedelta
@@ -140,11 +141,73 @@ def procesar_pago(reserva_id):
     flash(f'¡Pago exitoso! Su reserva ha sido confirmada. Hemos enviado el código de acceso a: {reserva.email_cliente}', 'success')
     return redirect(url_for('cliente.home'))
 
-@cliente_bp.route('/mis_reservas')
-@login_required
-def mis_reservas():
-    reservas = Reservacion.query.filter_by(usuario_id=current_user.id, estado='activa').all()
-    return render_template('cliente/reservas.html', reservas=reservas)
+@cliente_bp.route('/login', methods=['GET', 'POST'])
+def cliente_login():
+    if current_user.is_authenticated and getattr(current_user, 'rol', None) == 'cliente':
+        return redirect(url_for('cliente.mis_reservas'))
+        
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        
+        user = User.query.filter_by(email=email, rol='cliente').first()
+        
+        if user and user.check_password(password):
+            login_user(user)
+            flash('¡Bienvenido de nuevo!', 'success')
+            return redirect(url_for('cliente.mis_reservas'))
+        else:
+            flash('Credenciales incorrectas. Por favor, intente de nuevo.', 'danger')
+            
+    return render_template('cliente/login.html')
+
+@cliente_bp.route('/registro', methods=['GET', 'POST'])
+def cliente_registro():
+    if current_user.is_authenticated and getattr(current_user, 'rol', None) == 'cliente':
+        return redirect(url_for('cliente.mis_reservas'))
+        
+    if request.method == 'POST':
+        nombre = request.form.get('nombre', '').strip()
+        email = request.form.get('email', '').strip()
+        telefono = request.form.get('telefono', '').strip()
+        password = request.form.get('password', '')
+        password_confirm = request.form.get('password_confirm', '')
+        
+        if not all([nombre, email, telefono, password]):
+            flash('Todos los campos son obligatorios.', 'danger')
+        elif password != password_confirm:
+            flash('Las contraseñas no coinciden.', 'danger')
+        elif len(password) < 6:
+            flash('La contraseña debe tener al menos 6 caracteres.', 'danger')
+        elif User.query.filter_by(email=email).first():
+            flash('Este correo electrónico ya está registrado.', 'danger')
+        else:
+            # Crear usuario. Usamos email como username ya que el modelo pide username único
+            # pero el requerimiento dice autenticar por email.
+            new_user = User(
+                username=email,
+                email=email,
+                nombre=nombre,
+                telefono=telefono,
+                rol='cliente',
+                activo=True
+            )
+            new_user.password = password
+            db.session.add(new_user)
+            db.session.commit()
+            
+            login_user(new_user)
+            flash('Registro exitoso. ¡Bienvenido!', 'success')
+            return redirect(url_for('cliente.mis_reservas'))
+            
+    return render_template('cliente/registro.html')
+
+@cliente_bp.route('/logout_cliente')
+def cliente_logout():
+    if current_user.is_authenticated and getattr(current_user, 'rol', None) == 'cliente':
+        logout_user()
+        flash('Sesión cerrada exitosamente.', 'info')
+    return redirect(url_for('cliente.home'))
 
 @cliente_bp.route('/cancelar_codigo', methods=['GET', 'POST'])
 def cancelar_codigo():
@@ -164,9 +227,21 @@ def cancelar_codigo():
     
     return render_template('cliente/cancelar.html')
 
+@cliente_bp.route('/mis_reservas')
+def mis_reservas():
+    if not current_user.is_authenticated or getattr(current_user, 'rol', None) != 'cliente':
+        flash('Por favor, inicie sesión para ver sus reservas.', 'warning')
+        return redirect(url_for('cliente.cliente_login'))
+        
+    reservas = Reservacion.query.filter_by(usuario_id=current_user.id, estado='activa').all()
+    return render_template('cliente/reservas.html', reservas=reservas)
+
 @cliente_bp.route('/cancelar/<int:reserva_id>')
-@login_required
 def cancelar(reserva_id):
+    if not current_user.is_authenticated or getattr(current_user, 'rol', None) != 'cliente':
+        flash('Acceso no autorizado.', 'danger')
+        return redirect(url_for('cliente.cliente_login'))
+        
     reserva = Reservacion.query.get_or_404(reserva_id)
     
     if reserva.usuario_id != current_user.id:

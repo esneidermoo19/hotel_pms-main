@@ -210,6 +210,107 @@
             
             footer { padding: 2.5rem 1rem; font-size: 0.7rem; }
         }
+        /* Staff Modal Styling */
+        .staff-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 15, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .staff-modal.active { display: flex; }
+
+        .staff-modal-content {
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            padding: 3rem 2rem;
+            border: 1px solid rgba(197, 180, 165, 0.3);
+            background: white;
+        }
+
+        .staff-modal h3 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            color: var(--clr-ink);
+        }
+
+        .staff-modal p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .pin-input-container {
+            margin-bottom: 2rem;
+        }
+
+        .pin-input-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .pin-digit {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 1.5rem;
+            border: 2px solid var(--clr-border);
+            border-radius: var(--radius-md);
+            background: white;
+            color: var(--clr-ink);
+            font-family: var(--font-ui);
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .pin-digit:focus {
+            outline: none;
+            border-color: var(--clr-taupe);
+            box-shadow: 0 0 0 4px rgba(197, 180, 165, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .pin-input-container input:focus {
+            outline: none;
+            border-color: var(--clr-taupe);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(197, 180, 165, 0.1);
+        }
+
+        .staff-modal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .staff-modal-actions button {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-ui);
+            font-size: 0.8rem;
+        }
+
+        .btn-primary { background: var(--clr-ink); color: white; }
+        .btn-primary:hover { background: #222; transform: translateY(-2px); }
+        .btn-secondary { background: transparent; border: 1px solid var(--clr-border) !important; color: #666; }
+        .btn-secondary:hover { background: #f8f9fa; }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -221,11 +322,11 @@
         </a>
         <div class="nav-links">
             <a href="{{ url_for('cliente.habitaciones') }}">Habitaciones</a>
-            {% if current_user.is_authenticated %}
+            {% if current_user.is_authenticated and current_user.rol == 'cliente' %}
                 <a href="{{ url_for('cliente.mis_reservas') }}">Mis Reservas</a>
-                <a href="{{ url_for('auth.logout') }}">Cerrar Sesión</a>
+                <a href="{{ url_for('cliente.cliente_logout') }}">Cerrar Sesión</a>
             {% else %}
-                <a href="{{ url_for('auth.login') }}">Iniciar Sesión</a>
+                <a href="{{ url_for('cliente.cliente_login') }}" style="opacity: 0.7;">Mi Cuenta</a>
             {% endif %}
             <a href="{{ url_for('cliente.cancelar_codigo') }}">Cancelar</a>
         </div>
@@ -240,11 +341,11 @@
             <i class="fas fa-times" id="menu-close" style="color: white; font-size: 1.5rem; cursor: pointer;"></i>
         </div>
         <a href="{{ url_for('cliente.habitaciones') }}">Habitaciones</a>
-        {% if current_user.is_authenticated %}
+        {% if current_user.is_authenticated and current_user.rol == 'cliente' %}
             <a href="{{ url_for('cliente.mis_reservas') }}">Mis Reservas</a>
-            <a href="{{ url_for('auth.logout') }}">Cerrar Sesión</a>
+            <a href="{{ url_for('cliente.cliente_logout') }}">Cerrar Sesión</a>
         {% else %}
-            <a href="{{ url_for('auth.login') }}">Iniciar Sesión</a>
+            <a href="{{ url_for('cliente.cliente_login') }}" style="opacity: 0.7;">Mi Cuenta</a>
         {% endif %}
         <a href="{{ url_for('cliente.cancelar_codigo') }}">Cancelar Reserva</a>
     </div>
@@ -265,9 +366,107 @@
         </div>
     </div>
 
-    <footer>
-        &copy; 2026 Hotel La Orquídea - Experiencia Boutique & Elegancia
+    <footer style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+        <div>&copy; 2026 Hotel La Orquídea - Experiencia Boutique & Elegancia</div>
+        <a href="javascript:void(0)" onclick="openStaffModal()" style="color: rgba(255,255,255,0.1); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.1em;">Acceso Staff</a>
     </footer>
+
+    <!-- Custom Staff Modal -->
+    <div id="staff-modal" class="staff-modal">
+        <div class="staff-modal-content elegant-card">
+            <h3>Acceso Restringido</h3>
+            <p>Ingrese el PIN de seguridad del personal</p>
+            <div class="pin-input-container">
+                <input type="password" class="pin-digit" maxlength="1" pattern="\d*">
+                <input type="password" class="pin-digit" maxlength="1" pattern="\d*">
+                <input type="password" class="pin-digit" maxlength="1" pattern="\d*">
+                <input type="password" class="pin-digit" maxlength="1" pattern="\d*">
+            </div>
+            <div class="staff-modal-actions">
+                <button onclick="closeStaffModal()" class="btn-secondary">Cancelar</button>
+                <button onclick="validateStaffPin()" class="btn-primary">Validar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const staffModal = document.getElementById('staff-modal');
+        const pinDigits = document.querySelectorAll('.pin-digit');
+
+        function openStaffModal() {
+            staffModal.classList.add('active');
+            pinDigits.forEach(input => input.value = '');
+            setTimeout(() => pinDigits[0].focus(), 100);
+        }
+
+        function closeStaffModal() {
+            staffModal.classList.remove('active');
+        }
+
+        // Manejo de entrada en los cuadros
+        pinDigits.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value && index < 3) {
+                    pinDigits[index + 1].focus();
+                }
+                if (Array.from(pinDigits).every(input => input.value)) {
+                    validateStaffPin();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    pinDigits[index - 1].focus();
+                }
+            });
+        });
+
+        function validateStaffPin() {
+            const pinValue = Array.from(pinDigits).map(input => input.value).join('');
+            
+            fetch("{{ url_for('auth.verificar_staff') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({ pin: pinValue })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    pinDigits.forEach(input => {
+                        input.style.borderColor = "var(--clr-rose)";
+                        input.style.animation = "shake 0.4s ease";
+                        input.value = '';
+                    });
+                    setTimeout(() => {
+                        pinDigits.forEach(input => {
+                            input.style.animation = "";
+                            input.style.borderColor = "";
+                        });
+                        pinDigits[0].focus();
+                    }, 400);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        }
+
+        // Animación de vibración para error
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
     
     <script>
         const openBtn = document.getElementById('menu-open');

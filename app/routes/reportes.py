@@ -4,7 +4,7 @@ from app import db, mail
 from flask_mail import Message
 from datetime import datetime, timedelta
 from flask_login import login_required, current_user
-from app.helpers.rbac import admin_required
+from app.helpers.rbac import admin_required, empleado_required
 from sqlalchemy import func
 
 reportes_bp = Blueprint('reportes', __name__)
@@ -45,7 +45,7 @@ def enviar_factura_email(factura, reserva, habitacion, config):
                 </tr>
                 <tr><td style="padding: 10px;">Alojamiento ({noches} noches)</td>
                     <td style="padding: 10px; text-align: right;">{int(factura.total - total_extras):,} COP</td></tr>
-"""
+        """
         
         for c in consumos:
             html_factura += f"<tr><td style='padding: 10px;'>{c.producto}</td><td style='padding: 10px; text-align: right;'>{int(c.monto):,} COP</td></tr>"
@@ -82,7 +82,7 @@ def enviar_factura_email(factura, reserva, habitacion, config):
 
 
 @reportes_bp.route('/historial')
-@login_required
+@empleado_required
 def historial():
     fecha_inicio = request.args.get('fecha_inicio')
     fecha_fin = request.args.get('fecha_fin')
@@ -159,7 +159,7 @@ def resumen_diario():
                          detalle_habitaciones=detalle_habitaciones)
 
 @reportes_bp.route('/facturacion')
-@login_required
+@empleado_required
 def facturacion():
     reservacion_id = request.args.get('reservacion_id')
     reservas_activas = Reservacion.query.filter_by(estado='activa').all()
@@ -190,7 +190,7 @@ def facturacion():
     return render_template('reportes/facturacion.html', reservas_activas=reservas_activas)
 
 @reportes_bp.route('/generar_factura', methods=['POST'])
-@login_required
+@empleado_required
 def generar_factura():
     try:
         reservacion_id = request.form.get('reservacion_id')
@@ -387,7 +387,7 @@ def guardar_cliente():
     return redirect(url_for('reportes.lista_clientes'))
 
 @reportes_bp.route('/clientes/buscar/<nit>')
-@login_required
+@empleado_required
 def buscar_cliente(nit):
     cliente = ClienteFactura.query.filter_by(nit=nit).first()
     if cliente:

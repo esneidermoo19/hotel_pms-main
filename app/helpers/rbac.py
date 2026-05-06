@@ -3,14 +3,18 @@ from flask import redirect, url_for, flash
 from flask_login import current_user
 
 def empleado_required(f):
-    """Decorator para permitir empleados y admins"""
+    """Decorator para permitir solo empleados y admins"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
-            flash('Por favor inicie sesion.', 'warning')
+            flash('Por favor inicie sesión.', 'warning')
             return redirect(url_for('auth.login'))
         
-        # Permitir admins y empleados
+        # Seguridad: Solo permitir roles de staff
+        if getattr(current_user, 'rol', None) not in ['admin', 'recepcionista']:
+            flash('Acceso denegado. Esta área es exclusiva para el personal.', 'danger')
+            return redirect(url_for('cliente.home'))
+            
         return f(*args, **kwargs)
     return decorated_function
 

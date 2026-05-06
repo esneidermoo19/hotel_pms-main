@@ -2,39 +2,107 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>404 - Página no encontrada</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Extraviado en La Orquídea</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --clr-ink: #0F0F0F;
+            --clr-bone: #F9F8F6;
+            --clr-taupe: #C5B4A5;
+            --radius-md: 12px;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--clr-bone);
+            color: var(--clr-ink);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            background: #f5f5f5;
+            overflow: hidden;
         }
-        .error {
+
+        .container {
             text-align: center;
-            padding: 40px;
+            padding: 2rem;
+            max-width: 500px;
+            animation: fadeIn 1.2s ease-out;
         }
-        h1 { font-size: 72px; color: #1F1528; margin: 0; }
-        p { font-size: 18px; color: #666; }
-        a {
+
+        .error-code {
+            font-family: 'Playfair Display', serif;
+            font-size: 8rem;
+            line-height: 1;
+            margin: 0;
+            opacity: 0.1;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            letter-spacing: 0.2em;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 400;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+
+        .btn {
             display: inline-block;
-            margin-top: 20px;
-            padding: 12px 24px;
-            background: #1F1528;
+            padding: 1.2rem 2.5rem;
+            background: var(--clr-ink);
             color: white;
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-size: 0.8rem;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            background: #222;
+        }
+
+        .orchid-icon {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-    <div class="error">
-        <h1>404</h1>
-        <p>La página que buscas no existe.</p>
-        <a href="/login" class="btn-gold">Ir al Login</a>
+    <div class="error-code">404</div>
+    <div class="container">
+        <span class="orchid-icon">🌿</span>
+        <h1>Página Extraviada</h1>
+        <p>Lo sentimos, la página que busca no se encuentra en nuestro jardín. Permítanos guiarle de vuelta a la elegancia.</p>
+        <a href="/" class="btn">Regresar al Inicio</a>
     </div>
 </body>
 </html>

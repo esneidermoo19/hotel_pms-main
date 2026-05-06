@@ -36,10 +36,13 @@ def create_app(config_class=None):
     login_manager.login_message = 'Por favor inicie sesión para continuar.'
     login_manager.login_message_category = 'warning'
 
-    # Endpoint de salud para Coolify
     @app.route('/health')
     def health():
         return {'status': 'healthy'}, 200
+
+    @app.route('/')
+    def index():
+        return redirect(url_for('cliente.home'))
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -61,7 +64,7 @@ def create_app(config_class=None):
     app.register_blueprint(reportes_bp, url_prefix='/reportes')
     app.register_blueprint(auth_bp)
     app.register_blueprint(empleado_bp)
-    app.register_blueprint(cliente_bp)
+    app.register_blueprint(cliente_bp, url_prefix='/huespedes')
     
     # 4. Exenciones de CSRF necesarias para la operatividad
     # Se usan tanto el nombre del endpoint como la ruta completa para asegurar compatibilidad

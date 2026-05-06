@@ -3,17 +3,18 @@ from app.models import Habitacion, Reservacion, Empleado
 from app import db
 from datetime import datetime
 from flask_login import login_required, current_user
+from app.helpers.rbac import empleado_required
 import json
 
 recep_bp = Blueprint('recep', __name__)
 
 @recep_bp.route('/')
-@login_required
+@empleado_required
 def index():
     return redirect(url_for('recep.dashboard'))
 
 @recep_bp.route('/dashboard')
-@login_required
+@empleado_required
 def dashboard():
     habitaciones_libres = Habitacion.query.filter_by(estado='Disponible').all()
     habitaciones_ocupadas = Habitacion.query.filter_by(estado='Ocupada').all()
@@ -40,7 +41,7 @@ def dashboard():
     )
 
 @recep_bp.route('/habitacion/estado/<int:habitacion_id>', methods=['POST'])
-@login_required
+@empleado_required
 def cambiar_estado_habitacion(habitacion_id):
     habitacion = Habitacion.query.get_or_404(habitacion_id)
     nuevo_estado = request.form.get('estado')
@@ -55,7 +56,7 @@ def cambiar_estado_habitacion(habitacion_id):
     return redirect(url_for('recep.dashboard'))
 
 @recep_bp.route('/reserva/pago/<int:reservacion_id>', methods=['POST'])
-@login_required
+@empleado_required
 def actualizar_pago(reservacion_id):
     reserva = Reservacion.query.get_or_404(reservacion_id)
     pagado = request.form.get('pagado') == 'si'
@@ -72,7 +73,7 @@ def actualizar_pago(reservacion_id):
     return redirect(url_for('recep.dashboard'))
 
 @recep_bp.route('/reservar/<int:habitacion_id>', methods=['GET', 'POST'])
-@login_required
+@empleado_required
 def hacer_reserva(habitacion_id):
     habitacion = Habitacion.query.get_or_404(habitacion_id)
     
@@ -112,7 +113,7 @@ def hacer_reserva(habitacion_id):
             if conflicto:
                 flash(f'Conflicto de fechas: Ya existe una reserva para {conflicto.nombre_cliente} del {conflicto.fecha_inicio.strftime("%d/%m")} al {conflicto.fecha_fin.strftime("%d/%m")}.', 'danger')
                 return redirect(url_for('recep.hacer_reserva', habitacion_id=habitacion.id))
-
+            
             dias_estadia = (fecha_salida - fecha_ingreso).days
             if dias_estadia <= 0:
                 flash('La fecha de salida debe ser mayor a la de ingreso.', 'warning')
@@ -161,5 +162,5 @@ def hacer_reserva(habitacion_id):
         except Exception as e:
             db.session.rollback()
             flash(f'Ocurrió un error al guardar: {str(e)}', 'danger')
-
+    
     return render_template('recepcion/formulario_reserva.html', habitacion=habitacion)
