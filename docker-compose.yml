@@ -13,7 +13,7 @@ services:
     environment:
       POSTGRES_USER: '${POSTGRES_USER:-admin}'
       POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
-      POSTGRES_DB: '${POSTGRES_DB:-master_db}'
+      POSTGRES_DB: '${POSTGRES_DB:-hotel_pms_db}'
       POSTGRES_INITDB_ARGS: '--auth-host=md5 --auth-local=md5'
       POSTGRES_HOST_AUTH_METHOD: md5
       TZ: America/Bogota
@@ -21,14 +21,13 @@ services:
       postgres -c shared_buffers=256MB -c effective_cache_size=768MB -c work_mem=16MB -c maintenance_work_mem=128MB -c max_connections=100 -c effective_io_concurrency=200 -c log_timezone=America/Bogota
     volumes:
       - '/data/postgres/prod_data:/var/lib/postgresql/data'
-    ports:
-      - '127.0.0.1:5433:5432'
+
     networks:
       - coolify
     healthcheck:
       test:
         - CMD-SHELL
-        - 'pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-master_db}'
+        - 'pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-hotel_pms_db}'
       interval: 10s
       timeout: 5s
       retries: 5
@@ -41,7 +40,7 @@ services:
           memory: 512M
 
   postgres-backup:
-    image: 'prodrigestivill/postgres-backup-local:16-alpine'
+    image: 'prodrigestivill/postgres-backup-local:17-alpine'
     container_name: postgres_backup_sidecar
     restart: always
     volumes:
@@ -51,7 +50,7 @@ services:
         condition: service_healthy
     environment:
       POSTGRES_HOST: postgres-db
-      POSTGRES_DB: '${POSTGRES_DB:-master_db}'
+      POSTGRES_DB: '${POSTGRES_DB:-hotel_pms_db}'
       POSTGRES_USER: '${POSTGRES_USER:-admin}'
       POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
       SCHEDULE: '@daily'
@@ -68,23 +67,33 @@ services:
     container_name: hotel_pms_app
     restart: always
     environment:
-      DATABASE_URL: 'postgresql://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD}@postgres-db:5432/${POSTGRES_DB:-master_db}'
+
+      DATABASE_URL: 'postgresql://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD}@postgres-db:5432/${POSTGRES_DB:-hotel_pms_db}'
       SECRET_KEY: '${SECRET_KEY}'
-      MAIL_SERVER: '${MAIL_SERVER}'
-      MAIL_PORT: '${MAIL_PORT}'
-      MAIL_USE_TLS: '${MAIL_USE_TLS}'
+      MAIL_SERVER: '${MAIL_SERVER:-smtp.gmail.com}'
+      MAIL_PORT: '${MAIL_PORT:-587}'
+      MAIL_USE_TLS: '${MAIL_USE_TLS:-True}'
       MAIL_USERNAME: '${MAIL_USERNAME}'
       MAIL_PASSWORD: '${MAIL_PASSWORD}'
       MAIL_DEFAULT_SENDER: '${MAIL_DEFAULT_SENDER}'
-      FLASK_APP: '${FLASK_APP}'
+      FLASK_APP: '${FLASK_APP:-run.py}'
       FLASK_ENV: '${FLASK_ENV:-production}'
+      FLASK_DEBUG: '0'
     depends_on:
       postgres-db:
         condition: service_healthy
+
+    healthcheck:
+      test: [ 'CMD', 'curl', '-f', 'http://localhost:5000/health' ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
       - coolify
-    ports:
-      - '5000:5000'
+
+    expose:
+      - '5000'
 
 networks:
   coolify:
