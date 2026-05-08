@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres-db:
-    image: 'postgres:16-alpine'
+    image: 'postgres:17-alpine'
     container_name: postgres_prod_central
     restart: always
     logging:
@@ -18,14 +18,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: md5
       TZ: America/Bogota
     command: >-
-      postgres
-      -c shared_buffers=256MB
-      -c effective_cache_size=768MB
-      -c work_mem=16MB
-      -c maintenance_work_mem=128MB
-      -c max_connections=100
-      -c effective_io_concurrency=200
-      -c log_timezone=America/Bogota
+      postgres -c shared_buffers=256MB -c effective_cache_size=768MB -c work_mem=16MB -c maintenance_work_mem=128MB -c max_connections=100 -c effective_io_concurrency=200 -c log_timezone=America/Bogota
     volumes:
       - '/data/postgres/prod_data:/var/lib/postgresql/data'
     ports:
