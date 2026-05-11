@@ -18,10 +18,12 @@ COPY . .
 ENV FLASK_APP=run.py
 ENV FLASK_ENV=production
 ENV PORT=5000
+ENV WEB_CONCURRENCY=3
 
 # Expose port
 EXPOSE 5000
 
 # Run with gunicorn
 # Note: we use run:app because run.py creates the 'app' object
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "run:app"]
+# Optimization: Using multiple workers and threads
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "3", "--threads", "2", "--access-logfile", "-", "--error-logfile", "-", "run:app"]
