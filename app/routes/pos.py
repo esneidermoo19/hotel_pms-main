@@ -33,35 +33,41 @@ def cargar_consumo(reserva_id):
     
     if request.method == 'POST':
         try:
-            producto_nombre = request.form.get('producto')
-            monto_str = request.form.get('monto')
+            from decimal import Decimal, InvalidOperation
+            producto_nombre = request.form.get('producto', '').strip()
+            monto_str = request.form.get('monto', '').strip()
             empleado_id = request.form.get('empleado_id')
             
-            if not monto_str or float(monto_str) <= 0:
+            if not monto_str:
                 flash('El monto debe ser un número mayor a cero.', 'warning')
                 return redirect(url_for('pos.cargar_consumo', reserva_id=reserva.id))
                 
-            monto = float(monto_str)
+            monto_dec = Decimal(str(monto_str))
+            if monto_dec <= 0:
+                flash('El monto debe ser un número mayor a cero.', 'warning')
+                return redirect(url_for('pos.cargar_consumo', reserva_id=reserva.id))
 
             nuevo_consumo = ConsumoPOS(
                 reservacion_id=reserva.id,
                 producto=producto_nombre,
-                monto=monto,
+                monto=float(monto_dec),
                 empleado_id=empleado_id if empleado_id else None
             )
             db.session.add(nuevo_consumo)
 
-            reserva.total_pago += monto
+            current_total = Decimal(str(reserva.total_pago)) if reserva.total_pago is not None else Decimal('0')
+            reserva.total_pago = current_total + monto_dec
             
             db.session.commit()
 
-            flash(f'Cargo de ${monto} por "{producto_nombre}" añadido a la Habitación {habitacion.numero}.', 'success')
+            flash(f'Cargo de ${monto_dec:,.0f} por "{producto_nombre}" añadido exitosamente a la Habitación {habitacion.numero}.', 'success')
             return redirect(url_for('pos.caja_principal'))
 
-        except ValueError:
+        except (ValueError, TypeError, InvalidOperation):
              flash('Por favor, ingresa un valor numérico válido para el monto.', 'danger')
         except Exception as e:
             db.session.rollback()
+            print(f"[ERROR] Error al registrar consumo: {e}")
             flash(f'Ocurrió un error al procesar el cargo: {str(e)}', 'danger')
 
     historial_consumos = ConsumoPOS.query.filter_by(reservacion_id=reserva.id).order_by(ConsumoPOS.fecha.desc()).all()
