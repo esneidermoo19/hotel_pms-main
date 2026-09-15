@@ -10,74 +10,9 @@ from sqlalchemy import func
 reportes_bp = Blueprint('reportes', __name__)
 
 def enviar_factura_email(factura, reserva, habitacion, config):
-    """Envía la factura por correo electrónico"""
-    if not reserva.email_cliente:
-        return False
-    
-    try:
-        noches = (reserva.fecha_fin - reserva.fecha_inicio).days
-        consumos = ConsumoPOS.query.filter_by(reservacion_id=reserva.id).all()
-        total_extras = sum(c.monto for c in consumos)
-        
-        html_factura = f"""
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;">
-            <div style="text-align: center; border-bottom: 2px solid #4a235a; padding-bottom: 15px; margin-bottom: 20px;">
-                <h1 style="color: #1F1528; margin: 10px 0;">{config.nombre}</h1>
-                <p>NIT: {config.nit}</p>
-                <p>{config.direccion}, {config.ciudad}</p>
-                <p>Tel: {config.telefono}</p>
-            </div>
-            
-            <h2 style="background: #4a235a; color: white; padding: 10px; text-align: center;">FACTURA ELECTRÓNICA</h2>
-            <p style="text-align: center; font-weight: bold;">No. {factura.numero_factura}</p>
-            
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
-                <p><strong>Nombre:</strong> {reserva.nombre_cliente}</p>
-                <p><strong>Documento:</strong> {reserva.tipo_documento}: {reserva.cedula_nit}</p>
-                <p><strong>Habitación:</strong> {habitacion.numero} ({habitacion.tipo})</p>
-                <p><strong>Estancia:</strong> {reserva.fecha_inicio.strftime('%Y-%m-%d')} a {reserva.fecha_fin.strftime('%Y-%m-%d')} ({noches} noches)</p>
-            </div>
-            
-            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-                <tr style="background: #4a235a; color: white;">
-                    <th style="padding: 10px; text-align: left;">Concepto</th>
-                    <th style="padding: 10px; text-align: right;">Valor</th>
-                </tr>
-                <tr><td style="padding: 10px;">Alojamiento ({noches} noches)</td>
-                    <td style="padding: 10px; text-align: right;">{int(factura.total - total_extras):,} COP</td></tr>
-        """
-        
-        for c in consumos:
-            html_factura += f"<tr><td style='padding: 10px;'>{c.producto}</td><td style='padding: 10px; text-align: right;'>{int(c.monto):,} COP</td></tr>"
-        
-        html_factura += f"""
-                <tr style="background: #f8f9fa; font-weight: bold;">
-                    <td style="padding: 15px;">TOTAL PAGADO</td>
-                    <td style="padding: 15px; text-align: right; color: #4a235a; font-size: 18px;">{int(factura.total):,} COP</td>
-                </tr>
-            </table>
-            
-            <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ccc; font-size: 12px; color: #666;">
-                <p>Gracias por su preferencia</p>
-                <p>{config.nombre} - {config.ciudad}</p>
-                <p>{config.email} - {config.web}</p>
-            </div>
-        </div>
-        """
-        
-        from flask import current_app
-        sender = current_app.config.get('MAIL_DEFAULT_SENDER') or current_app.config.get('MAIL_USERNAME')
-        msg = Message(
-            subject=f"Factura {factura.numero_factura} - {config.nombre}",
-            sender=sender,
-            recipients=[reserva.email_cliente],
-            html=html_factura
-        )
-        mail.send(msg)
-        return True
-    except Exception as e:
-        print(f"Error enviando correo: {e}")
-        return False
+    """Envía la factura por correo electrónico usando EmailService"""
+    from app.services.email_service import EmailService
+    return EmailService.enviar_factura(factura, reserva, habitacion, config)
 
 
 
@@ -220,13 +155,13 @@ def generar_factura():
             subtotal=subtotal,
             impuesto=impuesto,
             total=total,
-            nombre_cliente=reserva.nombre_huesped,
+            nombre_cliente=reserva.nombre_cliente,
             nit_cliente=reserva.cedula_nit,
             tipo_documento=reserva.tipo_documento,
             direccion_cliente=direccion,
             metodo_pago=metodo_pago,
             estado='pagada',
-            email_cliente=reserva.email_huesped
+            email_cliente=reserva.email_cliente
         )
         db.session.add(factura)
         db.session.flush()
@@ -234,16 +169,15 @@ def generar_factura():
         reserva.estado = 'facturada'
         
         # Enviar email si se pidió
-        if enviar_email and reserva.email_huesped:
+        if enviar_email and reserva.email_cliente:
             config = ConfigHotel.query.first()
             habitacion = reserva.habitacion
-            from app.routes.facturacion import enviar_factura_email
             try:
                 email_enviado = enviar_factura_email(factura, reserva, habitacion, config)
                 if email_enviado:
                     factura.correo_enviado = True
-            except:
-                pass
+            except Exception as e:
+                print(f"Error enviando correo: {e}")
         
         db.session.commit()
     
@@ -329,12 +263,12 @@ def reenviar_factura(factura_id):
     habitacion = Habitacion.query.get(reserva.habitacion_id)
     config = ConfigHotel.query.first()
     
-    if reserva.email_huesped:
+    if reserva and reserva.email_cliente:
         email_enviado = enviar_factura_email(factura, reserva, habitacion, config)
         if email_enviado:
             factura.correo_enviado = True
             db.session.commit()
-            flash(f'Factura enviada a {reserva.email_huesped}', 'success')
+            flash(f'Factura enviada a {reserva.email_cliente}', 'success')
         else:
             flash('Error al enviar el correo. Verifique que el email sea válido.', 'danger')
     else:
