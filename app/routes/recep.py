@@ -16,6 +16,8 @@ def index():
 @recep_bp.route('/dashboard')
 @empleado_required
 def dashboard():
+    from app.models import TurnoEmpleado
+    
     habitaciones_libres = Habitacion.query.filter_by(estado='Disponible').all()
     habitaciones_ocupadas = Habitacion.query.filter_by(estado='Ocupada').all()
     habitaciones_mantenimiento = Habitacion.query.filter_by(estado='Mantenimiento').all()
@@ -31,14 +33,136 @@ def dashboard():
                 ocupadas_pagadas.append(item)
             else:
                 ocupadas_pendientes.append(item)
+                
+    # Obtener o vincular perfil de empleado del usuario en sesión
+    empleado = Empleado.query.filter_by(user_id=current_user.id).first()
+    if not empleado and hasattr(current_user, 'nombre'):
+        empleado = Empleado.query.filter_by(nombre=current_user.nombre).first()
+        if empleado and not empleado.user_id:
+            empleado.user_id = current_user.id
+            db.session.commit()
+            
+    if not empleado:
+        try:
+            empleado = Empleado(
+                nombre=current_user.nombre or current_user.username,
+                email=current_user.email,
+                telefono=current_user.telefono,
+                cargo=current_user.rol.capitalize() if current_user.rol else 'Recepcionista',
+                activo=True,
+                user_id=current_user.id
+            )
+            db.session.add(empleado)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            empleado = None
+
+    hoy_date = datetime.now().date()
+    turno_activo = None
+    if empleado:
+        turno_activo = TurnoEmpleado.query.filter_by(
+            empleado_id=empleado.id, 
+            hora_salida=None,
+            fecha=hoy_date
+        ).first()
     
     return render_template(
         'recepcion/dashboard.html', 
         libres=habitaciones_libres, 
         occupations_no_pagadas=ocupadas_pendientes,
         occupations_pagadas=ocupadas_pagadas,
-        mantenimiento=habitaciones_mantenimiento
+        mantenimiento=habitaciones_mantenimiento,
+        turno_activo=turno_activo,
+        empleado=empleado
     )
+
+@recep_bp.route('/turno/empezar', methods=['POST'])
+@empleado_required
+def empezar_turno():
+    from app.models import TurnoEmpleado
+    
+    empleado = Empleado.query.filter_by(user_id=current_user.id).first()
+    if not empleado and hasattr(current_user, 'nombre'):
+        empleado = Empleado.query.filter_by(nombre=current_user.nombre).first()
+        
+    if not empleado:
+        try:
+            empleado = Empleado(
+                nombre=current_user.nombre or current_user.username,
+                email=current_user.email,
+                telefono=current_user.telefono,
+                cargo=current_user.rol.capitalize() if current_user.rol else 'Recepcionista',
+                activo=True,
+                user_id=current_user.id
+            )
+            db.session.add(empleado)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al vincular perfil de empleado: {e}', 'danger')
+            return redirect(url_for('recep.dashboard'))
+        
+    hoy_date = datetime.now().date()
+    turno_existente = TurnoEmpleado.query.filter_by(
+        empleado_id=empleado.id, 
+        hora_salida=None,
+        fecha=hoy_date
+    ).first()
+    
+    if turno_existente:
+        flash('Ya tienes un turno activo en este momento.', 'warning')
+        return redirect(url_for('recep.dashboard'))
+        
+    now = datetime.now()
+    nuevo_turno = TurnoEmpleado(
+        empleado_id=empleado.id,
+        fecha=hoy_date,
+        hora_entrada=now,
+        estado='activo'
+    )
+    db.session.add(nuevo_turno)
+    db.session.commit()
+    
+    hora_str = now.strftime('%H:%M')
+    flash(f'¡Turno iniciado exitosamente a las {hora_str}! Registro de asistencia visible en Administración.', 'success')
+    return redirect(url_for('recep.dashboard'))
+
+
+@recep_bp.route('/turno/finalizar', methods=['POST'])
+@empleado_required
+def finalizar_turno():
+    from app.models import TurnoEmpleado
+    
+    empleado = Empleado.query.filter_by(user_id=current_user.id).first()
+    if not empleado and hasattr(current_user, 'nombre'):
+        empleado = Empleado.query.filter_by(nombre=current_user.nombre).first()
+        
+    if not empleado:
+        flash('No se encontró perfil de empleado activo.', 'danger')
+        return redirect(url_for('recep.dashboard'))
+        
+    hoy_date = datetime.now().date()
+    turno_activo = TurnoEmpleado.query.filter_by(
+        empleado_id=empleado.id, 
+        hora_salida=None,
+        fecha=hoy_date
+    ).first()
+    
+    if not turno_activo:
+        flash('No tienes ningún turno activo para finalizar.', 'warning')
+        return redirect(url_for('recep.dashboard'))
+        
+    now = datetime.now()
+    turno_activo.hora_salida = now
+    turno_activo.horas = turno_activo.calcular_horas()
+    turno_activo.estado = 'completado'
+    db.session.commit()
+    
+    hora_str = now.strftime('%H:%M')
+    horas_str = f"{turno_activo.horas:.1f}"
+    flash(f'¡Turno finalizado a las {hora_str}! Se registraron {horas_str} horas trabajadas.', 'info')
+    return redirect(url_for('recep.dashboard'))
 
 @recep_bp.route('/habitacion/estado/<int:habitacion_id>', methods=['POST'])
 @empleado_required

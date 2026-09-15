@@ -25,6 +25,152 @@
         </div>
     </div>
 
+    <!-- Shift Control Widget -->
+    <div class="shift-widget-banner {{ 'active' if turno_activo else 'inactive' }}">
+        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <div class="shift-status-pill {{ 'active' if turno_activo else 'inactive' }}">
+                {% if turno_activo %}
+                <span class="pulse-ring-dot"></span> EN TURNO LABORAL
+                {% else %}
+                <i class="fas fa-clock"></i> FUERA DE TURNO
+                {% endif %}
+            </div>
+
+            <div>
+                {% if turno_activo %}
+                <div style="font-size: 0.95rem; font-weight: 700; color: #111827;">
+                    Turno iniciado a las {{ turno_activo.hora_entrada.strftime('%H:%M') }} hs
+                </div>
+                <div style="font-size: 0.78rem; color: #4B5563;">
+                    Tu tiempo de trabajo se contabiliza en tiempo real en el Panel de Administración.
+                </div>
+                {% else %}
+                <div style="font-size: 0.95rem; font-weight: 700; color: #111827;">
+                    Registro de Horario Laboral
+                </div>
+                <div style="font-size: 0.78rem; color: #4B5563;">
+                    Presiona el botón para marcar tu entrada de turno y registrar tus horas de trabajo.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div>
+            {% if turno_activo %}
+            <form action="{{ url_for('recep.finalizar_turno') }}" method="POST" style="margin: 0;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-shift-action btn-shift-end" onclick="return confirm('¿Confirma que desea finalizar su turno de trabajo?')">
+                    <i class="fas fa-sign-out-alt"></i> Finalizar Turno
+                </button>
+            </form>
+            {% else %}
+            <form action="{{ url_for('recep.empezar_turno') }}" method="POST" style="margin: 0;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-shift-action btn-shift-start">
+                    <i class="fas fa-play"></i> Empezar Turno
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <style>
+    .shift-widget-banner {
+        background: #FFFFFF;
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin-bottom: 25px;
+        border: 1px solid #E5E7EB;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .shift-widget-banner.active {
+        background: linear-gradient(135deg, #ECFDF5 0%, #FFFFFF 100%);
+        border-color: #A7F3D0;
+    }
+
+    .shift-widget-banner.inactive {
+        background: linear-gradient(135deg, #FFFBEB 0%, #FFFFFF 100%);
+        border-color: #FDE68A;
+    }
+
+    .shift-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 6px 14px;
+        border-radius: 20px;
+    }
+
+    .shift-status-pill.active {
+        background: #10B981;
+        color: #FFFFFF;
+    }
+
+    .shift-status-pill.inactive {
+        background: #F59E0B;
+        color: #FFFFFF;
+    }
+
+    .btn-shift-action {
+        border: none;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-shift-start {
+        background: #10B981;
+        color: #FFFFFF;
+    }
+
+    .btn-shift-start:hover {
+        background: #059669;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-shift-end {
+        background: #EF4444;
+        color: #FFFFFF;
+    }
+
+    .btn-shift-end:hover {
+        background: #DC2626;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .pulse-ring-dot {
+        width: 8px;
+        height: 8px;
+        background: #FFFFFF;
+        border-radius: 50%;
+        animation: pulse-ring-anim 1.5s infinite;
+    }
+
+    @keyframes pulse-ring-anim {
+        0% { transform: scale(0.95); opacity: 0.8; }
+        50% { transform: scale(1.3); opacity: 1; }
+        100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    </style>
+
     <!-- Stats Cards -->
     <div class="stats-row">
         <div class="stat-card stat-libre">
