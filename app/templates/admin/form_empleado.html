@@ -14,46 +14,46 @@
     </a>
     
     <div class="elegant-card animated stagger-2" style="padding: 50px; border: none; box-shadow: var(--shadow-elegant);">
-        <form method="POST">
+        <form method="POST" action="{{ url_for('admin.nuevo_empleado') if not empleado else url_for('admin.editar_empleado', id=empleado.id) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
                 <div class="form-group" style="grid-column: span 2;">
                     <label for="nombre" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Nombre Completo *</label>
-                    <input type="text" id="nombre" name="nombre" class="form-control" value="{{ empleado.nombre if empleado else '' }}" required placeholder="Ej: Juan Pérez" style="font-size: 1.1rem; border-bottom-width: 2px;">
+                    <input type="text" id="nombre" name="nombre" class="form-control" value="{{ request.form.get('nombre', empleado.nombre if empleado else '') }}" required placeholder="Ej: Juan Pérez" style="font-size: 1.1rem; border-bottom-width: 2px;">
                 </div>
                 
                 <div class="form-group">
                     <label for="cargo" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Cargo / Posición</label>
                     <select id="cargo" name="cargo" class="form-control" style="background: transparent; -webkit-appearance: none; cursor: pointer;">
-                        <option value="Empleado" {{ 'selected' if empleado and empleado.cargo == 'Empleado' else '' }}>Empleado</option>
-                        <option value="Recepcionista" {{ 'selected' if empleado and empleado.cargo == 'Recepcionista' else '' }}>Recepcionista</option>
-                        <option value="Camarero" {{ 'selected' if empleado and empleado.cargo == 'Camarero' else '' }}>Camarero</option>
-                        <option value="Cocinero" {{ 'selected' if empleado and empleado.cargo == 'Cocinero' else '' }}>Cocinero</option>
-                        <option value="Gerente" {{ 'selected' if empleado and empleado.cargo == 'Gerente' else '' }}>Gerente</option>
+                        <option value="Empleado" {{ 'selected' if (request.form.get('cargo') == 'Empleado' or (empleado and empleado.cargo == 'Empleado')) else '' }}>Empleado</option>
+                        <option value="Recepcionista" {{ 'selected' if (request.form.get('cargo') == 'Recepcionista' or (empleado and empleado.cargo == 'Recepcionista')) else '' }}>Recepcionista</option>
+                        <option value="Camarero" {{ 'selected' if (request.form.get('cargo') == 'Camarero' or (empleado and empleado.cargo == 'Camarero')) else '' }}>Camarero</option>
+                        <option value="Cocinero" {{ 'selected' if (request.form.get('cargo') == 'Cocinero' or (empleado and empleado.cargo == 'Cocinero')) else '' }}>Cocinero</option>
+                        <option value="Gerente" {{ 'selected' if (request.form.get('cargo') == 'Gerente' or (empleado and empleado.cargo == 'Gerente')) else '' }}>Gerente</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="telefono" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Teléfono de Contacto</label>
-                    <input type="text" id="telefono" name="telefono" class="form-control" value="{{ empleado.telefono if empleado else '' }}" placeholder="+57 300 000 0000">
+                    <input type="text" id="telefono" name="telefono" class="form-control" value="{{ request.form.get('telefono', empleado.telefono if empleado else '') }}" placeholder="+57 300 000 0000">
                 </div>
                 
                 {% if not empleado %}
                 <div class="form-group">
-                    <label for="username" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Usuario (Login) *</label>
-                    <input type="text" id="username" name="username" class="form-control" placeholder="Ej: juan.p" required>
+                    <label for="username" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Usuario (Login)</label>
+                    <input type="text" id="username" name="username" class="form-control" value="{{ request.form.get('username', '') }}" placeholder="Ej: juan.p (Generado si está vacío)">
                 </div>
                 
                 <div class="form-group">
-                    <label for="password" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Contraseña *</label>
-                    <input type="password" id="password" name="password" class="form-control" required placeholder="••••••••">
+                    <label for="password" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Contraseña</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="•••••••• (Default: 123456)">
                 </div>
                 {% endif %}
                 
                 <div class="form-group" style="grid-column: span 2;">
                     <label for="email" class="stat-label" style="display: block; margin-bottom: 10px; color: var(--clr-taupe);">Correo Electrónico</label>
-                    <input type="email" id="email" name="email" class="form-control" value="{{ empleado.email if empleado else '' }}" placeholder="juan.perez@hotel.com">
+                    <input type="email" id="email" name="email" class="form-control" value="{{ request.form.get('email', empleado.email if empleado else '') }}" placeholder="juan.perez@hotel.com">
                 </div>
             </div>
             

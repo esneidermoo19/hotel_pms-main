@@ -73,9 +73,13 @@ def create_app(config_class=None):
     csrf.exempt('empleado.nuevo_cliente')
     csrf.exempt('empleado.cobrar_reserva')
     csrf.exempt('empleado.lista_clientes')
+    csrf.exempt('admin.nuevo_empleado')
+    csrf.exempt('admin.editar_empleado')
     csrf.exempt('app.routes.empleado.nuevo_cliente')
     csrf.exempt('app.routes.empleado.cobrar_reserva')
     csrf.exempt('app.routes.empleado.lista_clientes')
+    csrf.exempt('app.routes.admin.nuevo_empleado')
+    csrf.exempt('app.routes.admin.editar_empleado')
 
     # 5. Registro de filtros de plantillas
     from app.filters import register_filters

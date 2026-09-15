@@ -292,25 +292,35 @@ def gestionar_empleados():
 @admin_required
 def nuevo_empleado():
     if request.method == 'POST':
-        nombre = request.form.get('nombre')
-        telefono = request.form.get('telefono')
-        email = request.form.get('email')
-        cargo = request.form.get('cargo', 'Empleado')
-        username = request.form.get('username')
-        password = request.form.get('password')
+        import re
+        nombre = request.form.get('nombre', '').strip()
+        telefono = request.form.get('telefono', '').strip()
+        email = request.form.get('email', '').strip()
+        cargo = request.form.get('cargo', 'Empleado').strip()
+        username = request.form.get('username', '').strip().lower()
+        password = request.form.get('password', '').strip()
         
         if not nombre:
-            flash('El nombre es obligatorio.', 'warning')
-            return redirect(url_for('admin.nuevo_empleado'))
+            flash('El nombre del colaborador es obligatorio.', 'warning')
+            return render_template('admin/form_empleado.html')
         
-        if not username or not password:
-            flash('El usuario y contraseña son obligatorios.', 'warning')
-            return redirect(url_for('admin.nuevo_empleado'))
-        
+        # Autogenerar un usuario limpio si no fue ingresado
+        if not username:
+            clean_name = re.sub(r'[^a-zA-Z0-9]', '', nombre.lower())
+            username = clean_name[:12] if clean_name else 'empleado'
+            count = 1
+            base_user = username
+            while User.query.filter_by(username=username).first():
+                username = f"{base_user}{count}"
+                count += 1
+                
+        if not password:
+            password = "123456" # Contraseña por defecto si no ingresa una
+            
         existente = User.query.filter_by(username=username).first()
         if existente:
-            flash(f'El usuario "{username}" ya existe.', 'warning')
-            return redirect(url_for('admin.nuevo_empleado'))
+            flash(f'El usuario "{username}" ya existe en el sistema. Ingrese un usuario diferente.', 'warning')
+            return render_template('admin/form_empleado.html')
         
         try:
             user = User(
@@ -318,7 +328,7 @@ def nuevo_empleado():
                 nombre=nombre,
                 email=email,
                 telefono=telefono,
-                rol=cargo.lower(),
+                rol=cargo.lower() if cargo else 'empleado',
                 activo=True
             )
             user.password = password
@@ -336,11 +346,13 @@ def nuevo_empleado():
             db.session.add(empleado)
             db.session.commit()
             
-            flash(f'Empleado {nombre} agregado con usuario: {username}', 'success')
+            flash(f'¡Empleado {nombre} registrado exitosamente con el usuario "{username}"!', 'success')
             return redirect(url_for('admin.gestionar_empleados'))
         except Exception as e:
             db.session.rollback()
-            flash(f'Error: {str(e)}', 'danger')
+            print(f"[ERROR] Error al guardar empleado: {e}")
+            flash(f'Error al guardar el empleado: {str(e)}', 'danger')
+            return render_template('admin/form_empleado.html')
     
     return render_template('admin/form_empleado.html')
 
@@ -351,22 +363,30 @@ def editar_empleado(id):
     user = User.query.get(empleado.user_id) if empleado.user_id else None
     
     if request.method == 'POST':
-        empleado.nombre = request.form.get('nombre')
-        empleado.telefono = request.form.get('telefono')
-        empleado.email = request.form.get('email')
-        empleado.cargo = request.form.get('cargo', 'Empleado')
+        empleado.nombre = request.form.get('nombre', '').strip()
+        empleado.telefono = request.form.get('telefono', '').strip()
+        empleado.email = request.form.get('email', '').strip()
+        empleado.cargo = request.form.get('cargo', 'Empleado').strip()
         
-        nueva_pass = request.form.get('password')
+        nueva_pass = request.form.get('password', '').strip()
         if nueva_pass and user:
             user.password = nueva_pass
+            
+        if user:
+            user.nombre = empleado.nombre
+            user.email = empleado.email
+            user.telefono = empleado.telefono
+            user.rol = empleado.cargo.lower() if empleado.cargo else 'empleado'
         
         try:
             db.session.commit()
-            flash('Empleado actualizado.', 'success')
+            flash(f'Empleado {empleado.nombre} actualizado correctamente.', 'success')
             return redirect(url_for('admin.gestionar_empleados'))
         except Exception as e:
             db.session.rollback()
-            flash(f'Error: {str(e)}', 'danger')
+            print(f"[ERROR] Error al editar empleado: {e}")
+            flash(f'Error al actualizar: {str(e)}', 'danger')
+            return render_template('admin/form_empleado.html', empleado=empleado)
     
     return render_template('admin/form_empleado.html', empleado=empleado)
 
