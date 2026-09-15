@@ -3,7 +3,6 @@
 {% block title %}Dashboard de Administración - La Orquídea PMS{% endblock %}
 
 {% block extra_css %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 /* Dashboard Luxury Theme & Layout */
 .dash-header {
@@ -398,8 +397,9 @@
 {% set mantenimiento = habitaciones|selectattr('estado', 'equalto', 'Mantenimiento')|list|length %}
 {% set total_habs = habitaciones|length %}
 {% set ocupacion_pct = ((ocupadas / total_habs * 100)|int) if total_habs > 0 else 0 %}
-{% set disp_pct = ((disponibles / total_habs * 100)|int) if total_habs > 0 else 0 %}
-{% set ocup_pct = ((ocupadas / total_habs * 100)|int) if total_habs > 0 else 0 %}
+{% set dispon_pct = ((disponibles / total_habs * 100)|round(1)) if total_habs > 0 else 0 %}
+{% set ocup_pct = ((ocupadas / total_habs * 100)|round(1)) if total_habs > 0 else 0 %}
+{% set mant_pct = ((mantenimiento / total_habs * 100)|round(1)) if total_habs > 0 else 0 %}
 
 <!-- Key Metrics Row (KPIs) -->
 <div class="kpi-grid animated stagger-2">
@@ -472,32 +472,60 @@
     <div class="chart-card">
         <div class="chart-header">
             <h3 class="chart-title"><i class="fas fa-chart-pie" style="color: #C5A059;"></i> Distribución de Habitaciones</h3>
-            <span style="font-size: 0.8rem; color: #6B7280; font-weight: 600;">En tiempo real</span>
+            <span style="font-size: 0.8rem; color: #10B981; font-weight: 700; background: #ECFDF5; padding: 4px 10px; border-radius: 12px;"><i class="fas fa-circle" style="font-size: 8px;"></i> En vivo</span>
         </div>
         
-        <div class="chart-container" style="position: relative; height: 230px; width: 100%; display: flex; justify-content: center; align-items: center;">
-            <canvas id="roomStatusChart" style="position: relative; z-index: 2; max-height: 230px; width: 100%;"></canvas>
-            
-            <div id="chartFallback" style="position: absolute; width: 180px; height: 180px; border-radius: 50%; background: conic-gradient(#10B981 0% {{ disp_pct }}%, #EF4444 {{ disp_pct }}% {{ disp_pct + ocup_pct }}%, #F59E0B {{ disp_pct + ocup_pct }}% 100%); display: flex; align-items: center; justify-content: center; z-index: 1;">
-                <div style="width: 124px; height: 124px; background: #FFFFFF; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);">
-                    <span style="font-size: 1.7rem; font-weight: 700; color: #1F1528; line-height: 1;">{{ total_habs }}</span>
-                    <span style="font-size: 0.65rem; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px;">Habitaciones</span>
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0;">
+            <!-- Native SVG Vector Donut Chart -->
+            <div style="position: relative; width: 210px; height: 210px; display: flex; align-items: center; justify-content: center;">
+                <svg viewBox="0 0 42 42" style="width: 100%; height: 100%; transform: rotate(-90deg); filter: drop-shadow(0 6px 12px rgba(0,0,0,0.06));">
+                    <!-- Base Track Circle -->
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#F3F4F6" stroke-width="4"></circle>
+
+                    <!-- Segment 1: Disponibles (Green) -->
+                    {% if dispon_pct > 0 %}
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#10B981" stroke-width="4.8" 
+                            stroke-dasharray="{{ dispon_pct }} {{ 100 - dispon_pct }}" stroke-dashoffset="0" stroke-linecap="round"></circle>
+                    {% endif %}
+
+                    <!-- Segment 2: Ocupadas (Red) -->
+                    {% if ocup_pct > 0 %}
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#EF4444" stroke-width="4.8" 
+                            stroke-dasharray="{{ ocup_pct }} {{ 100 - ocup_pct }}" stroke-dashoffset="-{{ dispon_pct }}" stroke-linecap="round"></circle>
+                    {% endif %}
+
+                    <!-- Segment 3: Mantenimiento (Gold) -->
+                    {% if mant_pct > 0 %}
+                    <circle cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#F59E0B" stroke-width="4.8" 
+                            stroke-dasharray="{{ mant_pct }} {{ 100 - mant_pct }}" stroke-dashoffset="-{{ dispon_pct + ocup_pct }}" stroke-linecap="round"></circle>
+                    {% endif %}
+                </svg>
+
+                <!-- Center Data Display -->
+                <div style="position: absolute; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <span style="font-size: 2.4rem; font-weight: 800; color: #1F1528; line-height: 1;">{{ total_habs }}</span>
+                    <span style="font-size: 0.68rem; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px;">Habitaciones</span>
                 </div>
             </div>
-        </div>
-        
-        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; font-size: 0.85rem; font-weight: 600;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="width: 12px; height: 12px; background: #10B981; border-radius: 50%; display: inline-block;"></span>
-                <span>Disponibles ({{ disponibles }})</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="width: 12px; height: 12px; background: #EF4444; border-radius: 50%; display: inline-block;"></span>
-                <span>Ocupadas ({{ ocupadas }})</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="width: 12px; height: 12px; background: #F59E0B; border-radius: 50%; display: inline-block;"></span>
-                <span>Mantenimiento ({{ mantenimiento }})</span>
+
+            <!-- Legend Badges with Exact Percentages -->
+            <div style="display: flex; justify-content: center; gap: 14px; margin-top: 22px; width: 100%; flex-wrap: wrap;">
+                <div style="background: #F9FAFB; border: 1px solid #E5E7EB; padding: 8px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; font-size: 0.82rem;">
+                    <span style="width: 10px; height: 10px; background: #10B981; border-radius: 50%;"></span>
+                    <span style="font-weight: 600; color: #374151;">Disponibles: <strong style="color: #10B981;">{{ disponibles }}</strong> <small style="color: #6B7280;">({{ dispon_pct }}%)</small></span>
+                </div>
+                
+                <div style="background: #F9FAFB; border: 1px solid #E5E7EB; padding: 8px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; font-size: 0.82rem;">
+                    <span style="width: 10px; height: 10px; background: #EF4444; border-radius: 50%;"></span>
+                    <span style="font-weight: 600; color: #374151;">Ocupadas: <strong style="color: #EF4444;">{{ ocupadas }}</strong> <small style="color: #6B7280;">({{ ocup_pct }}%)</small></span>
+                </div>
+
+                {% if mantenimiento > 0 %}
+                <div style="background: #F9FAFB; border: 1px solid #E5E7EB; padding: 8px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; font-size: 0.82rem;">
+                    <span style="width: 10px; height: 10px; background: #F59E0B; border-radius: 50%;"></span>
+                    <span style="font-weight: 600; color: #374151;">Mantenimiento: <strong style="color: #F59E0B;">{{ mantenimiento }}</strong> <small style="color: #6B7280;">({{ mant_pct }}%)</small></span>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -658,58 +686,4 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-(function() {
-    function initRoomChart() {
-        const canvas = document.getElementById('roomStatusChart');
-        if (!canvas) return;
-
-        const fallback = document.getElementById('chartFallback');
-
-        if (typeof Chart === 'undefined') {
-            console.log('Chart.js fallback active');
-            return;
-        }
-
-        try {
-            new Chart(canvas.getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Disponibles', 'Ocupadas', 'Mantenimiento'],
-                    datasets: [{
-                        data: [{{ disponibles }}, {{ ocupadas }}, {{ mantenimiento }}],
-                        backgroundColor: ['#10B981', '#EF4444', '#F59E0B'],
-                        borderWidth: 0,
-                        hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1F1528',
-                            padding: 12,
-                            titleFont: { family: 'Outfit', size: 14 },
-                            bodyFont: { family: 'Outfit', size: 13 }
-                        }
-                    },
-                    cutout: '72%'
-                }
-            });
-            if (fallback) fallback.style.display = 'none';
-        } catch(e) {
-            console.error('Error initializing chart:', e);
-        }
-    }
-
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        setTimeout(initRoomChart, 20);
-    } else {
-        document.addEventListener('DOMContentLoaded', initRoomChart);
-    }
-})();
-</script>
 {% endblock %}
