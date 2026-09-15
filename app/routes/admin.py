@@ -55,7 +55,7 @@ def dashboard():
     
     # Empleados actualmente en turno (sin salida)
     empleados_en_turno = []
-    for emp in Empleado.query.filter_by(activo=True).all():
+    for emp in Empleado.query.all():
         if emp.user_id:
             tiene_turno_hoy = TurnoEmpleado.query.filter_by(
                 empleado_id=emp.id,
@@ -330,6 +330,7 @@ def nuevo_empleado():
                 telefono=telefono,
                 email=email,
                 cargo=cargo,
+                activo=True,
                 user_id=user.id
             )
             db.session.add(empleado)
@@ -442,7 +443,7 @@ def horarios_empleados():
         TurnoEmpleado.fecha <= fin_semana
     ).order_by(TurnoEmpleado.fecha.desc(), TurnoEmpleado.hora_entrada.desc()).all()
     
-    empleados = Empleado.query.filter_by(activo=True).order_by(Empleado.nombre).all()
+    empleados = Empleado.query.order_by(Empleado.nombre).all()
     
     return render_template('admin/horarios.html', 
                          horarios=horarios, 
