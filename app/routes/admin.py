@@ -431,7 +431,7 @@ def reportes_empleados():
 @admin_bp.route('/horarios')
 @admin_required
 def horarios_empleados():
-    from app.models import TurnoEmpleado
+    from app.models import TurnoEmpleado, Empleado
     
     hoy = datetime.now().date()
     inicio_semana = hoy - timedelta(days=hoy.weekday())
@@ -442,7 +442,14 @@ def horarios_empleados():
         TurnoEmpleado.fecha <= fin_semana
     ).order_by(TurnoEmpleado.fecha.desc(), TurnoEmpleado.hora_entrada.desc()).all()
     
-    return render_template('admin/horarios.html', horarios=horarios, hoy=hoy, inicio_semana=inicio_semana, fin_semana=fin_semana)
+    empleados = Empleado.query.filter_by(activo=True).order_by(Empleado.nombre).all()
+    
+    return render_template('admin/horarios.html', 
+                         horarios=horarios, 
+                         empleados=empleados,
+                         hoy=hoy, 
+                         inicio_semana=inicio_semana, 
+                         fin_semana=fin_semana)
 
 @admin_bp.route('/horarios/iniciar', methods=['POST'])
 @admin_required
@@ -453,13 +460,13 @@ def iniciar_horario():
     empleado_id = request.form.get('empleado_id')
     if not empleado_id:
         flash('Seleccione un empleado.', 'warning')
-        return redirect(url_for('recep.dashboard'))
+        return redirect(url_for('admin.horarios_empleados'))
     
     hoy_date = datetime.now().date()
     ultimo = TurnoEmpleado.query.filter_by(empleado_id=empleado_id, hora_salida=None, fecha=hoy_date).first()
     if ultimo:
         flash('Este empleado ya tiene un turno activo hoy.', 'warning')
-        return redirect(url_for('recep.dashboard'))
+        return redirect(url_for('admin.horarios_empleados'))
     
     now = datetime.now()
     turno = TurnoEmpleado(
@@ -471,8 +478,8 @@ def iniciar_horario():
     db.session.add(turno)
     db.session.commit()
     
-    flash('Turno iniciado.', 'success')
-    return redirect(url_for('recep.dashboard'))
+    flash('Turno iniciado exitosamente.', 'success')
+    return redirect(url_for('admin.horarios_empleados'))
 
 @admin_bp.route('/horarios/finalizar/<int:id>')
 @admin_required
