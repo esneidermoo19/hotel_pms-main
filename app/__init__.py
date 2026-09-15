@@ -57,6 +57,7 @@ def create_app(config_class=None):
     from .routes.auth import auth_bp
     from .routes.empleado import empleado_bp
     from .routes.cliente import cliente_bp
+    from .routes.facturacion import facturacion_bp
 
     app.register_blueprint(recep_bp, url_prefix='/recepcion')
     app.register_blueprint(pos_bp, url_prefix='/pos')
@@ -65,6 +66,7 @@ def create_app(config_class=None):
     app.register_blueprint(auth_bp)
     app.register_blueprint(empleado_bp)
     app.register_blueprint(cliente_bp, url_prefix='/huespedes')
+    app.register_blueprint(facturacion_bp, url_prefix='/facturacion')
     
     # 4. Exenciones de CSRF necesarias para la operatividad
     # Se usan tanto el nombre del endpoint como la ruta completa para asegurar compatibilidad

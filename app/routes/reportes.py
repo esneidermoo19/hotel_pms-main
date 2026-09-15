@@ -11,11 +11,11 @@ reportes_bp = Blueprint('reportes', __name__)
 
 def enviar_factura_email(factura, reserva, habitacion, config):
     """Envía la factura por correo electrónico"""
-    if not reserva.email_huesped:
+    if not reserva.email_cliente:
         return False
     
     try:
-        noches = (reserva.fecha_salida - reserva.fecha_ingreso).days
+        noches = (reserva.fecha_fin - reserva.fecha_inicio).days
         consumos = ConsumoPOS.query.filter_by(reservacion_id=reserva.id).all()
         total_extras = sum(c.monto for c in consumos)
         
@@ -32,10 +32,10 @@ def enviar_factura_email(factura, reserva, habitacion, config):
             <p style="text-align: center; font-weight: bold;">No. {factura.numero_factura}</p>
             
             <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
-                <p><strong>Nombre:</strong> {reserva.nombre_huesped}</p>
+                <p><strong>Nombre:</strong> {reserva.nombre_cliente}</p>
                 <p><strong>Documento:</strong> {reserva.tipo_documento}: {reserva.cedula_nit}</p>
                 <p><strong>Habitación:</strong> {habitacion.numero} ({habitacion.tipo})</p>
-                <p><strong>Estancia:</strong> {reserva.fecha_ingreso.strftime('%Y-%m-%d')} a {reserva.fecha_salida.strftime('%Y-%m-%d')} ({noches} noches)</p>
+                <p><strong>Estancia:</strong> {reserva.fecha_inicio.strftime('%Y-%m-%d')} a {reserva.fecha_fin.strftime('%Y-%m-%d')} ({noches} noches)</p>
             </div>
             
             <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
@@ -70,7 +70,7 @@ def enviar_factura_email(factura, reserva, habitacion, config):
         msg = Message(
             subject=f"Factura {factura.numero_factura} - {config.nombre}",
             sender=sender,
-            recipients=[reserva.email_huesped],
+            recipients=[reserva.email_cliente],
             html=html_factura
         )
         mail.send(msg)
