@@ -72,11 +72,31 @@ def dashboard():
                     'estado': 'En turno'
                 })
     
+    # Facturación e Ingresos de Hoy
+    try:
+        facturas_hoy = Factura.query.filter(func.date(Factura.fecha_emision) == hoy).all()
+        total_ingresos_hoy = sum(f.total for f in facturas_hoy) if facturas_hoy else 0
+    except Exception:
+        total_ingresos_hoy = 0
+        
+    try:
+        facturas_recientes = Factura.query.order_by(Factura.fecha_emision.desc()).limit(5).all()
+    except Exception:
+        facturas_recientes = []
+        
+    try:
+        reservas_activas_count = Reservacion.query.filter(Reservacion.estado.in_(['activa', 'checkin'])).count()
+    except Exception:
+        reservas_activas_count = 0
+    
     return render_template('admin/dashboard.html', 
                          habitaciones=habitaciones,
                          usuarios=usuarios,
                          empleados_en_turno=empleados_en_turno,
-                         turnos_hoy=turnos_hoy)
+                         turnos_hoy=turnos_hoy,
+                         total_ingresos_hoy=total_ingresos_hoy,
+                         facturas_recientes=facturas_recientes,
+                         reservas_activas_count=reservas_activas_count)
 
 @admin_bp.route('/habitaciones')
 @admin_required
