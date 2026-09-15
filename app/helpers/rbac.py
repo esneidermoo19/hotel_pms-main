@@ -2,17 +2,19 @@ from functools import wraps
 from flask import redirect, url_for, flash
 from flask_login import current_user
 
+STAFF_ROLES = ['admin', 'recepcionista', 'empleado', 'gerente', 'camarero', 'cocinero', 'staff', 'cajero']
+
 def empleado_required(f):
-    """Decorator para permitir solo empleados y admins"""
+    """Decorator para permitir solo empleados, staff y administradores"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
             flash('Por favor inicie sesión.', 'warning')
             return redirect(url_for('auth.login'))
         
-        # Seguridad: Solo permitir roles de staff
-        if getattr(current_user, 'rol', None) not in ['admin', 'recepcionista']:
-            flash('Acceso denegado. Esta área es exclusiva para el personal.', 'danger')
+        user_role = (getattr(current_user, 'rol', '') or '').strip().lower()
+        if user_role == 'cliente':
+            flash('Acceso denegado. Esta área es exclusiva para el personal del hotel.', 'danger')
             return redirect(url_for('cliente.home'))
             
         return f(*args, **kwargs)
@@ -23,15 +25,16 @@ def any_staff_required(f):
     return empleado_required(f)
 
 def admin_required(f):
-    """Decorator solo para admin"""
+    """Decorator solo para administradores"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
-            flash('Por favor inicie sesion.', 'warning')
+            flash('Por favor inicie sesión.', 'warning')
             return redirect(url_for('auth.login'))
         
-        if getattr(current_user, 'rol', None) != 'admin':
-            flash('Solo administradores pueden acceder.', 'warning')
+        user_role = (getattr(current_user, 'rol', '') or '').strip().lower()
+        if user_role != 'admin':
+            flash('Acceso restringido solo para administradores.', 'warning')
             return redirect(url_for('recep.dashboard'))
         
         return f(*args, **kwargs)

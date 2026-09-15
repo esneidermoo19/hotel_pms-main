@@ -15,13 +15,11 @@ empleado_bp = Blueprint('empleado', __name__, url_prefix='/empleado')
 
 @empleado_bp.route('/')
 def index():
-    """Redirige al dashboard según rol"""
+    """Redirige al dashboard de recepción"""
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
     
-    if getattr(current_user, 'rol', None) == 'admin':
-        return redirect(url_for('admin.dashboard'))
-    return redirect(url_for('empleado.dashboard'))
+    return redirect(url_for('recep.dashboard'))
 
 
 @empleado_bp.route('/dashboard')
