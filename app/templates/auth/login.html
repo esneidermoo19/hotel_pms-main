@@ -273,7 +273,7 @@
                 {% endif %}
             {% endwith %}
 
-            <form method="POST">
+            <form method="POST" action="{{ url_for('staff.login') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="context" id="login-context" value="admin">
                 

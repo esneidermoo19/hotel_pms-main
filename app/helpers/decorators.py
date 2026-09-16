@@ -10,13 +10,13 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('staff.login'))
         
         # Solo User con rol='admin' puede acceder
         from app.models import User
         if not isinstance(current_user, User) or getattr(current_user, 'rol', None) != 'admin':
             flash('Acceso restringido solo para administradores.', 'danger')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('staff.login'))
         
         return f(*args, **kwargs)
     return decorated_function
@@ -27,13 +27,13 @@ def empleado_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
-            return redirect(url_for('empleado.login'))
+            return redirect(url_for('staff.login'))
         
         # Solo Empleado puede acceder
         from app.models import Empleado
         if not isinstance(current_user, Empleado):
             flash('Acceso restringido para empleados.', 'danger')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('staff.login'))
         
         return f(*args, **kwargs)
     return decorated_function
@@ -44,6 +44,6 @@ def any_authenticated(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('staff.login'))
         return f(*args, **kwargs)
     return decorated_function

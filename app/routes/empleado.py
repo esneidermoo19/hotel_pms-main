@@ -17,7 +17,7 @@ empleado_bp = Blueprint('empleado', __name__, url_prefix='/empleado')
 def index():
     """Redirige al dashboard de recepción"""
     if not current_user.is_authenticated:
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('staff.login'))
     
     return redirect(url_for('recep.dashboard'))
 
@@ -109,7 +109,7 @@ def registrar_salida():
 def logout():
     """Cerrar sesión"""
     logout_user()
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('staff.login'))
 
 
 # ============================================

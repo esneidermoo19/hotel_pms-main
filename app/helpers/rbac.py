@@ -10,7 +10,7 @@ def empleado_required(f):
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
             flash('Por favor inicie sesión.', 'warning')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('staff.login'))
         
         user_role = (getattr(current_user, 'rol', '') or '').strip().lower()
         if user_role == 'cliente':
@@ -30,7 +30,7 @@ def admin_required(f):
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
             flash('Por favor inicie sesión.', 'warning')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('staff.login'))
         
         user_role = (getattr(current_user, 'rol', '') or '').strip().lower()
         if user_role != 'admin':

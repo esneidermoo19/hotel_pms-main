@@ -32,8 +32,8 @@ def create_app(config_class=None):
     migrate.init_app(app, db)
     
     # Configuración de Login
-    login_manager.login_view = 'auth.login'
-    login_manager.login_message = 'Por favor inicie sesión para continuar.'
+    login_manager.login_view = 'staff.login'
+    login_manager.login_message = 'Por favor inicie sesión para acceder al portal de personal.'
     login_manager.login_message_category = 'warning'
 
     @app.route('/health')
@@ -54,19 +54,24 @@ def create_app(config_class=None):
     from .routes.pos import pos_bp
     from .routes.admin import admin_bp
     from .routes.reportes import reportes_bp
-    from .routes.auth import auth_bp
+    from .routes.auth import staff_bp
     from .routes.empleado import empleado_bp
     from .routes.cliente import cliente_bp
     from .routes.facturacion import facturacion_bp
 
-    app.register_blueprint(recep_bp, url_prefix='/recepcion')
-    app.register_blueprint(pos_bp, url_prefix='/pos')
-    app.register_blueprint(admin_bp, url_prefix='/admin')
-    app.register_blueprint(reportes_bp, url_prefix='/reportes')
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(empleado_bp)
+    # Blueprint de autenticación staff
+    app.register_blueprint(staff_bp, url_prefix='/staff')
+
+    # Blueprints del portal staff bajo /staff/*
+    app.register_blueprint(admin_bp, url_prefix='/staff/admin')
+    app.register_blueprint(recep_bp, url_prefix='/staff/recepcion')
+    app.register_blueprint(pos_bp, url_prefix='/staff/pos')
+    app.register_blueprint(reportes_bp, url_prefix='/staff/reportes')
+    app.register_blueprint(empleado_bp, url_prefix='/staff/empleado')
+    app.register_blueprint(facturacion_bp, url_prefix='/staff/facturacion')
+
+    # Blueprint exclusivo para Huéspedes (Guest)
     app.register_blueprint(cliente_bp, url_prefix='/huespedes')
-    app.register_blueprint(facturacion_bp, url_prefix='/facturacion')
     
     # 4. Exenciones de CSRF necesarias para la operatividad
     # Se usan tanto el nombre del endpoint como la ruta completa para asegurar compatibilidad
