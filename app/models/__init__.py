@@ -5,6 +5,7 @@ from app.models.facturacion import Factura, ConsumoPOS, ClienteFactura
 from app.models.configuracion import ConfigHotel
 from app.models.empleado import Empleado, TurnoEmpleado
 from app.models.horario import HorarioEmpleado
+from app.models.audit import AuditLog
 
 __all__ = [
     'User', 
@@ -16,5 +17,6 @@ __all__ = [
     'ConfigHotel',
     'Empleado',
     'TurnoEmpleado',
-    'HorarioEmpleado'
+    'HorarioEmpleado',
+    'AuditLog'
 ]

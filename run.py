@@ -56,33 +56,33 @@ with app.app_context():
     if not User.query.filter_by(username='jhonny').first():
         jhonny = User(
             username='jhonny',
-            password='6556',
+            password=Config.ADMIN_JHONNY_PASS,
             nombre='Jhonny',
             rol='admin'
         )
         db.session.add(jhonny)
-        print("Usuario creado: jhonny / 6556 (admin)")
+        print("Usuario inicial creado: jhonny (admin)")
 
     if not User.query.filter_by(username='edwin').first():
         edwin = User(
             username='edwin',
-            password='2345',
+            password=Config.ADMIN_EDWIN_PASS,
             nombre='Edwin',
             rol='admin'
         )
         db.session.add(edwin)
-        print("Usuario creado: edwin / 2345 (admin)")
+        print("Usuario inicial creado: edwin (admin)")
     
     # Recepcionistas
     if not User.query.filter_by(username='ana').first():
         ana = User(
             username='ana',
-            password='1234',
+            password=Config.RECEP_ANA_PASS,
             nombre='Ana Recepcionista',
             rol='recepcionista'
         )
         db.session.add(ana)
-        print("Usuario creado: ana / 1234 (recepcionista)")
+        print("Usuario inicial creado: ana (recepcionista)")
     
     if Habitacion.query.count() == 0:
         habitaciones = [
