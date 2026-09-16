@@ -600,6 +600,69 @@
     </div>
 </div>
 
+<!-- Verificación de Pagos Nequi -->
+<div class="animated stagger-4" style="margin-bottom: 35px;">
+    <h3 class="section-title"><i class="fas fa-money-check-alt" style="color: #8B5CF6;"></i> Verificación de Pagos (Nequi)</h3>
+    {% if reservas_verificacion %}
+    <div class="rooms-grid">
+        {% for res in reservas_verificacion %}
+        <div class="room-card-modern" style="border-top: 4px solid #8B5CF6;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div style="font-size: 1.2rem; font-weight: 700; color: #111827;">Res. {{ res.codigo }}</div>
+                    <div style="font-size: 0.85rem; color: #6B7280; font-weight: 600; margin-top: 4px;">{{ res.nombre_cliente }}</div>
+                </div>
+                <span class="status-badge" style="background: #EDE9FE; color: #6D28D9;">Validación</span>
+            </div>
+            <div style="margin-top: 10px; font-weight: 700; font-size: 1.1rem; color: #1F1528;">
+                ${{ "{:,}".format(res.total_pago) }}
+            </div>
+            
+            {% if res.comprobante_pago %}
+            <div style="margin-top: 15px;">
+                <a href="{{ url_for('static', filename='uploads/comprobantes/' ~ res.comprobante_pago) }}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #6D28D9; font-size: 0.85rem; font-weight: 600; text-decoration: none; background: #F5F3FF; padding: 8px 12px; border-radius: 8px; border: 1px solid #EDE9FE; width: 100%; justify-content: center;">
+                    <i class="fas fa-file-invoice-dollar"></i> Ver Comprobante
+                </a>
+            </div>
+            {% else %}
+            <div style="margin-top: 15px; color: #DC2626; font-size: 0.85rem; font-weight: 600; text-align: center; background: #FEF2F2; padding: 8px; border-radius: 8px;">
+                <i class="fas fa-exclamation-circle"></i> Sin comprobante
+            </div>
+            {% endif %}
+
+            <div style="display: flex; gap: 8px; margin-top: 15px;">
+                <!-- We post to recep.verificar_pago for simplicity, as they share logic, 
+                     but admin might need its own route if we want redirect to admin.
+                     Let's add admin.verificar_pago route as well! 
+                -->
+                <form method="POST" action="{{ url_for('recep.verificar_pago', reservacion_id=res.id) }}" style="flex: 1; margin: 0;" onsubmit="return confirm('¿Confirmas que el pago por Nequi ha sido recibido correctamente?')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="accion" value="aprobar">
+                    <!-- Added a hidden field to redirect back to admin -->
+                    <input type="hidden" name="from_admin" value="1">
+                    <button type="submit" style="width: 100%; padding: 8px; background: #10B981; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">
+                        <i class="fas fa-check"></i> Aprobar
+                    </button>
+                </form>
+                <form method="POST" action="{{ url_for('recep.verificar_pago', reservacion_id=res.id) }}" style="flex: 1; margin: 0;" onsubmit="return confirm('¿Estás seguro de rechazar este pago? La reserva será cancelada.')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="accion" value="rechazar">
+                    <input type="hidden" name="from_admin" value="1">
+                    <button type="submit" style="width: 100%; padding: 8px; background: #EF4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">
+                        <i class="fas fa-times"></i> Rechazar
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="background: #FFFFFF; border-radius: 16px; padding: 30px; text-align: center; border: 1px solid #E5E7EB; color: #6B7280; font-size: 0.95rem;">
+        No hay pagos pendientes de verificación en este momento.
+    </div>
+    {% endif %}
+</div>
+
 <!-- Real-time Property Status -->
 <div class="animated stagger-4" style="margin-bottom: 35px;">
     <h3 class="section-title"><i class="fas fa-hotel" style="color: #C5A059;"></i> Estatus de Habitaciones</h3>

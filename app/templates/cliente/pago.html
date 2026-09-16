@@ -1,6 +1,6 @@
 {% extends "cliente/base_cliente.html" %}
 
-{% block title %}Pago Seguro - La Orquídea{% endblock %}
+{% block title %}Finalizar Reserva - La Orquídea{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -57,35 +57,54 @@
         padding-bottom: 1rem;
     }
 
-    /* Form Styles */
-    .card-element {
-        background: #fdfdfd;
-        border: 1px solid #e0e0e0;
-        padding: 1.5rem;
-        border-radius: 12px;
-        margin-bottom: 2rem;
-        transition: all 0.3s;
+    .payment-methods-selector {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 3rem;
     }
 
-    .card-element:focus-within {
-        border-color: var(--pay-gold);
-        box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.1);
+    .method-option {
+        background: white;
+        border: 1px solid #edf2f7;
+        padding: 2rem;
+        border-radius: 20px;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 140px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
     }
 
-    .form-label {
-        font-size: 0.75rem;
-        font-weight: 700;
+    .method-option.active {
+        border: 2px solid var(--pay-gold);
+        background: rgba(197, 160, 89, 0.04);
+        box-shadow: 0 10px 25px rgba(197, 160, 89, 0.15);
+    }
+
+    .method-name {
+        font-size: 0.9rem;
+        font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        color: #888;
-        margin-bottom: 0.8rem;
-        display: block;
+        color: #4a5568;
     }
 
-    .input-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
+    .method-nequi.active { 
+        background: #F4F0FF; 
+        border-color: #7000FF; 
+        box-shadow: 0 10px 25px rgba(112, 0, 255, 0.15);
+    }
+
+    .method-efectivo.active {
+        background: #F0FFF4;
+        border-color: #2ecc71;
+        box-shadow: 0 10px 25px rgba(46, 204, 113, 0.15);
     }
 
     .pay-input {
@@ -96,13 +115,13 @@
         font-size: 1rem;
         outline: none;
         transition: border 0.3s;
+        background: white;
     }
 
     .pay-input:focus {
         border-color: var(--pay-gold);
     }
 
-    /* Summary Details */
     .summary-item {
         display: flex;
         justify-content: space-between;
@@ -142,15 +161,37 @@
         font-size: 1.1rem;
         cursor: pointer;
         transition: all 0.4s;
-        margin-top: 2rem;
+        margin-top: 2.5rem;
         text-transform: uppercase;
         letter-spacing: 0.15em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
     }
 
     .btn-pay:hover {
         background: #b08e4d;
         transform: translateY(-2px);
         box-shadow: 0 10px 25px rgba(197, 160, 89, 0.3);
+    }
+
+    .btn-pay-nequi {
+        background: #7000FF !important;
+    }
+
+    .btn-pay-nequi:hover {
+        background: #5900CC !important;
+        box-shadow: 0 10px 25px rgba(112, 0, 255, 0.3) !important;
+    }
+
+    .btn-pay-efectivo {
+        background: #27ae60 !important;
+    }
+
+    .btn-pay-efectivo:hover {
+        background: #219150 !important;
+        box-shadow: 0 10px 25px rgba(39, 174, 96, 0.3) !important;
     }
 
     .secure-badge {
@@ -190,54 +231,30 @@
         color: rgba(255,255,255,0.6);
     }
 
-    .payment-main {
-        background: var(--pay-card);
-        padding: 4rem;
-        border-radius: 30px;
-        box-shadow: 0 30px 60px rgba(0,0,0,0.06);
-    }
-
-    .payment-methods-selector {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.5rem;
-        margin-bottom: 3rem;
-    }
-
-    .method-option {
+    .nequi-qr-box {
         background: white;
-        border: 1px solid #edf2f7;
-        padding: 2rem;
-        border-radius: 20px;
-        cursor: pointer;
-        text-align: center;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        position: relative;
+        border: 2px dashed #7000FF44;
+        border-radius: 16px;
+        padding: 1.5rem;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: 140px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        margin: 1.5rem 0;
     }
 
-    .method-option.active {
-        border: 2px solid var(--pay-gold);
-        background: rgba(197, 160, 89, 0.02);
-        box-shadow: 0 10px 25px rgba(197, 160, 89, 0.15);
-    }
-
-    .method-name {
-        font-size: 0.8rem;
+    .nequi-number-pill {
+        background: #7000FF;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 30px;
+        font-size: 1.4rem;
         font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: #4a5568;
+        letter-spacing: 0.15em;
+        margin: 1rem 0;
+        display: inline-block;
+        box-shadow: 0 4px 15px rgba(112, 0, 255, 0.2);
     }
-
-    /* Bank Specific Styling */
-    .method-nequi.active { background: #F4F0FF; border-color: #7000FF; }
-    .method-bancolombia.active { background: #FFFBEB; border-color: #FDDA24; }
 
     @media (max-width: 900px) {
         .payment-container { 
@@ -255,23 +272,6 @@
             padding: 2.5rem 1.5rem;
             border-radius: 20px;
         }
-        .payment-methods-selector { 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 1rem;
-        }
-    }
-
-    @media (max-width: 600px) {
-        .method-option {
-            padding: 1rem;
-            min-height: 100px;
-        }
-        .input-row {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-        .section-title { font-size: 1.3rem; }
-        .total-amount { font-size: 1.6rem; }
     }
 </style>
 {% endblock %}
@@ -284,120 +284,103 @@
             Finalizar Reserva
         </h2>
 
+        <!-- Selección de Método de Pago: Solo Nequi y Efectivo -->
         <div class="payment-methods-selector">
-            <div class="method-option active" data-method="mastercard" onclick="selectMethod(this)">
-                <div class="logo-wrapper" style="height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
-                    <!-- Mastercard SVG -->
-                    <svg width="60" height="38" viewBox="0 0 820 512" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="256" cy="256" r="256" fill="#eb001b"/>
-                        <circle cx="564" cy="256" r="256" fill="#f79e1b" fill-opacity=".8"/>
-                    </svg>
-                </div>
-                <span class="method-name">Mastercard</span>
-            </div>
-            
-            <div class="method-option method-nequi" data-method="nequi" onclick="selectMethod(this)">
-                <div class="logo-wrapper" style="height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
-                    <!-- Nequi Style Logo (CSS/SVG) -->
-                    <div style="background: #7000FF; color: white; padding: 4px 12px; border-radius: 6px; font-weight: 900; font-size: 1.1rem; letter-spacing: -1px;">
+            <div class="method-option method-nequi active" data-method="nequi" onclick="selectMethod(this)">
+                <div class="logo-wrapper" style="height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+                    <div style="background: #7000FF; color: white; padding: 6px 16px; border-radius: 8px; font-weight: 900; font-size: 1.2rem; letter-spacing: -1px; box-shadow: 0 4px 12px rgba(112, 0, 255, 0.3);">
                         NEQUI
                     </div>
                 </div>
-                <span class="method-name">Nequi</span>
+                <span class="method-name">Transferencia Nequi</span>
             </div>
 
-            <div class="method-option method-bancolombia" data-method="bancolombia" onclick="selectMethod(this)">
-                <div class="logo-wrapper" style="height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
-                    <!-- Bancolombia Style Logo (CSS) -->
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                        <div style="width: 45px; height: 6px; background: #000; margin-bottom: 2px;"></div>
-                        <div style="width: 45px; height: 6px; background: #FDDA24;"></div>
-                        <div style="font-size: 0.55rem; font-weight: 900; color: #000; margin-top: 2px; text-transform: uppercase;">Bancolombia</div>
-                    </div>
-                </div>
-                <span class="method-name">Bancolombia</span>
-            </div>
-
-            <div class="method-option" data-method="efectivo" onclick="selectMethod(this)">
-                <div class="logo-wrapper" style="height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
-                    <!-- Cash SVG -->
-                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div class="method-option method-efectivo" data-method="efectivo" onclick="selectMethod(this)">
+                <div class="logo-wrapper" style="height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+                    <svg width="55" height="55" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="2" y="5" width="20" height="14" rx="2" fill="#2ecc71"/>
                         <circle cx="12" cy="12" r="3" fill="white" fill-opacity="0.3"/>
                         <rect x="5" y="8" width="2" height="2" rx="1" fill="white" fill-opacity="0.3"/>
                         <rect x="17" y="14" width="2" height="2" rx="1" fill="white" fill-opacity="0.3"/>
                     </svg>
                 </div>
-                <span class="method-name">Efectivo</span>
+                <span class="method-name">Efectivo al Llegar</span>
             </div>
         </div>
 
-        <form action="{{ url_for('cliente.procesar_pago', reserva_id=reserva.id) }}" method="POST" id="payment-form">
+        <form action="{{ url_for('cliente.procesar_pago', reserva_id=reserva.id) }}" method="POST" enctype="multipart/form-data" id="payment-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="metodo_pago" id="metodo_pago_input" value="mastercard">
+            <input type="hidden" name="metodo_pago" id="metodo_pago_input" value="nequi">
             
-            <div id="form-mastercard" class="animated fadeIn">
-                <div class="form-group">
-                    <label class="form-label">Nombre en la tarjeta</label>
-                    <input type="text" class="pay-input" placeholder="Nombre completo" required>
-                </div>
+            <!-- Vista 1: Formulario Nequi -->
+            <div id="form-nequi" class="animated fadeIn">
+                <div style="background: #F4F0FF; padding: 2.5rem; border-radius: 24px; text-align: center; border: 1px solid rgba(112, 0, 255, 0.15);">
+                    <div style="color: #7000FF; font-weight: 900; font-size: 1.6rem; letter-spacing: -1px; margin-bottom: 0.5rem;">
+                        NEQUI
+                    </div>
+                    <h4 style="color: #4A154B; margin-bottom: 0.8rem; font-size: 1.2rem;">Transferencia Directa Nequi</h4>
+                    
+                    <p style="font-size: 0.95rem; color: #4A5568; line-height: 1.5; max-width: 500px; margin: 0 auto 1.5rem auto;">
+                        Realice la transferencia desde su aplicación Nequi al siguiente número por el monto exacto de su estancia:
+                    </p>
 
-                <div class="form-group" style="margin-top: 1.5rem;">
-                    <label class="form-label">Número de Tarjeta</label>
-                    <div class="card-element">
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <i class="far fa-credit-card fa-lg" style="color: #ccc;"></i>
-                            <input type="text" class="pay-input" style="border: none; padding: 0;" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                    <!-- Número de Nequi Configurable -->
+                    <div class="nequi-number-pill">
+                        📱 {{ config.nequi_numero if config and config.nequi_numero else '300 123 4567' }}
+                    </div>
+
+                    <!-- Código QR o Espacio de Imagen -->
+                    <div class="nequi-qr-box">
+                        <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #7000FF; letter-spacing: 0.1em; margin-bottom: 0.8rem;">
+                            Escanea el Código QR para Pagar
+                        </div>
+                        {% if config and config.nequi_qr %}
+                            <img src="{{ url_for('static', filename=config.nequi_qr) }}" alt="QR Nequi" style="max-width: 180px; height: auto; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);" onerror="this.onerror=null; this.style.display='none'; document.getElementById('qr-placeholder').style.display='block';">
+                            <div id="qr-placeholder" style="display: none; padding: 2rem; background: #F8F9FA; border-radius: 12px; color: #888; font-size: 0.85rem;">
+                                <i class="fas fa-qrcode fa-3x" style="color: #7000FF; margin-bottom: 0.5rem; display: block;"></i>
+                                Código QR Nequi del Hotel
+                            </div>
+                        {% else %}
+                            <div style="padding: 1.5rem; background: #F8F9FA; border-radius: 12px; color: #888; font-size: 0.85rem;">
+                                <i class="fas fa-qrcode fa-3x" style="color: #7000FF; margin-bottom: 0.5rem; display: block;"></i>
+                                Código QR Nequi del Hotel
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div style="background: white; padding: 1.2rem; border-radius: 14px; margin-bottom: 1.8rem; border: 1px solid #E2E8F0; text-align: center;">
+                        <span style="font-size: 0.85rem; color: #718096;">Monto Exacto a Transferir:</span>
+                        <div style="font-size: 1.6rem; font-weight: 800; color: #7000FF;">
+                            ${{ "{:,.0f}".format(reserva.total_pago) }} COP
                         </div>
                     </div>
-                </div>
 
-                <div class="input-row">
-                    <div class="form-group">
-                        <label class="form-label">Expiración</label>
-                        <input type="text" class="pay-input" placeholder="MM / YY" maxlength="5" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">CVC</label>
-                        <input type="password" class="pay-input" placeholder="***" maxlength="4" required>
-                    </div>
-                </div>
-            </div>
-
-            <div id="form-nequi" style="display: none;" class="animated fadeIn">
-                <div style="background: #F4F0FF; padding: 3rem; border-radius: 24px; text-align: center; border: 1px solid #7000FF1A;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Nequi_Logo.png" style="height: 60px; margin-bottom: 1.5rem;">
-                    <h4 style="color: #7000FF; margin-bottom: 0.5rem;">Paga con Nequi</h4>
-                    <p style="font-size: 0.9rem; color: #444; margin-bottom: 2rem;">Ingresa tu número de celular asociado a Nequi.</p>
-                    <input type="tel" class="pay-input" placeholder="300 000 0000" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.1em; max-width: 300px; margin: 0 auto; display: block;">
-                </div>
-            </div>
-
-            <div id="form-bancolombia" style="display: none;" class="animated fadeIn">
-                <div style="background: #FFFBEB; padding: 3rem; border-radius: 24px; text-align: center; border: 1px solid #FDDA2433;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Bancolombia_logo.svg/2560px-Bancolombia_logo.svg.png" style="height: 50px; margin-bottom: 1.5rem;">
-                    <h4 style="color: #2D3748; margin-bottom: 1rem;">Transferencia Bancolombia</h4>
-                    <p style="font-size: 0.9rem; color: #718096; margin-bottom: 2rem; line-height: 1.6;">
-                        Usa el botón para ir a la plataforma de Bancolombia y confirmar tu pago.
-                    </p>
-                    <div style="display: inline-flex; align-items: center; gap: 10px; background: #FDDA24; padding: 10px 20px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; color: #2D3748;">
-                        <i class="fas fa-external-link-alt"></i> Redirigir a Sucursal Virtual
+                    <!-- Input para Subir Comprobante -->
+                    <div style="text-align: left; max-width: 500px; margin: 0 auto;">
+                        <label class="form-label" style="color: #4A154B; font-weight: 800;">
+                            <i class="fas fa-paperclip" style="color: #7000FF;"></i> Adjuntar Comprobante o Captura de Pantalla:
+                        </label>
+                        <input type="file" name="comprobante" accept="image/*,.pdf" class="pay-input" style="border: 2px dashed #7000FF44; padding: 0.8rem; cursor: pointer; background: white;">
+                        <small style="color: #718096; display: block; margin-top: 0.5rem; font-size: 0.8rem;">
+                            * Formatos permitidos: JPG, PNG, WEBP o PDF.
+                        </small>
                     </div>
                 </div>
             </div>
 
+            <!-- Vista 2: Formulario Efectivo -->
             <div id="form-efectivo" style="display: none;" class="animated fadeIn">
                 <div style="background: #F0FFF4; padding: 3rem; border-radius: 24px; border: 1px solid #C6F6D5;">
                     <div style="display: flex; gap: 1.5rem; align-items: flex-start;">
-                        <div style="background: #2ecc71; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0;">
+                        <div style="background: #2ecc71; width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);">
                             <i class="fas fa-hotel fa-2x"></i>
                         </div>
                         <div>
-                            <h4 style="color: #22543D; margin: 0 0 0.5rem 0;">Pago en el Hotel</h4>
+                            <h4 style="color: #22543D; margin: 0 0 0.5rem 0; font-size: 1.2rem;">Pago en Efectivo al Llegar</h4>
                             <p style="font-size: 0.95rem; color: #2F855A; line-height: 1.6; margin: 0;">
-                                Reserva ahora y paga al momento del Check-in. <br>
+                                Su reserva se confirmará de inmediato y el cobro total se realizará en recepción durante el Check-in.<br>
                                 <small style="opacity: 0.8; display: block; margin-top: 10px;">
-                                    * Se requerirá un documento de identidad válido para confirmar la reserva a tu llegada.
+                                    * Recuerde presentar su documento de identidad original al momento del ingreso.
                                 </small>
                             </p>
                         </div>
@@ -405,14 +388,14 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-pay">
-                Finalizar con <span id="method-name-btn">Mastercard</span>
+            <button type="submit" class="btn-pay btn-pay-nequi" id="btn-submit-payment">
+                <i class="fas fa-check-circle"></i> Confirmar que ya transferí
             </button>
         </form>
 
         <div class="secure-badge">
             <i class="fas fa-lock"></i>
-            Transacción encriptada con SSL de 256 bits
+            Gestión segura de reserva • La Orquídea Hotel Boutique
         </div>
     </div>
 
@@ -420,14 +403,14 @@
         <h3>Resumen de Reserva</h3>
         
         <div class="room-mini-card">
-            {% if habitacion.imagen %}
+            {% if habitacion and habitacion.imagen %}
                 <img src="{{ url_for('static', filename=habitacion.imagen) }}" alt="Habitación">
             {% else %}
                 <img src="{{ url_for('static', filename='img/room_placeholder.png') }}" alt="Habitación">
             {% endif %}
             <div class="room-mini-info">
-                <h4>{{ habitacion.tipo }}</h4>
-                <p>Habitación #{{ habitacion.numero }}</p>
+                <h4>{{ habitacion.tipo if habitacion else 'Habitación' }}</h4>
+                <p>Habitación #{{ habitacion.numero if habitacion else '-' }}</p>
             </div>
         </div>
 
@@ -446,7 +429,7 @@
             </div>
             <div class="summary-item">
                 <span>Precio por noche:</span>
-                <span>${{ "{:,.0f}".format(habitacion.precio_noche) }} COP</span>
+                <span>${{ "{:,.0f}".format(habitacion.precio_noche if habitacion else 0) }} COP</span>
             </div>
         </div>
 
@@ -456,7 +439,7 @@
         </div>
 
         <div style="margin-top: 2.5rem; font-size: 0.8rem; color: rgba(255,255,255,0.5); line-height: 1.6;">
-            Al confirmar el pago, aceptas nuestras políticas de cancelación y términos de servicio. El cargo se realizará de forma inmediata.
+            Al confirmar la reserva, acepta nuestras políticas de estancia y términos de servicio.
         </div>
     </div>
 </div>
@@ -464,42 +447,32 @@
 
 {% block scripts %}
 <script>
-    // Method selector logic
     function selectMethod(element) {
-        // Remove active class from all
         document.querySelectorAll('.method-option').forEach(opt => {
-            opt.style.border = '1px solid #eee';
             opt.classList.remove('active');
         });
 
-        // Add active to current
-        element.style.border = '2px solid var(--pay-gold)';
         element.classList.add('active');
-
         const method = element.getAttribute('data-method');
         document.getElementById('metodo_pago_input').value = method;
-        document.getElementById('method-name-btn').innerText = element.innerText;
 
-        // Show/Hide forms
-        ['mastercard', 'nequi', 'bancolombia', 'efectivo'].forEach(m => {
-            document.getElementById('form-' + m).style.display = (m === method) ? 'block' : 'none';
-        });
+        const btn = document.getElementById('btn-submit-payment');
+
+        if (method === 'nequi') {
+            document.getElementById('form-nequi').style.display = 'block';
+            document.getElementById('form-efectivo').style.display = 'none';
+            btn.className = 'btn-pay btn-pay-nequi';
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> Confirmar que ya transferí';
+        } else {
+            document.getElementById('form-nequi').style.display = 'none';
+            document.getElementById('form-efectivo').style.display = 'block';
+            btn.className = 'btn-pay btn-pay-efectivo';
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> Confirmar Reserva y Pagar al Llegar';
+        }
     }
 
-    // Simple formatter for card number
-    document.querySelector('input[placeholder="0000 0000 0000 0000"]').addEventListener('input', function (e) {
-        let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-        let formattedValue = "";
-        for (let i = 0; i < value.length; i++) {
-            if (i > 0 && i % 4 == 0) formattedValue += " ";
-            formattedValue += value[i];
-        }
-        e.target.value = formattedValue;
-    });
-
-    // Form submission animation
     document.getElementById('payment-form').addEventListener('submit', function(e) {
-        const btn = this.querySelector('.btn-pay');
+        const btn = document.getElementById('btn-submit-payment');
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
         btn.style.opacity = '0.7';
         btn.style.pointerEvents = 'none';

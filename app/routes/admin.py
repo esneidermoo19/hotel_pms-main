@@ -89,6 +89,11 @@ def dashboard():
     except Exception:
         reservas_activas_count = 0
     
+    try:
+        reservas_verificacion = Reservacion.query.filter_by(estado='pendiente_verificacion').order_by(Reservacion.fecha_creacion.desc()).all()
+    except Exception:
+        reservas_verificacion = []
+    
     return render_template('admin/dashboard.html', 
                          habitaciones=habitaciones,
                          usuarios=usuarios,
@@ -96,7 +101,8 @@ def dashboard():
                          turnos_hoy=turnos_hoy,
                          total_ingresos_hoy=total_ingresos_hoy,
                          facturas_recientes=facturas_recientes,
-                         reservas_activas_count=reservas_activas_count)
+                         reservas_activas_count=reservas_activas_count,
+                         reservas_verificacion=reservas_verificacion)
 
 @admin_bp.route('/habitaciones')
 @admin_required

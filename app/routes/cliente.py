@@ -111,38 +111,64 @@ def pago(reserva_id):
         return redirect(url_for('cliente.home'))
     
     habitacion = Habitacion.query.get(reserva.habitacion_id)
+    config = ConfigHotel.query.first()
     noches = (reserva.fecha_fin - reserva.fecha_inicio).days
     
-    return render_template('cliente/pago.html', reserva=reserva, habitacion=habitacion, noches=noches)
+    return render_template('cliente/pago.html', reserva=reserva, habitacion=habitacion, noches=noches, config=config)
 
 @cliente_bp.route('/procesar_pago/<int:reserva_id>', methods=['POST'])
 def procesar_pago(reserva_id):
+    import os
+    from werkzeug.utils import secure_filename
+    
     reserva = Reservacion.query.get_or_404(reserva_id)
     if reserva.estado != 'pendiente_pago':
         return redirect(url_for('cliente.home'))
     
-    metodo = request.form.get('metodo_pago', 'mastercard')
+    metodo = request.form.get('metodo_pago', 'efectivo')
     reserva.metodo_pago = metodo
-    
-    reserva.estado = 'activa'
-    if metodo != 'efectivo':
-        reserva.pagado = True
-
-    # Si la fecha de inicio es hoy o anterior, actualizar estado de habitación a Ocupada
-    if reserva.fecha_inicio.date() <= datetime.now().date():
-        habitacion = Habitacion.query.get(reserva.habitacion_id)
-        if habitacion:
-            habitacion.estado = 'Ocupada'
-    
-    db.session.commit()
-    
-    # Enviar Email de confirmación
-    habitacion = Habitacion.query.get(reserva.habitacion_id)
     config = ConfigHotel.query.first()
-    EmailService.enviar_codigo_reserva(reserva, habitacion, config)
-    
-    flash(f'¡Pago exitoso! Su reserva ha sido confirmada. Hemos enviado el código de acceso a: {reserva.email_cliente}', 'success')
-    return redirect(url_for('cliente.home'))
+    habitacion = Habitacion.query.get(reserva.habitacion_id)
+
+    if metodo == 'nequi':
+        file = request.files.get('comprobante')
+        if file and file.filename:
+            uploads_dir = os.path.join(os.path.dirname(__file__), '..', 'static', 'uploads', 'comprobantes')
+            os.makedirs(uploads_dir, exist_ok=True)
+            filename = secure_filename(f"nequi_{reserva.codigo}_{file.filename}")
+            file.save(os.path.join(uploads_dir, filename))
+            reserva.comprobante_pago = filename
+
+        reserva.estado = 'pendiente_verificacion'
+        reserva.pagado = False
+        db.session.commit()
+
+        EmailService.enviar_codigo_reserva(reserva, habitacion, config)
+        flash(f'¡Comprobante de Nequi recibido! Su reserva {reserva.codigo} ha quedado en estado "Nequi - pendiente de verificación" a la espera de validación por parte del personal de recepción.', 'info')
+        return redirect(url_for('cliente.home'))
+
+    elif metodo == 'efectivo':
+        reserva.estado = 'activa'
+        reserva.pagado = False
+
+        if reserva.fecha_inicio.date() <= datetime.now().date():
+            if habitacion:
+                habitacion.estado = 'Ocupada'
+
+        db.session.commit()
+        EmailService.enviar_codigo_reserva(reserva, habitacion, config)
+        flash(f'¡Reserva confirmada! Su código es {reserva.codigo}. El pago en efectivo se realizará al momento del Check-in.', 'success')
+        return redirect(url_for('cliente.home'))
+        
+    else:
+        # Compatibilidad con otros métodos anteriores si aplica
+        reserva.estado = 'activa'
+        reserva.pagado = True
+        db.session.commit()
+        EmailService.enviar_codigo_reserva(reserva, habitacion, config)
+        flash(f'¡Pago exitoso! Su reserva ha sido confirmada.', 'success')
+        return redirect(url_for('cliente.home'))
+
 
 @cliente_bp.route('/login', methods=['GET', 'POST'])
 def cliente_login():

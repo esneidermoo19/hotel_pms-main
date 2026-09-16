@@ -27,6 +27,8 @@ class Reservacion(db.Model):
     
     ip_address = db.Column(db.String(45), nullable=True) # Soporte para IPv6
     metodo_pago = db.Column(db.String(50), nullable=True)
+    comprobante_pago = db.Column(db.String(255), nullable=True)
+
     
     habitacion = db.relationship('Habitacion', back_populates='reservaciones')
     empleado = db.relationship('Empleado', backref='reservas')

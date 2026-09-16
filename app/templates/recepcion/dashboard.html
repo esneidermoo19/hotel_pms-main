@@ -282,6 +282,62 @@
         {% endif %}
     </div>
 
+    <!-- Verificación de Pagos Nequi -->
+    <div class="section">
+        <div class="section-header">
+            <h2><span class="dot" style="background: #8B5CF6;"></span> Verificación de Pagos (Nequi)</h2>
+            <span class="badge" style="background: #EDE9FE; color: #6D28D9;">{{ reservas_verificacion|length }}</span>
+        </div>
+        {% if reservas_verificacion %}
+        <div class="habitacion-grid">
+            {% for res in reservas_verificacion %}
+            <div class="habitacion-card" style="border-left: 4px solid #8B5CF6;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                    <div>
+                        <div class="habitacion-numero">{{ res.codigo }}</div>
+                        <div class="habitacion-huesped" style="margin-top: 5px; font-weight: 600;">{{ res.nombre_cliente }}</div>
+                    </div>
+                    <span class="status-badge" style="background: #EDE9FE; color: #6D28D9; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">Validación Nequi</span>
+                </div>
+                
+                <div class="habitacion-precio">${{ "{:,}".format(res.total_pago) }}</div>
+                
+                {% if res.comprobante_pago %}
+                <div style="margin: 15px 0;">
+                    <a href="{{ url_for('static', filename='uploads/comprobantes/' ~ res.comprobante_pago) }}" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #6D28D9; font-size: 0.85rem; font-weight: 600; text-decoration: none; background: #F5F3FF; padding: 8px 12px; border-radius: 8px; border: 1px solid #EDE9FE;">
+                        <i class="fas fa-file-invoice-dollar"></i> Ver Comprobante Adjunto
+                    </a>
+                </div>
+                {% else %}
+                <div style="margin: 15px 0; color: #DC2626; font-size: 0.85rem; font-weight: 600;">
+                    <i class="fas fa-exclamation-circle"></i> Sin comprobante adjunto
+                </div>
+                {% endif %}
+
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <form method="POST" action="{{ url_for('recep.verificar_pago', reservacion_id=res.id) }}" style="flex: 1; margin: 0;" onsubmit="return confirm('¿Confirmas que el pago por Nequi ha sido recibido correctamente?')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="accion" value="aprobar">
+                        <button type="submit" style="width: 100%; padding: 10px; background: #10B981; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <i class="fas fa-check"></i> Aprobar
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('recep.verificar_pago', reservacion_id=res.id) }}" style="flex: 1; margin: 0;" onsubmit="return confirm('¿Estás seguro de rechazar este pago? La reserva será cancelada.')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="accion" value="rechazar">
+                        <button type="submit" style="width: 100%; padding: 10px; background: #EF4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <i class="fas fa-times"></i> Rechazar
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">No hay pagos pendientes de verificación</div>
+        {% endif %}
+    </div>
+
     <!-- Habitaciones Disponibles -->
     <div class="section">
         <div class="section-header">

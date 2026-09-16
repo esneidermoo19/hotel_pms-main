@@ -72,6 +72,8 @@ def dashboard():
             fecha=hoy_date
         ).first()
     
+    reservas_verificacion = Reservacion.query.filter_by(estado='pendiente_verificacion').order_by(Reservacion.fecha_creacion.desc()).all()
+    
     return render_template(
         'recepcion/dashboard.html', 
         libres=habitaciones_libres, 
@@ -79,6 +81,7 @@ def dashboard():
         occupations_pagadas=ocupadas_pagadas,
         mantenimiento=habitaciones_mantenimiento,
         reservas_online=reservas_online,
+        reservas_verificacion=reservas_verificacion,
         turno_activo=turno_activo,
         empleado=empleado
     )
@@ -103,6 +106,28 @@ def cancelar_reserva_staff(reservacion_id):
         reserva.habitacion.estado = 'Disponible'
     db.session.commit()
     flash(f'Reserva {reserva.codigo} cancelada por recepción.', 'info')
+    return redirect(url_for('recep.dashboard'))
+
+@recep_bp.route('/reserva/verificar_pago/<int:reservacion_id>', methods=['POST'])
+@empleado_required
+def verificar_pago(reservacion_id):
+    reserva = Reservacion.query.get_or_404(reservacion_id)
+    accion = request.form.get('accion')
+    
+    if accion == 'aprobar':
+        reserva.estado = 'activa'
+        reserva.pagado = True
+        if reserva.habitacion and reserva.fecha_inicio.date() <= datetime.now().date():
+            reserva.habitacion.estado = 'Ocupada'
+        flash(f'Pago aprobado para la reserva {reserva.codigo}.', 'success')
+    elif accion == 'rechazar':
+        reserva.estado = 'cancelada'
+        flash(f'Pago rechazado para la reserva {reserva.codigo}. Reserva cancelada.', 'danger')
+        
+    db.session.commit()
+    
+    if request.form.get('from_admin') == '1':
+        return redirect(url_for('admin.dashboard'))
     return redirect(url_for('recep.dashboard'))
 
 
