@@ -23,6 +23,11 @@ def create_app(config_class=None):
     # 1. Cargar configuración desde app/config.py
     from app.config import Config
     app.config.from_object(Config)
+    if config_class:
+        if isinstance(config_class, dict):
+            app.config.update(config_class)
+        else:
+            app.config.from_object(config_class)
 
     # 2. Inicializar extensiones con la app
     db.init_app(app)
