@@ -1,39 +1,75 @@
 /* 
-   Hotel La Orquídea - Neutral Elegant Design System
-   Color Palette: Ink, Bone, Taupe, Sage
+   Hotel La Orquídea - Refined Design System
+   Identity: Neutral Luxury & Professional PMS
 */
 
 :root {
     /* Primary Neutrals */
     --clr-ink: #0F0F0F;
-    /* Deepest obsidian for sidebars and text */
-    --clr-bone: #e2e0e077;
-    /* Beige background */
+    --clr-ink-light: #2A2A2A;
+    --clr-bone: #F5F4F0;
     --clr-surface: #FFFFFF;
-    /* Pure white for cards */
-    --clr-border: rgba(0, 0, 0, 0.06);
+    --clr-border: #E5E7EB;
+    --clr-border-subtle: rgba(0, 0, 0, 0.05);
 
-    /* Accents */
+    /* Brand Accents */
     --clr-taupe: #C5B4A5;
-    /* Warm muted gold for highlights */
-    --clr-sage: #8C9C8E;
-    /* Muted green for successes */
-    --clr-rose: #B28E8E;
-    /* Dusty rose for alerts/danger */
+    --clr-taupe-dark: #A39080;
+    --clr-taupe-light: #F4F0EC;
+    --clr-sage: #4E6E58;
+    --clr-sage-bg: #ECFDF5;
+    --clr-sage-border: #A7F3D0;
+    --clr-rose: #9E4A4A;
+    --clr-rose-bg: #FEF2F2;
+    --clr-rose-border: #FECACA;
+    --clr-warning: #D97706;
+    --clr-warning-bg: #FFFBEB;
+    --clr-warning-border: #FDE68A;
+    --clr-info: #2563EB;
+    --clr-info-bg: #EFF6FF;
+    --clr-info-border: #BFDBFE;
 
-    /* Typography */
-    --font-heading: 'Outfit', sans-serif;
-    --font-serif: 'Playfair Display', serif;
-    --font-ui: 'Inter', sans-serif;
+    /* Typography Scale */
+    --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-    /* Spacing & Borders */
-    --radius-sm: 4px;
+    --font-size-xs: 0.75rem;     /* 12px */
+    --font-size-sm: 0.875rem;    /* 14px */
+    --font-size-base: 1rem;      /* 16px */
+    --font-size-lg: 1.125rem;    /* 18px */
+    --font-size-xl: 1.25rem;     /* 20px */
+    --font-size-2xl: 1.5rem;    /* 24px */
+    --font-size-3xl: 2rem;      /* 32px */
+    --font-size-4xl: 2.5rem;    /* 40px */
+    --font-size-5xl: 3.25rem;   /* 52px */
+
+    /* Spacing Grid (8px Scale) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+
+    /* Border Radius */
+    --radius-sm: 6px;
     --radius-md: 12px;
-    --radius-lg: 20px;
+    --radius-lg: 18px;
+    --radius-full: 9999px;
 
-    /* Shadows */
-    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.03);
-    --shadow-elegant: 0 20px 40px rgba(0, 0, 0, 0.06);
+    /* Elevation & Shadows */
+    --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.04);
+    --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.06);
+    --shadow-elegant: 0 16px 40px rgba(0, 0, 0, 0.08);
+
+    /* Transitions */
+    --transition-fast: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    --transition-smooth: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 * {
@@ -46,6 +82,7 @@ body {
     font-family: var(--font-ui);
     background-color: var(--clr-bone);
     color: var(--clr-ink);
+    font-size: var(--font-size-base);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
 }
@@ -69,45 +106,38 @@ body {
     flex-direction: column;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 .sidebar::-webkit-scrollbar {
-    width: 6px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-    background: transparent;
+    width: 5px;
 }
 
 .sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
 }
 
 .hotel-logo-container {
-    padding: 60px 40px;
+    padding: var(--space-8) var(--space-6);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 20px;
+    gap: var(--space-3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .orchid-wrapper {
-    width: 55px;
-    height: 55px;
+    width: 52px;
+    height: 52px;
     background: transparent;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid rgba(197, 160, 89, 0.3);
+    border: 1.5px solid rgba(197, 180, 165, 0.4);
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
 .orchid-graphic {
@@ -118,9 +148,9 @@ body {
 
 .hotel-logo-text {
     font-family: var(--font-heading);
-    font-size: 16px;
+    font-size: var(--font-size-sm);
     font-weight: 700;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.18em;
     color: white;
     text-transform: uppercase;
 }
@@ -128,125 +158,137 @@ body {
 .main-content {
     flex: 1;
     margin-left: 280px;
-    padding: 60px;
+    padding: var(--space-8);
     min-height: 100vh;
-    transition: all 0.3s ease;
+    transition: var(--transition-smooth);
 }
 
-/* Typography Primitives */
-h1,
-h2,
-h3 {
+/* Typography Hierarchy */
+h1, h2, h3, h4 {
     font-family: var(--font-serif);
     font-weight: 400;
+    color: var(--clr-ink);
     letter-spacing: -0.01em;
 }
 
 h1 {
-    font-size: 3.5rem;
-    line-height: 1.1;
-    margin-bottom: 20px;
+    font-size: var(--font-size-4xl);
+    line-height: 1.15;
+    margin-bottom: var(--space-4);
 }
 
 h2 {
-    font-size: 1.8rem;
-    margin-bottom: 30px;
+    font-size: var(--font-size-2xl);
+    line-height: 1.25;
+    margin-bottom: var(--space-6);
+}
+
+h3 {
+    font-size: var(--font-size-xl);
+    line-height: 1.3;
+    margin-bottom: var(--space-4);
+}
+
+h4 {
+    font-size: var(--font-size-lg);
+    line-height: 1.4;
+    margin-bottom: var(--space-3);
+}
+
+p {
+    margin-bottom: var(--space-4);
 }
 
 .text-muted {
-    color: #888;
-    font-size: 0.9rem;
+    color: #6B7280;
+    font-size: var(--font-size-sm);
 }
 
 .text-uppercase {
     text-transform: uppercase;
-    letter-spacing: 0.2em;
-    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    font-size: var(--font-size-xs);
     font-weight: 700;
 }
 
-/* Components */
+/* Base Components */
 .elegant-card {
     background: var(--clr-surface);
     border-radius: var(--radius-md);
-    padding: 40px;
+    padding: var(--space-8);
     box-shadow: var(--shadow-soft);
     border: 1px solid var(--clr-border);
-    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: var(--transition-smooth);
 }
 
 .elegant-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-elegant);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
 }
 
-/* Navigation inside Sidebar */
+/* Sidebar Navigation */
 .sidebar nav {
-    padding: 0 30px;
-    margin-top: 40px;
+    padding: var(--space-4) var(--space-4);
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: var(--space-1);
 }
 
 .nav-section-label {
-    font-size: 10px;
+    font-size: var(--font-size-xs);
     font-family: var(--font-ui);
     text-transform: uppercase;
-    letter-spacing: 0.25em;
+    letter-spacing: 0.2em;
     color: rgba(255, 255, 255, 0.4);
-    margin: 25px 0 10px 15px;
+    margin: var(--space-4) 0 var(--space-2) var(--space-3);
     font-weight: 600;
 }
 
 .sidebar nav a {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 14px 20px;
-    color: rgba(255, 255, 255, 0.6);
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 400;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
     font-family: var(--font-ui);
-    border-radius: 12px;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
     background: transparent;
     border: 1px solid transparent;
 }
 
 .sidebar nav a .nav-icon {
-    font-size: 16px;
-    opacity: 0.7;
-    transition: all 0.4s ease;
-    filter: grayscale(100%);
+    font-size: var(--font-size-base);
+    opacity: 0.8;
+    width: 20px;
+    text-align: center;
+    transition: var(--transition-fast);
 }
 
 .sidebar nav a:hover {
     color: white;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transform: translateX(5px);
+    background: rgba(255, 255, 255, 0.07);
+    transform: translateX(3px);
 }
 
 .sidebar nav a:hover .nav-icon {
     opacity: 1;
-    filter: grayscale(0%);
-    transform: scale(1.1);
+    color: var(--clr-taupe);
 }
 
 .sidebar nav a.active {
     color: var(--clr-ink);
     background: var(--clr-bone);
     font-weight: 600;
-    box-shadow: 0 4px 15px rgba(249, 248, 246, 0.1);
+    box-shadow: var(--shadow-soft);
 }
 
 .sidebar nav a.active .nav-icon {
     opacity: 1;
-    filter: grayscale(0%);
+    color: var(--clr-ink);
 }
 
 .sidebar nav a.active::before {
@@ -263,21 +305,29 @@ h2 {
 
 .nav-footer {
     margin-top: auto;
-    padding-top: 30px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: var(--space-6);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.logout-link {
+    color: #F87171 !important;
+}
+
+.logout-link:hover {
+    background: rgba(239, 68, 68, 0.1) !important;
 }
 
 .ui-speed-control {
-    padding: 15px 20px;
+    padding: var(--space-3) var(--space-4);
 }
 
 .ui-speed-control label {
     display: block;
-    font-size: 10px;
+    font-size: var(--font-size-xs);
     text-transform: uppercase;
     letter-spacing: 0.15em;
     color: rgba(255, 255, 255, 0.4);
-    margin-bottom: 10px;
+    margin-bottom: var(--space-2);
 }
 
 .ui-speed-control input[type=range] {
@@ -285,46 +335,32 @@ h2 {
     accent-color: var(--clr-taupe);
 }
 
-/* Animations */
+/* Global Animations */
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
-        filter: blur(5px);
+        transform: translateY(12px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
-        filter: blur(0);
     }
 }
 
 .animated {
-    animation: fadeIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
-.stagger-1 {
-    animation-delay: 0.1s;
-}
-
-.stagger-2 {
-    animation-delay: 0.2s;
-}
-
-.stagger-3 {
-    animation-delay: 0.3s;
-}
-
-.stagger-4 {
-    animation-delay: 0.4s;
-}
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
 
 .mobile-menu-toggle {
     display: none;
     cursor: pointer;
-    margin-bottom: 20px;
-    padding: 10px;
+    margin-bottom: var(--space-4);
+    padding: var(--space-2) var(--space-4);
     background: var(--clr-surface);
     border-radius: var(--radius-sm);
     box-shadow: var(--shadow-soft);
@@ -332,7 +368,13 @@ h2 {
     color: var(--clr-ink);
 }
 
-/* Responsive */
+/* Focus and Accessibility Accessibility (WCAG AA) */
+:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(197, 180, 165, 0.4);
+}
+
+/* Responsive Breakpoints */
 @media (max-width: 1024px) {
     .sidebar {
         width: 0;
@@ -346,7 +388,7 @@ h2 {
 
     .main-content {
         margin-left: 0;
-        padding: 30px;
+        padding: var(--space-6);
     }
 
     .mobile-menu-toggle {
@@ -356,20 +398,20 @@ h2 {
 
 @media (max-width: 768px) {
     .main-content {
-        padding: 15px;
+        padding: var(--space-4);
     }
 
     h1 {
-        font-size: 2rem;
-        margin-bottom: 15px;
+        font-size: var(--font-size-3xl);
+        margin-bottom: var(--space-3);
     }
 
     h2 {
-        font-size: 1.4rem;
-        margin-bottom: 20px;
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--space-4);
     }
 
     .elegant-card {
-        padding: 20px;
+        padding: var(--space-4);
     }
 }

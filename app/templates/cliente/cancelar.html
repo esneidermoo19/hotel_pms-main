@@ -125,9 +125,10 @@
 
 <div class="cancel-container animated">
     <div class="elegant-form-card">
-        <span class="form-icon">🎫</span>
+        <span class="form-icon"><i class="fas fa-ticket-alt"></i></span>
         
         <form method="POST" action="{{ url_for('cliente.cancelar_codigo') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="text" 
                    name="codigo" 
                    placeholder="CÓDIGO" 
@@ -143,7 +144,7 @@
 
     <div class="help-section">
         <div class="help-card">
-            <span style="font-size: 1.5rem;">📧</span>
+            <span style="font-size: 1.5rem; color: var(--clr-taupe);"><i class="fas fa-envelope"></i></span>
             <div class="help-info">
                 <span class="help-title">¿Olvidó su código?</span>
                 <p class="help-text">El código de 6 caracteres fue enviado a su correo electrónico al confirmar la reserva.</p>
@@ -152,7 +153,7 @@
 
         {% if current_user.is_authenticated %}
         <div class="help-card">
-            <span style="font-size: 1.5rem;">👤</span>
+            <span style="font-size: 1.5rem; color: var(--clr-taupe);"><i class="fas fa-user-circle"></i></span>
             <div class="help-info">
                 <span class="help-title">Acceso Directo</span>
                 <p class="help-text">Como usuario registrado, puede gestionar todas sus estancias desde <a href="{{ url_for('cliente.mis_reservas') }}" class="help-link">Mis Reservas</a>.</p>

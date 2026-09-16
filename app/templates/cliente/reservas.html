@@ -191,16 +191,16 @@
     {% if current_user.is_authenticated %}
     <div style="background: white; border-radius: var(--radius-md); padding: 2rem 3rem; margin-bottom: 3rem; border: 1px solid var(--clr-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; box-shadow: var(--shadow-soft);">
         <div>
-            <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--clr-taupe); font-weight: 700;">Perfil de Huésped</div>
+            <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--clr-taupe-dark); font-weight: 700;">Perfil de Huésped</div>
             <h2 style="margin: 0.3rem 0; font-family: var(--font-serif); font-size: 1.8rem;">{{ current_user.nombre or current_user.username }}</h2>
-            <div style="color: #666; font-size: 0.9rem;">
-                <span>📧 {{ current_user.email }}</span>
-                {% if current_user.telefono %} <span style="margin-left: 1rem;">📱 {{ current_user.telefono }}</span>{% endif %}
+            <div style="color: #6B7280; font-size: 0.9rem;">
+                <span><i class="fas fa-envelope" style="margin-right: 6px; color: var(--clr-taupe-dark);"></i> {{ current_user.email }}</span>
+                {% if current_user.telefono %} <span style="margin-left: 1.5rem;"><i class="fas fa-phone-alt" style="margin-right: 6px; color: var(--clr-taupe-dark);"></i> {{ current_user.telefono }}</span>{% endif %}
             </div>
         </div>
         <div>
             <a href="{{ url_for('cliente.cliente_logout') }}" class="btn-cancel-reserva" style="border-color: #666; color: #444; padding: 0.8rem 1.8rem;">
-                Cerrar Sesión
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
             </a>
         </div>
     </div>
@@ -264,7 +264,7 @@
         {% endfor %}
     {% else %}
         <div class="empty-state">
-            <span class="empty-icon">📅</span>
+            <span class="empty-icon" style="color: var(--clr-taupe-dark);"><i class="fas fa-calendar-alt"></i></span>
             <h3 class="info-title">No hay reservas registradas</h3>
             <p class="info-text">Actualmente no tiene ninguna estancia programada con nosotros.</p>
             <a href="{{ url_for('cliente.habitaciones') }}" class="btn-primary-action">Explorar Habitaciones</a>
