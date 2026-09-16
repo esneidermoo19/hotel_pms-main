@@ -32,6 +32,21 @@ with app.app_context():
         except Exception as e:
             db.session.rollback()
             print(f"Nota: No se pudo alterar la tabla (probablemente ya está actualizada): {e}")
+            
+        # Parche para añadir columnas nequi a config_hotel si no existen
+        try:
+            db.session.execute(db.text('ALTER TABLE config_hotel ADD COLUMN nequi_numero VARCHAR(30) DEFAULT \'300 123 4567\''))
+            db.session.commit()
+            print("Columna nequi_numero agregada a config_hotel")
+        except Exception as e:
+            db.session.rollback()
+            
+        try:
+            db.session.execute(db.text('ALTER TABLE config_hotel ADD COLUMN nequi_qr VARCHAR(200) DEFAULT \'img/qr_nequi.png\''))
+            db.session.commit()
+            print("Columna nequi_qr agregada a config_hotel")
+        except Exception as e:
+            db.session.rollback()
 
     print("Base de datos verificada: hotel.db")
     
