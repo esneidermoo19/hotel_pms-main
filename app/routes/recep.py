@@ -34,6 +34,11 @@ def dashboard():
             else:
                 ocupadas_pendientes.append(item)
                 
+    # Reservas hechas por huéspedes (online) activas o pendientes de pago
+    reservas_online = Reservacion.query.filter(
+        Reservacion.estado.in_(['activa', 'pendiente_pago'])
+    ).order_by(Reservacion.fecha_creacion.desc()).all()
+
     # Obtener o vincular perfil de empleado del usuario en sesión
     empleado = Empleado.query.filter_by(user_id=current_user.id).first()
     if not empleado and hasattr(current_user, 'nombre'):
@@ -73,9 +78,33 @@ def dashboard():
         occupations_no_pagadas=ocupadas_pendientes,
         occupations_pagadas=ocupadas_pagadas,
         mantenimiento=habitaciones_mantenimiento,
+        reservas_online=reservas_online,
         turno_activo=turno_activo,
         empleado=empleado
     )
+
+@recep_bp.route('/reserva/checkin/<int:reservacion_id>', methods=['POST'])
+@empleado_required
+def checkin_reserva(reservacion_id):
+    reserva = Reservacion.query.get_or_404(reservacion_id)
+    reserva.estado = 'activa'
+    if reserva.habitacion:
+        reserva.habitacion.estado = 'Ocupada'
+    db.session.commit()
+    flash(f'Check-in completado exitosamente para {reserva.nombre_cliente} en Habitación #{reserva.habitacion.numero if reserva.habitacion else ""}.', 'success')
+    return redirect(url_for('recep.dashboard'))
+
+@recep_bp.route('/reserva/cancelar_staff/<int:reservacion_id>', methods=['POST'])
+@empleado_required
+def cancelar_reserva_staff(reservacion_id):
+    reserva = Reservacion.query.get_or_404(reservacion_id)
+    reserva.estado = 'cancelada'
+    if reserva.habitacion and reserva.habitacion.estado == 'Ocupada':
+        reserva.habitacion.estado = 'Disponible'
+    db.session.commit()
+    flash(f'Reserva {reserva.codigo} cancelada por recepción.', 'info')
+    return redirect(url_for('recep.dashboard'))
+
 
 @recep_bp.route('/turno/empezar', methods=['POST'])
 @empleado_required

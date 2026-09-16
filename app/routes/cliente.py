@@ -124,12 +124,15 @@ def procesar_pago(reserva_id):
     metodo = request.form.get('metodo_pago', 'mastercard')
     reserva.metodo_pago = metodo
     
-    # Simulación de éxito de pago
-    # Si es efectivo, podríamos dejarlo como pendiente, pero para el flujo del cliente 
-    # diremos que la reserva está confirmada pero pendiente de cobro físico.
     reserva.estado = 'activa'
     if metodo != 'efectivo':
         reserva.pagado = True
+
+    # Si la fecha de inicio es hoy o anterior, actualizar estado de habitación a Ocupada
+    if reserva.fecha_inicio.date() <= datetime.now().date():
+        habitacion = Habitacion.query.get(reserva.habitacion_id)
+        if habitacion:
+            habitacion.estado = 'Ocupada'
     
     db.session.commit()
     
@@ -182,8 +185,6 @@ def cliente_registro():
         elif User.query.filter_by(email=email).first():
             flash('Este correo electrónico ya está registrado.', 'danger')
         else:
-            # Crear usuario. Usamos email como username ya que el modelo pide username único
-            # pero el requerimiento dice autenticar por email.
             new_user = User(
                 username=email,
                 email=email,
@@ -213,16 +214,26 @@ def cliente_logout():
 def cancelar_codigo():
     if request.method == 'POST':
         codigo = request.form.get('codigo', '').strip().upper()
-        reserva = Reservacion.query.filter_by(codigo=codigo, estado='activa').first()
+        reserva = Reservacion.query.filter(
+            db.func.upper(Reservacion.codigo) == codigo,
+            Reservacion.estado.in_(['activa', 'pendiente_pago'])
+        ).first()
         
         if not reserva:
-            flash('Código de reserva no encontrado.', 'danger')
+            flash('Código de reserva no encontrado o ya fue cancelado.', 'danger')
             return redirect(url_for('cliente.cancelar_codigo'))
         
         reserva.estado = 'cancelada'
+        if reserva.habitacion and reserva.habitacion.estado == 'Ocupada':
+            reserva.habitacion.estado = 'Disponible'
+            
         db.session.commit()
         
-        flash('Reserva cancelada exitosamente.', 'success')
+        habitacion = Habitacion.query.get(reserva.habitacion_id)
+        config = ConfigHotel.query.first()
+        EmailService.enviar_cancelacion_reserva(reserva, habitacion, config)
+        
+        flash(f'La reserva {reserva.codigo} ha sido cancelada exitosamente.', 'success')
         return redirect(url_for('cliente.home'))
     
     return render_template('cliente/cancelar.html')
@@ -233,7 +244,7 @@ def mis_reservas():
         flash('Por favor, inicie sesión para ver sus reservas.', 'warning')
         return redirect(url_for('cliente.cliente_login'))
         
-    reservas = Reservacion.query.filter_by(usuario_id=current_user.id, estado='activa').all()
+    reservas = Reservacion.query.filter_by(usuario_id=current_user.id).order_by(Reservacion.fecha_creacion.desc()).all()
     return render_template('cliente/reservas.html', reservas=reservas)
 
 @cliente_bp.route('/cancelar/<int:reserva_id>')
@@ -249,7 +260,15 @@ def cancelar(reserva_id):
         return redirect(url_for('cliente.mis_reservas'))
     
     reserva.estado = 'cancelada'
+    if reserva.habitacion and reserva.habitacion.estado == 'Ocupada':
+        reserva.habitacion.estado = 'Disponible'
+        
     db.session.commit()
+    
+    habitacion = Habitacion.query.get(reserva.habitacion_id)
+    config = ConfigHotel.query.first()
+    EmailService.enviar_cancelacion_reserva(reserva, habitacion, config)
     
     flash('Reserva cancelada exitosamente.', 'success')
     return redirect(url_for('cliente.mis_reservas'))
+

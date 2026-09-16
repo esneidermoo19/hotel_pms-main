@@ -214,3 +214,65 @@ class EmailService:
             recipients=[reserva.email_cliente],
             html_body=html_body
         )
+
+    @staticmethod
+    def enviar_cancelacion_reserva(reserva, habitacion, config):
+        if not reserva.email_cliente:
+            return False
+            
+        nombre_hotel = config.nombre if config else "Hotel La Orquídea"
+        num_hab = habitacion.numero if habitacion else "-"
+        tipo_hab = habitacion.tipo if habitacion else ""
+        
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+                * {{ font-family: 'Outfit', 'Segoe UI', Arial, sans-serif; }}
+            </style>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f3f4f6;">
+            <div style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid #e5e7eb;">
+                
+                <div style="background-color: #1F1528; padding: 40px 20px; text-align: center; border-bottom: 4px solid #ef4444;">
+                    <div style="color: #f87171; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3em; margin-bottom: 10px;">Notificación de Cancelación</div>
+                    <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;">{nombre_hotel}</h1>
+                </div>
+
+                <div style="padding: 40px; text-align: center;">
+                    <p style="color: #4b5563; font-size: 16px;">Estimado/a <strong>{reserva.nombre_cliente}</strong>,</p>
+                    <p style="color: #6b7280; font-size: 15px; line-height: 1.6;">Le confirmamos que su reserva con código <strong>{reserva.codigo}</strong> ha sido cancelada exitosamente.</p>
+                    
+                    <div style="background-color: #fef2f2; padding: 25px; border-radius: 16px; border: 1px solid #fecaca; margin: 25px 0; text-align: left;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                            <tr style="border-bottom: 1px solid #fee2e2;">
+                                <td style="padding: 10px 0; color: #991b1b;">Habitación</td>
+                                <td style="padding: 10px 0; text-align: right; color: #991b1b; font-weight: 600;">#{num_hab} ({tipo_hab})</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #fee2e2;">
+                                <td style="padding: 10px 0; color: #991b1b;">Fechas Canceladas</td>
+                                <td style="padding: 10px 0; text-align: right; color: #991b1b; font-weight: 600;">{reserva.fecha_inicio.strftime('%d/%m/%Y')} - {reserva.fecha_fin.strftime('%d/%m/%Y')}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <p style="color: #6b7280; font-size: 14px;">Esperamos volver a atenderle muy pronto en una próxima ocasión.</p>
+
+                    <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #e5e7eb; color: #9ca3af; font-size: 11px;">
+                        <p>&copy; 2026 {nombre_hotel} • Gestión de Hospitalidad</p>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        return EmailService.enviar_correo(
+            subject=f"CANCELACIÓN DE RESERVA #{reserva.codigo} - {nombre_hotel}",
+            recipients=[reserva.email_cliente],
+            html_body=html_body
+        )
+

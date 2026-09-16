@@ -183,19 +183,49 @@
 
 {% block content %}
 <header class="page-header">
-    <h1 class="page-title">Mis Reservas</h1>
-    <p class="page-subtitle">Gestione sus estancias y detalles de reserva</p>
+    <h1 class="page-title">Mi Cuenta & Reservas</h1>
+    <p class="page-subtitle">Gestione sus estancias y detalles de su cuenta</p>
 </header>
 
 <div class="reservas-container">
+    {% if current_user.is_authenticated %}
+    <div style="background: white; border-radius: var(--radius-md); padding: 2rem 3rem; margin-bottom: 3rem; border: 1px solid var(--clr-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; box-shadow: var(--shadow-soft);">
+        <div>
+            <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--clr-taupe); font-weight: 700;">Perfil de Huésped</div>
+            <h2 style="margin: 0.3rem 0; font-family: var(--font-serif); font-size: 1.8rem;">{{ current_user.nombre or current_user.username }}</h2>
+            <div style="color: #666; font-size: 0.9rem;">
+                <span>📧 {{ current_user.email }}</span>
+                {% if current_user.telefono %} <span style="margin-left: 1rem;">📱 {{ current_user.telefono }}</span>{% endif %}
+            </div>
+        </div>
+        <div>
+            <a href="{{ url_for('cliente.cliente_logout') }}" class="btn-cancel-reserva" style="border-color: #666; color: #444; padding: 0.8rem 1.8rem;">
+                Cerrar Sesión
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
     {% if reservas %}
         {% for reserva in reservas %}
         <div class="reserva-item animated stagger-{{ loop.index % 4 }}">
-            <div class="reserva-status {{ reserva.estado.lower() }}">{{ reserva.estado|title }}</div>
+            <div class="reserva-status {{ reserva.estado.lower() }}">
+                {% if reserva.estado == 'pendiente_pago' %}
+                    Pendiente Pago
+                {% else %}
+                    {{ reserva.estado|title }}
+                {% endif %}
+            </div>
             
             <div class="reserva-info">
                 <span class="reserva-code">Código: {{ reserva.codigo }}</span>
-                <h2 class="reserva-room">{{ reserva.habitacion.tipo }} <small style="font-size: 1rem; color: #888;">(N° {{ reserva.habitacion.numero }})</small></h2>
+                <h2 class="reserva-room">
+                    {% if reserva.habitacion %}
+                        {{ reserva.habitacion.tipo }} <small style="font-size: 1rem; color: #888;">(N° {{ reserva.habitacion.numero }})</small>
+                    {% else %}
+                        Habitación General
+                    {% endif %}
+                </h2>
                 
                 <div class="reserva-details">
                     <div class="detail-group">
@@ -208,26 +238,36 @@
                     </div>
                     <div class="detail-group">
                         <span class="detail-label">Total Estancia</span>
-                        <span class="reserva-price">${{ (reserva.habitacion.precio_noche * (reserva.fecha_fin - reserva.fecha_inicio).days) }}</span>
+                        <span class="reserva-price">${{ "{:,.0f}".format(reserva.total_pago or 0) }}</span>
                     </div>
                 </div>
 
-                {% if reserva.estado.lower() != 'cancelada' %}
-                <a href="{{ url_for('cliente.cancelar', reserva_id=reserva.id) }}" 
-                   class="btn-cancel-reserva" 
-                   onclick="return confirm('¿Está seguro de que desea cancelar esta reserva?')">
-                    Cancelar Reserva
-                </a>
-                {% endif %}
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                    {% if reserva.estado == 'pendiente_pago' %}
+                    <a href="{{ url_for('cliente.pago', reserva_id=reserva.id) }}" 
+                       class="btn-primary-action" 
+                       style="margin: 0; padding: 0.8rem 1.8rem; font-size: 0.75rem;">
+                        Completar Pago
+                    </a>
+                    {% endif %}
+
+                    {% if reserva.estado in ['activa', 'pendiente_pago'] %}
+                    <a href="{{ url_for('cliente.cancelar', reserva_id=reserva.id) }}" 
+                       class="btn-cancel-reserva" 
+                       onclick="return confirm('¿Está seguro de que desea cancelar esta reserva?')">
+                        Cancelar Reserva
+                    </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
         {% endfor %}
     {% else %}
         <div class="empty-state">
             <span class="empty-icon">📅</span>
-            <h3 class="info-title">No hay reservas activas</h3>
+            <h3 class="info-title">No hay reservas registradas</h3>
             <p class="info-text">Actualmente no tiene ninguna estancia programada con nosotros.</p>
-            <a href="{{ url_for('cliente.home') }}" class="btn-primary-action">Explorar Habitaciones</a>
+            <a href="{{ url_for('cliente.habitaciones') }}" class="btn-primary-action">Explorar Habitaciones</a>
         </div>
     {% endif %}
 </div>
