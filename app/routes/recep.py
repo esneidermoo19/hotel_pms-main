@@ -4,6 +4,7 @@ from app import db
 from datetime import datetime
 from flask_login import login_required, current_user
 from app.helpers.rbac import empleado_required
+from app.services.email_service import EmailService
 import json
 
 recep_bp = Blueprint('recep', __name__)
@@ -331,8 +332,16 @@ def hacer_reserva(habitacion_id):
             # Change room status only if it's for today
             if fecha_ingreso.date() <= datetime.now().date():
                 habitacion.estado = 'Ocupada'
-            
+
             db.session.commit()
+
+            # Reserva de staff: también intenta enviar confirmación sin romper nada.
+            try:
+                from app.models import ConfigHotel
+                _config = ConfigHotel.query.first()
+                EmailService.enviar_confirmacion_reserva(nueva_reserva, habitacion, _config)
+            except Exception:
+                db.session.rollback()
             
             flash(f'¡Reserva confirmada! Habitación {habitacion.numero} asignada a {nombre_huesped}.', 'success')
             return redirect(url_for('recep.dashboard'))

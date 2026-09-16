@@ -29,6 +29,13 @@ class Reservacion(db.Model):
     metodo_pago = db.Column(db.String(50), nullable=True)
     comprobante_pago = db.Column(db.String(255), nullable=True)
 
+    # Estado del correo de confirmación (no afecta la reserva si falla).
+    # Valores: 'pendiente' | 'enviado' | 'fallido' | 'no_aplica' (sin email)
+    email_estado = db.Column(db.String(20), default='pendiente')
+    email_error = db.Column(db.Text, nullable=True)
+    email_enviado_en = db.Column(db.DateTime, nullable=True)
+    email_intentos = db.Column(db.Integer, default=0)
+
     
     habitacion = db.relationship('Habitacion', back_populates='reservaciones')
     empleado = db.relationship('Empleado', backref='reservas')

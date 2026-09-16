@@ -211,6 +211,14 @@ def nueva_reserva(habitacion_id):
             db.session.add(reserva)
             habitacion.estado = 'Ocupada'
             db.session.commit()
+
+            # Reserva creada por staff: intentar correo de confirmación (resiliente).
+            try:
+                from app.services.email_service import EmailService
+                _config = ConfigHotel.query.first()
+                EmailService.enviar_confirmacion_reserva(reserva, habitacion, _config)
+            except Exception:
+                db.session.rollback()
             
             flash(f'Reserva creada para {nombre}. Liquidación se gestionará en Caja.', 'success')
             return redirect(url_for('empleado.recepcion'))

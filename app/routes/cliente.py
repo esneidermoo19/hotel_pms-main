@@ -143,7 +143,11 @@ def procesar_pago(reserva_id):
         reserva.pagado = False
         db.session.commit()
 
-        EmailService.enviar_codigo_reserva(reserva, habitacion, config)
+        # El correo nunca debe romper la reserva: se registra su estado aparte.
+        EmailService.enviar_confirmacion_reserva(reserva, habitacion, config)
+        db.session.refresh(reserva)
+        if reserva.email_estado == 'fallido':
+            flash('Su reserva quedó registrada, pero el correo de confirmación no pudo enviarse. El personal le contactará manualmente.', 'warning')
         flash(f'¡Comprobante de Nequi recibido! Su reserva {reserva.codigo} ha quedado en estado "Nequi - pendiente de verificación" a la espera de validación por parte del personal de recepción.', 'info')
         return redirect(url_for('cliente.home'))
 
@@ -156,7 +160,10 @@ def procesar_pago(reserva_id):
                 habitacion.estado = 'Ocupada'
 
         db.session.commit()
-        EmailService.enviar_codigo_reserva(reserva, habitacion, config)
+        EmailService.enviar_confirmacion_reserva(reserva, habitacion, config)
+        db.session.refresh(reserva)
+        if reserva.email_estado == 'fallido':
+            flash('Su reserva quedó confirmada, pero el correo no pudo enviarse. Guarde su código y el personal le contactará.', 'warning')
         flash(f'¡Reserva confirmada! Su código es {reserva.codigo}. El pago en efectivo se realizará al momento del Check-in.', 'success')
         return redirect(url_for('cliente.home'))
         
@@ -165,7 +172,7 @@ def procesar_pago(reserva_id):
         reserva.estado = 'activa'
         reserva.pagado = True
         db.session.commit()
-        EmailService.enviar_codigo_reserva(reserva, habitacion, config)
+        EmailService.enviar_confirmacion_reserva(reserva, habitacion, config)
         flash(f'¡Pago exitoso! Su reserva ha sido confirmada.', 'success')
         return redirect(url_for('cliente.home'))
 
