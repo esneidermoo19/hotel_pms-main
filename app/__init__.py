@@ -91,10 +91,16 @@ def create_app(config_class=None):
 
     @app.after_request
     def add_header(response):
-        """Prevenir que el navegador guarde en caché páginas protegidas"""
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '-1'
+        """Prevenir caché en páginas dinámicas pero permitir caché de 1 año en archivos estáticos (imágenes, CSS, JS)"""
+        from flask import request
+        if request.path.startswith('/static/'):
+            response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+            response.headers.pop('Pragma', None)
+            response.headers.pop('Expires', None)
+        else:
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '-1'
         return response
 
     return app

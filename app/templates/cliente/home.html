@@ -308,9 +308,9 @@
 
         <div class="room-media">
             {% if habitacion.imagen %}
-                <img src="{{ url_for('static', filename=habitacion.imagen) }}" alt="{{ habitacion.tipo }}">
+                <img src="{{ url_for('static', filename=habitacion.imagen) }}" alt="{{ habitacion.tipo }}" loading="lazy" decoding="async">
             {% else %}
-                <img src="{{ url_for('static', filename='img/room_placeholder.png') }}" alt="Habitación Boutique">
+                <img src="{{ url_for('static', filename='img/room_placeholder.webp') }}" alt="Habitación Boutique" loading="lazy" decoding="async">
             {% endif %}
             <div class="room-price-badge">${{ "{:,.0f}".format(habitacion.precio_noche) }} COP / NOCHE</div>
         </div>

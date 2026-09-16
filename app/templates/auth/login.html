@@ -48,7 +48,7 @@
         .login-hero-bg {
             position: absolute;
             inset: 0;
-            background-image: url("{{ url_for('static', filename='img/hero_lobby.png') }}");
+            background-image: url("{{ url_for('static', filename='img/hero_lobby.webp') }}");
             background-size: cover;
             background-position: center;
             filter: blur(15px) brightness(0.4); /* Stronger blur and darker to hide original text */
@@ -255,7 +255,7 @@
         
         <div class="login-form-container">
             <div class="login-header">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="orchid-mini-logo">
+                <img src="{{ url_for('static', filename='img/logo.webp') }}" alt="Logo" class="orchid-mini-logo" decoding="async">
                 <div class="login-brand">SISTEMA PMS</div>
                 <div class="login-tagline">Panel de Gestión Administrativa</div>
             </div>

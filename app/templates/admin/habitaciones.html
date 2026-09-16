@@ -20,15 +20,15 @@
         
         <div class="room-image-container" style="position: relative; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 16px;">
             {% if hab.imagen %}
-            <img src="{{ url_for('static', filename='img/habitaciones/' + hab.imagen) }}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 16px;">
+            <img src="{{ url_for('static', filename='img/habitaciones/' + hab.imagen) }}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 16px;" loading="lazy" decoding="async">
             {% else %}
-            {% set default_img = 'default_simple.png' %}
+            {% set default_img = 'default_simple.webp' %}
             {% if 'doble' in hab.tipo|lower %}
-                {% set default_img = 'default_doble.png' %}
+                {% set default_img = 'default_doble.webp' %}
             {% elif 'suite' in hab.tipo|lower %}
-                {% set default_img = 'default_suite.png' %}
+                {% set default_img = 'default_suite.webp' %}
             {% endif %}
-            <img src="{{ url_for('static', filename='img/habitaciones/' ~ default_img) }}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 16px; border: 1px solid rgba(197, 160, 89, 0.2);">
+            <img src="{{ url_for('static', filename='img/habitaciones/' ~ default_img) }}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 16px; border: 1px solid rgba(197, 160, 89, 0.2);" loading="lazy" decoding="async">
             {% endif %}
             <div style="position: absolute; top: 15px; right: 15px;">
                 <span class="badge badge-{{ 'disponible' if hab.estado == 'Disponible' else 'ocupada' if hab.estado == 'Ocupada' else 'mantenimiento' }}">
