@@ -210,107 +210,7 @@
             
             footer { padding: 2.5rem 1rem; font-size: 0.7rem; }
         }
-        /* Staff Modal Styling */
-        .staff-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 15, 15, 0.85);
-            backdrop-filter: blur(8px);
-            z-index: 3000;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.4s ease-out;
-        }
 
-        .staff-modal.active { display: flex; }
-
-        .staff-modal-content {
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            padding: 3rem 2rem;
-            border: 1px solid rgba(197, 180, 165, 0.3);
-            background: white;
-        }
-
-        .staff-modal h3 {
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-            color: var(--clr-ink);
-        }
-
-        .staff-modal p {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 2rem;
-        }
-
-        .pin-input-container {
-            margin-bottom: 2rem;
-        }
-
-        .pin-input-container {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-bottom: 2rem;
-        }
-
-        .pin-digit {
-            width: 50px;
-            height: 60px;
-            text-align: center;
-            font-size: 1.5rem;
-            border: 2px solid var(--clr-border);
-            border-radius: var(--radius-md);
-            background: white;
-            color: var(--clr-ink);
-            font-family: var(--font-ui);
-            font-weight: 700;
-            transition: all 0.3s ease;
-        }
-
-        .pin-digit:focus {
-            outline: none;
-            border-color: var(--clr-taupe);
-            box-shadow: 0 0 0 4px rgba(197, 180, 165, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .pin-input-container input:focus {
-            outline: none;
-            border-color: var(--clr-taupe);
-            background: white;
-            box-shadow: 0 0 0 4px rgba(197, 180, 165, 0.1);
-        }
-
-        .staff-modal-actions {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .staff-modal-actions button {
-            flex: 1;
-            padding: 1rem;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: var(--font-ui);
-            font-size: 0.8rem;
-        }
-
-        .btn-primary { background: var(--clr-ink); color: white; }
-        .btn-primary:hover { background: #222; transform: translateY(-2px); }
-        .btn-secondary { background: transparent; border: 1px solid var(--clr-border) !important; color: #666; }
-        .btn-secondary:hover { background: #f8f9fa; }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -366,9 +266,8 @@
         </div>
     </div>
 
-    <footer style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+    <footer>
         <div>&copy; 2026 Hotel La Orquídea - Experiencia Boutique & Elegancia</div>
-        <a href="{{ url_for('staff.login') }}" style="color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.05em; transition: color 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Acceso Personal</a>
     </footer>
     
     <script>
