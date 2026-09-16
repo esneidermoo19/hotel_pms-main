@@ -35,33 +35,35 @@ with app.app_context():
             
         # Parche para añadir columnas nequi a config_hotel si no existen
         try:
-            db.session.execute(db.text('ALTER TABLE config_hotel ADD COLUMN nequi_numero VARCHAR(30) DEFAULT \'300 123 4567\''))
+            db.session.execute(db.text("ALTER TABLE config_hotel ADD COLUMN IF NOT EXISTS nequi_numero VARCHAR(30) DEFAULT '300 123 4567'"))
             db.session.commit()
-            print("Columna nequi_numero agregada a config_hotel")
+            print("Columna nequi_numero verificada en config_hotel")
         except Exception as e:
             db.session.rollback()
-            
+             
         try:
-            db.session.execute(db.text('ALTER TABLE config_hotel ADD COLUMN nequi_qr VARCHAR(200) DEFAULT \'img/qr_nequi.png\''))
+            db.session.execute(db.text("ALTER TABLE config_hotel ADD COLUMN IF NOT EXISTS nequi_qr VARCHAR(200) DEFAULT 'img/qr_nequi.png'"))
             db.session.commit()
-            print("Columna nequi_qr agregada a config_hotel")
+            print("Columna nequi_qr verificada en config_hotel")
         except Exception as e:
             db.session.rollback()
             
         # Parche para añadir columnas metodo_pago y comprobante_pago a reservacion
-        try:
-            db.session.execute(db.text('ALTER TABLE reservacion ADD COLUMN metodo_pago VARCHAR(50)'))
-            db.session.commit()
-            print("Columna metodo_pago agregada a reservacion")
-        except Exception as e:
-            db.session.rollback()
-            
-        try:
-            db.session.execute(db.text('ALTER TABLE reservacion ADD COLUMN comprobante_pago VARCHAR(255)'))
-            db.session.commit()
-            print("Columna comprobante_pago agregada a reservacion")
-        except Exception as e:
-            db.session.rollback()
+        for _ddl, _label in [
+            ('ALTER TABLE reservacion ADD COLUMN IF NOT EXISTS metodo_pago VARCHAR(50)', 'metodo_pago'),
+            ('ALTER TABLE reservacion ADD COLUMN IF NOT EXISTS comprobante_pago VARCHAR(255)', 'comprobante_pago'),
+            # Estado del correo de confirmación (arreglo envío de correo)
+            ("ALTER TABLE reservacion ADD COLUMN IF NOT EXISTS email_estado VARCHAR(20) DEFAULT 'pendiente'", 'email_estado'),
+            ('ALTER TABLE reservacion ADD COLUMN IF NOT EXISTS email_error TEXT', 'email_error'),
+            ('ALTER TABLE reservacion ADD COLUMN IF NOT EXISTS email_enviado_en TIMESTAMP', 'email_enviado_en'),
+            ('ALTER TABLE reservacion ADD COLUMN IF NOT EXISTS email_intentos INTEGER DEFAULT 0', 'email_intentos'),
+        ]:
+            try:
+                db.session.execute(db.text(_ddl))
+                db.session.commit()
+                print(f"Columna {_label} verificada en reservacion")
+            except Exception as e:
+                db.session.rollback()
 
     print("Base de datos verificada: hotel.db")
     
