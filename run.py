@@ -47,6 +47,21 @@ with app.app_context():
             print("Columna nequi_qr agregada a config_hotel")
         except Exception as e:
             db.session.rollback()
+            
+        # Parche para añadir columnas metodo_pago y comprobante_pago a reservacion
+        try:
+            db.session.execute(db.text('ALTER TABLE reservacion ADD COLUMN metodo_pago VARCHAR(50)'))
+            db.session.commit()
+            print("Columna metodo_pago agregada a reservacion")
+        except Exception as e:
+            db.session.rollback()
+            
+        try:
+            db.session.execute(db.text('ALTER TABLE reservacion ADD COLUMN comprobante_pago VARCHAR(255)'))
+            db.session.commit()
+            print("Columna comprobante_pago agregada a reservacion")
+        except Exception as e:
+            db.session.rollback()
 
     print("Base de datos verificada: hotel.db")
     
