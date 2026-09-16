@@ -112,8 +112,8 @@ def test_rate_limiting_reservas(client, sample_habitacion, db):
     inicio = (datetime.now() + timedelta(days=5)).strftime('%Y-%m-%d')
     fin = (datetime.now() + timedelta(days=6)).strftime('%Y-%m-%d')
     
-    # Intentar 8 reservas (límite: 7 por día)
-    for _ in range(8):
+    # Intentar 21 reservas (límite: 20 por día)
+    for _ in range(21):
         response = client.post('/huespedes/habitaciones', data={
             'habitacion_id': sample_habitacion.id,
             'fecha_inicio': inicio,

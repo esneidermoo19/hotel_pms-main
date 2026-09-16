@@ -38,7 +38,7 @@ def habitaciones():
             flash('La fecha de inicio no puede ser anterior a hoy.', 'danger')
             return redirect(url_for('cliente.habitaciones'))
         
-        # 1. Validar Límites Diarios (Máximo 7 por IP o Email)
+        # 1. Validar Límites Diarios (Máximo 20 por IP o Email)
         email = request.form.get('email', '').strip()
         if current_user.is_authenticated:
             email = current_user.email
@@ -51,8 +51,8 @@ def habitaciones():
             Reservacion.fecha_creacion >= hace_24h
         ).count()
         
-        if conteo_reservas >= 7:
-            flash('Has alcanzado el límite máximo de 7 reservas por día. Inténtalo de nuevo mañana.', 'warning')
+        if conteo_reservas >= 20:
+            flash('Has alcanzado el límite máximo de 20 reservas por día. Inténtalo de nuevo mañana.', 'warning')
             return redirect(url_for('cliente.habitaciones'))
         
         # 2. Verificar Disponibilidad
