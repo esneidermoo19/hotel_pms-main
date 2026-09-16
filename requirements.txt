@@ -7,4 +7,8 @@ Flask-Migrate
 gunicorn
 Flask-WTF
 psycopg2-binary
+pytest
+pytest-flask
+pytest-cov
+pytest-mock
 

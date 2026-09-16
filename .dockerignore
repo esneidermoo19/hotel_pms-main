@@ -1,17 +1,48 @@
+# Git y VCS
+.git/
+.github/
+.gitignore
+
+# Entornos virtuales
 venv/
 .venv/
+env/
+ENV/
+
+# Archivos de compilación y caché de Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.db
-.sqlite
+
+# Testing, Scripts de desarrollo y Cobertura
+tests/
+scripts/
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+pytest.ini
+conftest.py
+
+# Archivos de datos, logs e instancias SQLite locales
 instance/
+logs/
+*.log
+*.db
+*.sqlite
+*.sqlite3
+hotel.db
+
+# Secretos y variables de entorno locales (se inyectan vía Docker / Coolify)
 .env
-.git/
-.github/
+.env.local
+.env.*
+
+# IDEs, herramientas de desarrollo y documentación local
 .vscode/
 .idea/
-tests/
-scripts/test_*.py
-hotel.db
+*.md
+.gemini/
+.agents/

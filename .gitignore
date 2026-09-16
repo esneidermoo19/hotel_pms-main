@@ -3,35 +3,57 @@ venv/
 .venv/
 env/
 ENV/
+env.bak/
+venv.bak/
 
-# Python
+# Archivos de caché y compilados de Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
-pip-log.txt
-pip-delete-this-directory.txt
-.toast
-.build
-.pytest_cache/
+*.py=
+*.py~
 
-# Datos y base de datos
+# Testing y Cobertura (Pytest / Coverage)
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+nosetests.xml
+*.lprof
+
+# Base de datos local e instancias
 instance/
 *.db
+*.sqlite
 *.sqlite3
-*.log
+hotel.db
 
-# Variables de entorno
+# Archivos de Log y Auditoría
+logs/
+*.log
+*.log.*
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Variables de entorno y secretos
 .env
 .env.local
-.env.*
+.env.*.local
 !.env.example
 
-# IDEs y Editores
+# IDEs, Editores y SO
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 .DS_Store
 Thumbs.db
+ehthumbs.db
+
+# Antigravity y herramientas agentic
+.gemini/
+.agents/
