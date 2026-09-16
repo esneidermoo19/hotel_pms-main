@@ -57,6 +57,28 @@ def test_plantilla_nequi_indica_pendiente(app, db, sample_habitacion):
             assert 'nequi' in html.lower()
 
 
+def test_correo_incluye_version_texto_plano(app, db, sample_habitacion):
+    """El mensaje debe ser multipart/alternative (html + texto plano)."""
+    from app import mail as _mail
+    _config(db)
+    app.config['TESTING'] = False
+    app.config['MAIL_SUPPRESS_SEND'] = False
+    app.config['MAIL_USERNAME'] = 'hotel@ejemplo.com'
+    app.config['MAIL_PASSWORD'] = 'abcdefghijklmnop'
+    try:
+        with app.app_context():
+            with patch.object(_mail, 'send') as mock_send:
+                ok = EmailService.enviar_correo(
+                    'Asunto', ['t@ejemplo.com'], '<p>Hola <strong>TXT001</strong></p>')
+                assert ok is True
+                msg = mock_send.call_args[0][0]
+                assert msg.html and 'TXT001' in msg.html
+                assert msg.body and 'TXT001' in msg.body
+                assert '<' not in msg.body
+    finally:
+        app.config['TESTING'] = True
+
+
 def test_fallo_correo_no_rompe_reserva(client, sample_habitacion, db):
     c = _config(db)
     res = Reservacion(

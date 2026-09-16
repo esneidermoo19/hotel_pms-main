@@ -1,4 +1,6 @@
+import html as _html
 import logging
+import re
 import smtplib
 import traceback
 from flask_mail import Message
@@ -31,11 +33,29 @@ class EmailService:
         return True, ''
 
     @staticmethod
-    def enviar_correo(subject, recipients, html_body):
+    def _html_a_texto(html_body):
+        """Genera la versión texto plano del HTML (multipart/alternative).
+
+        Los filtros antispam penalizan los correos solo-HTML; incluir
+        text/plain mejora la entregabilidad.
+        """
+        texto = re.sub(r'<(script|style)[^>]*>.*?</\1>', ' ', html_body or '',
+                       flags=re.DOTALL | re.IGNORECASE)
+        texto = re.sub(r'<br\s*/?>', '\n', texto, flags=re.IGNORECASE)
+        texto = re.sub(r'</(p|div|tr|h\d|li)>', '\n', texto, flags=re.IGNORECASE)
+        texto = re.sub(r'<[^>]+>', ' ', texto)
+        texto = _html.unescape(texto)
+        texto = re.sub(r'[ \t]+', ' ', texto)
+        texto = re.sub(r'\n\s*\n+', '\n\n', texto)
+        return texto.strip()
+
+    @staticmethod
+    def enviar_correo(subject, recipients, html_body, plain_body=None):
         """Envío base con logging real. Nunca lanza: devuelve True/False.
 
         En tests (MAIL_SUPPRESS_SEND=True o TESTING) no se envía de verdad:
         se registra en el log y se devuelve True para no romper flujos.
+        Siempre incluye versión texto plano (mejor entregabilidad).
         """
         try:
             if current_app.config.get('MAIL_SUPPRESS_SEND') or current_app.config.get('TESTING'):
@@ -48,7 +68,9 @@ class EmailService:
                 return False
 
             sender = current_app.config.get('MAIL_DEFAULT_SENDER') or current_app.config.get('MAIL_USERNAME')
-            msg = Message(subject=subject, sender=sender, recipients=recipients, html=html_body)
+            msg = Message(subject=subject, sender=sender, recipients=recipients,
+                          body=plain_body or EmailService._html_a_texto(html_body),
+                          html=html_body)
             mail.send(msg)
             logger.info("Correo enviado a %s | asunto=%s", recipients, subject)
             return True
@@ -227,7 +249,7 @@ class EmailService:
         """
         
         return EmailService.enviar_correo(
-            subject=f"OFICIAL: Su Factura de Estancia - {factura.numero_factura} - {config.nombre}",
+            subject=f"Su factura de estancia {factura.numero_factura} - {config.nombre}",
             recipients=[reserva.email_cliente],
             html_body=html_factura
         )
@@ -354,7 +376,7 @@ class EmailService:
         """
 
         return EmailService.enviar_correo(
-            subject=f"OFICIAL: Confirmación de Reserva #{reserva.codigo} - {nombre_hotel}",
+            subject=f"Confirmación de reserva #{reserva.codigo} - {nombre_hotel}",
             recipients=[reserva.email_cliente],
             html_body=html_body
         )
@@ -415,7 +437,7 @@ class EmailService:
         """
         
         return EmailService.enviar_correo(
-            subject=f"CANCELACIÓN DE RESERVA #{reserva.codigo} - {nombre_hotel}",
+            subject=f"Cancelación de reserva #{reserva.codigo} - {nombre_hotel}",
             recipients=[reserva.email_cliente],
             html_body=html_body
         )
