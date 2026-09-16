@@ -1,4 +1,5 @@
 import logging
+import smtplib
 import traceback
 from flask_mail import Message
 from flask import current_app
@@ -51,6 +52,14 @@ class EmailService:
             mail.send(msg)
             logger.info("Correo enviado a %s | asunto=%s", recipients, subject)
             return True
+        except smtplib.SMTPAuthenticationError as e:
+            logger.error(
+                "Error enviando correo a %s | asunto=%s: Gmail rechazó usuario/contraseña (535). "
+                "Verifique que MAIL_USERNAME sea la cuenta Gmail y que MAIL_PASSWORD sea una "
+                "App Password vigente de esa misma cuenta (myaccount.google.com/apppasswords), "
+                "sin espacios. Detalle: %s\n%s",
+                recipients, subject, e, traceback.format_exc())
+            return False
         except Exception as e:
             logger.error("Error enviando correo a %s | asunto=%s: %s\n%s",
                          recipients, subject, e, traceback.format_exc())

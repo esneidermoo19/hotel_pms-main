@@ -59,7 +59,10 @@ class Config:
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'True').lower() == 'true'
     MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL', 'False').lower() == 'true'
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    # Google muestra la App Password con espacios ("abcd efgh ijkl mnop");
+    # SMTP la rechaza con 535 si se dejan, así que se normaliza aquí.
+    _raw_pwd = os.environ.get('MAIL_PASSWORD') or ''
+    MAIL_PASSWORD = ''.join(_raw_pwd.split()) or None
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'Hotel Boutique La Orquidea <laorquideahotel45@gmail.com>')
 
 # Log de verificación

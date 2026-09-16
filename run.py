@@ -20,6 +20,12 @@ from app.config import Config
 
 app = create_app()
 
+# Diagnóstico de correo (enmascarado: nunca imprime el secreto).
+# Sirve para verificar en los logs del deploy qué credenciales ve la app.
+print(f"MAIL check: server={app.config.get('MAIL_SERVER')}:{app.config.get('MAIL_PORT')} "
+      f"tls={app.config.get('MAIL_USE_TLS')} user={app.config.get('MAIL_USERNAME')} "
+      f"pwd_len={len(app.config.get('MAIL_PASSWORD') or '')}")
+
 with app.app_context():
     db.create_all()
     
