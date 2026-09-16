@@ -81,8 +81,6 @@ services:
         condition: service_healthy
     networks:
       - coolify
-    ports:
-      - '5000:5000'
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:5000/health').read()\""]
       interval: 30s
