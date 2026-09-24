@@ -62,3 +62,24 @@ Un sistema de gestión hotelera (PMS) modular y escalable construido con **Flask
 ├── config.py            # Manejo de configuraciones por entorno
 ├── requirements.txt     # Dependencias de Python
 └── run.py               # Punto de entrada de la aplicación
+
+---
+
+## 🚀 Instalación y Configuración Local
+
+Sigue estos pasos para ejecutar el proyecto en tu entorno de desarrollo local.
+
+### 📋 Requisitos Previos
+
+- **Python 3.10+**
+- **Git**
+- **PostgreSQL** o **SQLite**
+- **Docker** y **Docker Compose** *(opcional para despliegue en contenedores)*
+
+---
+
+### 1. Clonar el repositorio
+
+```bash
+git clone [https://github.com/esneidermoo19/hotel_pms-main.git](https://github.com/esneidermoo19/hotel_pms-main.git)
+cd hotel_pms-main
