@@ -1,4 +1,4 @@
-# 🏨 Hotel PMS - System Management Solution
+#  Hotel PMS - System Management Solution
 
 ![Build Status](https://github.com/esneidermoo19/hotel_pms-main/actions/workflows/pytest.yml/badge.svg)
 ![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)
@@ -9,7 +9,7 @@ Un sistema de gestión hotelera (PMS) modular y escalable construido con **Flask
 
 ---
 
-## 📌 Tabla de Contenidos
+##  Tabla de Contenidos
 
 - [Características Principales](#-características-principales)
 - [Stack Tecnológico](#-stack-tecnológico)
@@ -24,7 +24,7 @@ Un sistema de gestión hotelera (PMS) modular y escalable construido con **Flask
 
 ---
 
-## ✨ Características Principales
+##  Características Principales
 
 - **🔐 Autenticación y RBAC:** Control de acceso basado en roles (Administrador, Recepcionista, Empleado).
 - **🛎️ Recepción en Tiempo Real:** Gestión de Check-in, Check-out y mapa interactivo de estado de habitaciones.
@@ -65,11 +65,11 @@ Un sistema de gestión hotelera (PMS) modular y escalable construido con **Flask
 
 ---
 
-## 🚀 Instalación y Configuración Local
+##  Instalación y Configuración Local
 
 Sigue estos pasos para ejecutar el proyecto en tu entorno de desarrollo local.
 
-### 📋 Requisitos Previos
+### Requisitos Previos
 
 - **Python 3.10+**
 - **Git**
@@ -78,28 +78,39 @@ Sigue estos pasos para ejecutar el proyecto en tu entorno de desarrollo local.
 
 ---
 
-### 1. Clonar el repositorio
+1. Clonar el repositorio
 
 ```bash
-git clone [https://github.com/esneidermoo19/hotel_pms-main.git](https://github.com/esneidermoo19/hotel_pms-main.git)
+git clone https://github.com/esneidermoo19/hotel_pms-main.git
 cd hotel_pms-main
 
 
-
-
-### 2. Crear y activar el entorno virtual
-
-Selecciona tu sistema operativo para desplegar los comandos de configuración:
-
-<details>
-<summary><b>🐧 Linux / 🍎 macOS</b> (Haz clic para desplegar)</summary>
-
-```bash
-# 1. Crear el entorno virtual
+2. Crear y activar el entorno virtual
+Desplegar los comandos de configuración:
+ # 1. Crear el entorno virtual
 python3 -m venv venv
 
 # 2. Activar el entorno
 source venv/bin/activate
 
-# 3. Confirmar la activación (debe mostrar el entorno 'venv')
+# 3. Confirmar la activación
 which python
+
+3. Instalar dependencias
+pip install -r requirements.txt
+
+4. Configurar variables de entorno
+Copia la plantilla .env.example y crea tu archivo .env:
+
+cp .env.example .env
+
+Ajusta los parámetros requeridos en tu archivo .env:
+FLASK_APP=run.py
+FLASK_ENV=development
+SECRET_KEY=tu_clave_secreta_aqui
+DATABASE_URL=sqlite:///hotel.db
+
+5. Iniciar la aplicación
+python run.py
+
+Accede desde tu navegador a: http://localhost:
