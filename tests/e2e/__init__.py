@@ -1,0 +1,1 @@
+"""Paquete de pruebas E2E: flujo CRUD continuo e integrado sobre la aplicación real."""

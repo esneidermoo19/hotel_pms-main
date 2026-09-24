@@ -1,0 +1,73 @@
+# Pipeline de Integración Continua para la suite de pruebas de Hotel Gema (PMS)
+#
+# Se ejecuta sobre la rama `main` en dos eventos:
+#   1. push directo a main.
+#   2. pull_request dirigido a main.
+#
+# Orquesta tres etapas de QA:
+#   - Pruebas unitarias (tests/unit) usando el marker `unit`.
+#   - Pruebas E2E (tests/e2e) con el flujo CRUD completo usando el marker `e2e`.
+#   - Reporte de cobertura de código (pytest-cov) en formatos terminal y XML.
+
+name: Hotel PMS • Suite de pruebas (Unit + E2E)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pytest-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Pytest • Python 3.10
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Traer el código del repositorio
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      # 2. Preparar el intérprete de Python 3.10 con caché de pip
+      - name: Configurar Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      # 3. Instalar dependencias del proyecto + herramientas de testing
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov httpx
+          pip install -r requirements.txt
+
+      # 4. Pruebas unitarias: verificación aislada de endpoints y reglas de negocio
+      - name: Ejecutar pruebas unitarias (tests/unit)
+        run: pytest tests/unit -v -m unit --tb=short
+
+      # 5. Pruebas E2E: ciclo CRUD completo e integrado
+      - name: Ejecutar pruebas E2E (tests/e2e)
+        run: pytest tests/e2e -v -m e2e --tb=short
+
+      # 6. Reporte de cobertura de código sobre toda la suite
+      - name: Generar reporte de cobertura
+        run: >
+          pytest tests/ -v
+          --cov=app
+          --cov-report=xml:coverage.xml
+          --cov-report=term-missing
+
+      # 7. Publicar el reporte XML como artefacto descargable
+      - name: Subir artefacto de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml

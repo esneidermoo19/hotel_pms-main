@@ -1,0 +1,1 @@
+"""Paquete de pruebas unitarias: verificación aislada de endpoints y reglas de negocio."""

@@ -1,0 +1,1 @@
+"""Paquete de pruebas de Hotel Gema (PMS). Contiene las suites unit y e2e."""
