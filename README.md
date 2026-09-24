@@ -1,6 +1,6 @@
 # 🏨 Hotel PMS - System Management Solution
 
-![Build Status](https://github.com/TU_USUARIO/TU_REPO/workflows/Pytest/badge.svg)
+![Build Status](https://github.com/esneidermoo19/hotel_pms_main/workflows/Pytest/badge.svg)
 ![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 ![Flask Version](https://img.shields.io/badge/flask-3.x-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
