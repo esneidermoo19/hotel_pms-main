@@ -83,3 +83,23 @@ Sigue estos pasos para ejecutar el proyecto en tu entorno de desarrollo local.
 ```bash
 git clone [https://github.com/esneidermoo19/hotel_pms-main.git](https://github.com/esneidermoo19/hotel_pms-main.git)
 cd hotel_pms-main
+
+
+
+
+### 2. Crear y activar el entorno virtual
+
+Selecciona tu sistema operativo para desplegar los comandos de configuración:
+
+<details>
+<summary><b>🐧 Linux / 🍎 macOS</b> (Haz clic para desplegar)</summary>
+
+```bash
+# 1. Crear el entorno virtual
+python3 -m venv venv
+
+# 2. Activar el entorno
+source venv/bin/activate
+
+# 3. Confirmar la activación (debe mostrar el entorno 'venv')
+which python
