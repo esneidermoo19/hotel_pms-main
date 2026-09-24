@@ -1,0 +1,1 @@
+"""Suite de pruebas de interfaz de usuario (Playwright) para Hotel PMS."""
