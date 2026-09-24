@@ -1,21 +1,26 @@
 # Pipeline de Integración Continua para la suite de pruebas de Hotel Gema (PMS)
 #
-# Se ejecuta sobre la rama `main` en dos eventos:
-#   1. push directo a main.
-#   2. pull_request dirigido a main.
+# Se ejecuta sobre las ramas `main` y `feature/playwright-ui-tests` en dos
+# eventos:
+#   1. push directo a la rama.
+#   2. pull_request dirigido a la rama.
 #
-# Orquesta tres etapas de QA:
+# Orquesta las etapas de QA:
 #   - Pruebas unitarias (tests/unit) usando el marker `unit`.
 #   - Pruebas E2E (tests/e2e) con el flujo CRUD completo usando el marker `e2e`.
+#   - Pruebas de UI con Playwright (tests/ui) usando el marker `ui`.
+#     El job levanta `tests.ui.server` (Flask) en el puerto 5151, instala el
+#     navegador Chromium y ejecuta la suite con `--no-cov` para no mezclar la
+#     cobertura del servidor hijo (que corre en otro proceso).
 #   - Reporte de cobertura de código (pytest-cov) en formatos terminal y XML.
 
-name: Hotel PMS • Suite de pruebas (Unit + E2E)
+name: Hotel PMS • Suite de pruebas (Unit + E2E + UI)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "feature/playwright-ui-tests" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "feature/playwright-ui-tests" ]
 
 permissions:
   contents: read
@@ -56,10 +61,12 @@ jobs:
       - name: Ejecutar pruebas E2E (tests/e2e)
         run: pytest tests/e2e -v -m e2e --tb=short
 
-      # 6. Reporte de cobertura de código sobre toda la suite
+      # 6. Reporte de cobertura de código sobre toda la suite. Se ignora
+      #    tests/ui porque ese job no instala Chromium; su cobertura la maneja
+      #    el job dedicado `ui` (que corre con --no-cov, ver su comentario).
       - name: Generar reporte de cobertura
         run: >
-          pytest tests/ -v
+          pytest tests/ -v --ignore=tests/ui
           --cov=app
           --cov-report=xml:coverage.xml
           --cov-report=term-missing
@@ -71,3 +78,52 @@ jobs:
         with:
           name: coverage-report
           path: coverage.xml
+
+  ui:
+    name: UI (Playwright) • Python 3.10
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Traer el código del repositorio
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      # 2. Preparar el intérprete de Python 3.10 con caché de pip
+      - name: Configurar Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      # 3. Instalar dependencias + pytest-playwright
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov pytest-playwright
+          pip install -r requirements.txt
+
+      # 4. Descargar el navegador Chromium (con --with-deps instala libs del SO)
+      - name: Instalar navegador Chromium de Playwright
+        run: playwright install --with-deps chromium
+
+      # 5. Levantar el servidor Flask aislado de pruebas de UI en el puerto 5151
+      - name: Levantar servidor de pruebas de UI (puerto 5151)
+        run: |
+          python -m tests.ui.server --port 5151 > ui-server.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -s http://127.0.0.1:5151/health; then
+              echo "Servidor de UI listo."
+              break
+            fi
+            sleep 1
+          done
+
+      # 6. Ejecutar la suite de UI con Playwright (marker ui, sin cobertura:
+      #    la app corre en un subproceso distinto al de pytest)
+      - name: Ejecutar pruebas de UI (tests/ui)
+        run: pytest tests/ui -v -m ui --no-cov --tb=short
+
+      # 7. Si falló, exponer el log del servidor para depurar
+      - name: Publicar log del servidor en fallos
+        if: failure()
+        run: cat ui-server.log
