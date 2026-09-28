@@ -45,7 +45,8 @@ def upgrade():
         """)
         return
 
-    with op.get_context().autocommit_block() as connection:
+    connection = op.get_bind()
+    with op.get_context().autocommit_block():
         max_id = connection.execute(
             sa.text('SELECT COALESCE(MAX(id), 0) FROM factura')
         ).scalar_one()
