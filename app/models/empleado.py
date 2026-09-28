@@ -1,9 +1,12 @@
 from app import db
 from datetime import datetime
+from sqlalchemy import event
 
 class Empleado(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
+    documento_identidad = db.Column(db.String(30), nullable=True)
+    documento_identidad_v2 = db.Column(db.String(30), nullable=True)
     telefono = db.Column(db.String(20))
     email = db.Column(db.String(100))
     cargo = db.Column(db.String(50), default='Empleado')
@@ -12,7 +15,7 @@ class Empleado(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     hora_entrada = db.Column(db.DateTime, nullable=True)
     hora_salida = db.Column(db.DateTime, nullable=True)
-    
+
     def horas_trabajadas(self):
         if self.hora_entrada and self.hora_salida:
             delta = self.hora_salida - self.hora_entrada
@@ -24,6 +27,11 @@ class Empleado(db.Model):
     
     def __repr__(self):
         return f'<Empleado {self.nombre}>'
+
+
+@event.listens_for(Empleado.documento_identidad, 'set')
+def _dual_write_documento_identidad(target, value, oldvalue, initiator):
+    target.documento_identidad_v2 = value
 
 
 class TurnoEmpleado(db.Model):

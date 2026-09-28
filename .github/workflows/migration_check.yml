@@ -1,0 +1,74 @@
+name: PostgreSQL Migration Check
+
+on:
+  pull_request:
+  push:
+    branches: [main, feature/playwright-ui-tests]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: migration-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  migrations:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: hotel_pms_test
+          POSTGRES_USER: hotel_pms
+          POSTGRES_PASSWORD: hotel_pms
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hotel_pms -d hotel_pms_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://hotel_pms:hotel_pms@localhost:5432/hotel_pms_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Prepare legacy PostgreSQL schema
+        run: python scripts/prepare_migration_ci.py
+
+      - name: Run PostgreSQL preflight
+        run: python scripts/preflight_check.py
+
+      - name: Apply all Alembic migrations
+        run: python -m flask --app app:create_app db upgrade
+
+      - name: Assert a single Alembic head
+        shell: bash
+        run: |
+          heads="$(python -m flask --app app:create_app db heads 2>&1)"
+          printf '%s\n' "$heads"
+          head_count="$(printf '%s\n' "$heads" | awk '/ \(head\)$/ { count++ } END { print count + 0 }')"
+          test "$head_count" -eq 1
+
+      - name: Check ORM and database schema
+        run: python -m flask --app app:create_app db check
+
+      - name: Verify migration effects
+        run: python scripts/verify_migration_ci.py
+
+      - name: Run pytest suite
+        run: python -m pytest tests --ignore=tests/ui -q

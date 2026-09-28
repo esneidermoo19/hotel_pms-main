@@ -34,6 +34,7 @@ class Factura(db.Model):
     correo_enviado = db.Column(db.Boolean, default=False)
     xml_fel = db.Column(db.Text)
     uuid = db.Column(db.String(50))
+    referencia_auditoria = db.Column(db.String(64), nullable=True)
 
 class ClienteFactura(db.Model):
     id = db.Column(db.Integer, primary_key=True)

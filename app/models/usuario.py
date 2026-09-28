@@ -10,6 +10,7 @@ class User(db.Model, UserMixin):
     nombre = db.Column(db.String(100))
     email = db.Column(db.String(120))
     telefono = db.Column(db.String(20))
+    telefono_normalizado = db.Column(db.String(20), nullable=True)
     rol = db.Column(db.String(20), default='recepcionista')
     activo = db.Column(db.Boolean, default=True)
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)

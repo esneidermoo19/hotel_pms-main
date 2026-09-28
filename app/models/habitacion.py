@@ -1,6 +1,10 @@
 from app import db
 
 class Habitacion(db.Model):
+    __table_args__ = (
+        db.Index('idx_habitacion_estado', 'estado'),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
     numero = db.Column(db.String(10), unique=True, nullable=False)
     tipo = db.Column(db.String(50))
