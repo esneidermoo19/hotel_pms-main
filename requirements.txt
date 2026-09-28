@@ -11,4 +11,5 @@ pytest
 pytest-flask
 pytest-cov
 pytest-mock
-
+psycopg2-binary>=2.9.9
+psycopg[binary]>=3.1.0
