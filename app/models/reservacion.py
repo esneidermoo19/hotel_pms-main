@@ -4,7 +4,11 @@ import secrets
 
 class Reservacion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    usuario_id = db.Column(
+        db.Integer,
+        db.ForeignKey('user.id', name='fk_reservacion_user'),
+        nullable=True,
+    )
     habitacion_id = db.Column(db.Integer, db.ForeignKey('habitacion.id'), nullable=False)
     fecha_inicio = db.Column(db.DateTime, nullable=False)
     fecha_fin = db.Column(db.DateTime, nullable=False)
