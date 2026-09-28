@@ -1,1 +1,35 @@
-Single-database configuration for Flask.
+# Hotel Gema - Arquitectura de Migraciones de Base de Datos
+
+Este directorio contiene los scripts de migración de Alembic / Flask-Migrate implementados bajo la estrategia **Zero-Downtime Migration Architecture** (Protocolo V.E.R.A.) para PostgreSQL 15.
+
+---
+
+## 📐 Estrategias Aplicadas por Revisión
+
+| Revisión | Tabla Target | Estrategia Técnica / DDL |
+| :--- | :--- | :--- |
+| `20260928_01` | `user` | **Expansión Schema:** Campo nullable para evitar bloqueos. |
+| `20260928_02` | `habitacion` | **Índices No Bloqueantes:** `CREATE INDEX CONCURRENTLY` en `autocommit_block()`. |
+| `20260928_03` | `empleado` | **Dual-Write Pattern:** Sincronización en ORM (`documento_identidad_v2`). |
+| `20260928_04` | `reservacion` | **FK en 2 Fases (Fase 1):** `ADD CONSTRAINT ... NOT VALID` sin lock prolongado. |
+| `20260928_05` | `reservacion` | **FK en 2 Fases (Fase 2):** `VALIDATE CONSTRAINT` posterior. |
+| `20260928_06` | `factura` | **Backfill por Keyset:** Paginación idempotente por lotes de 100 registros. |
+
+---
+
+## 🛠️ Comandos de Operación
+ 1. Preflight Check
+Garantiza la ausencia de referencias huérfanas antes de ejecutar validaciones estricta:
+```bash
+python scripts/preflight_check.py
+
+
+2. Aplicar Migraciones en Producciones / Entornos Dev
+python -m flask --app app:create_app db upgrade
+
+3. Verificar Grafo de Migraciones y Sincronía del ORM
+# Verificar que exista una sola cabeza (HEAD)
+python -m flask --app app:create_app db heads
+
+# Detectar Schema Drift entre los modelos SQLAlchemy y la BD
+python -m flask --app app:create_app db check
