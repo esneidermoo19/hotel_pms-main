@@ -25,10 +25,15 @@ _failed_attempts = {}
 class SecurityManager:
     @staticmethod
     def get_client_ip():
-        """Obtiene la IP real del cliente detrás de proxies como Coolify/Cloudflare/Nginx"""
+        """Obtiene la IP del cliente.
+
+        X-Forwarded-For solo se usa si TRUST_PROXY=true, para evitar que un
+        cliente falsifique su IP y evada el rate limiting.
+        """
         from flask import has_request_context, request
         if has_request_context():
-            if request.headers.get('X-Forwarded-For'):
+            trust_proxy = os.environ.get('TRUST_PROXY', 'false').lower() in ('1', 'true', 'yes')
+            if trust_proxy and request.headers.get('X-Forwarded-For'):
                 return request.headers.get('X-Forwarded-For').split(',')[0].strip()
             return request.remote_addr or '127.0.0.1'
         return '127.0.0.1'

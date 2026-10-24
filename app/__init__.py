@@ -78,22 +78,10 @@ def create_app(config_class=None):
     # Blueprint exclusivo para Huéspedes (Guest)
     app.register_blueprint(cliente_bp, url_prefix='/huespedes')
     
-    # 4. Exenciones de CSRF necesarias para la operatividad
-    # Se usan tanto el nombre del endpoint como la ruta completa para asegurar compatibilidad
-    csrf.exempt('empleado.nuevo_cliente')
-    csrf.exempt('empleado.cobrar_reserva')
-    csrf.exempt('empleado.lista_clientes')
-    csrf.exempt('admin.nuevo_empleado')
-    csrf.exempt('admin.editar_empleado')
-    csrf.exempt('recep.empezar_turno')
-    csrf.exempt('recep.finalizar_turno')
-    csrf.exempt('app.routes.empleado.nuevo_cliente')
-    csrf.exempt('app.routes.empleado.cobrar_reserva')
-    csrf.exempt('app.routes.empleado.lista_clientes')
-    csrf.exempt('app.routes.admin.nuevo_empleado')
-    csrf.exempt('app.routes.admin.editar_empleado')
-    csrf.exempt('app.routes.recep.empezar_turno')
-    csrf.exempt('app.routes.recep.finalizar_turno')
+    # 4. CSRF activo en TODOS los endpoints que mutan estado.
+    # Los formularios deben incluir:
+    #   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    # (Las antiguas exenciones se eliminaron por ser un riesgo CSRF.)
 
     # 5. Registro de filtros de plantillas
     from app.filters import register_filters
