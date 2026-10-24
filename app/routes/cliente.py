@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 
 cliente_bp = Blueprint('cliente', __name__)
 
+ALLOWED_UPLOAD_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'pdf'}
+
 @cliente_bp.route('/')
 def home():
     return render_template('cliente/welcome.html')
@@ -133,6 +135,10 @@ def procesar_pago(reserva_id):
     if metodo == 'nequi':
         file = request.files.get('comprobante')
         if file and file.filename:
+            ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+            if ext not in ALLOWED_UPLOAD_EXTENSIONS:
+                flash('El comprobante debe ser una imagen (PNG, JPG, WEBP) o PDF.', 'danger')
+                return redirect(url_for('cliente.pago', reserva_id=reserva.id))
             uploads_dir = os.path.join(os.path.dirname(__file__), '..', 'static', 'uploads', 'comprobantes')
             os.makedirs(uploads_dir, exist_ok=True)
             filename = secure_filename(f"nequi_{reserva.codigo}_{file.filename}")
@@ -213,8 +219,8 @@ def cliente_registro():
             flash('Todos los campos son obligatorios.', 'danger')
         elif password != password_confirm:
             flash('Las contraseñas no coinciden.', 'danger')
-        elif len(password) < 6:
-            flash('La contraseña debe tener al menos 6 caracteres.', 'danger')
+        elif len(password) < 8:
+            flash('La contraseña debe tener al menos 8 caracteres.', 'danger')
         elif User.query.filter_by(email=email).first():
             flash('Este correo electrónico ya está registrado.', 'danger')
         else:

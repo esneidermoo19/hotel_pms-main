@@ -23,7 +23,8 @@ app = create_app()
 # Diagnóstico de correo (enmascarado: nunca imprime el secreto).
 # Sirve para verificar en los logs del deploy qué credenciales ve la app.
 print(f"MAIL check: server={app.config.get('MAIL_SERVER')}:{app.config.get('MAIL_PORT')} "
-      f"tls={app.config.get('MAIL_USE_TLS')} user={app.config.get('MAIL_USERNAME')} "
+      f"tls={app.config.get('MAIL_USE_TLS')} "
+      f"user={'set' if app.config.get('MAIL_USERNAME') else 'MISSING'} "
       f"pwd_len={len(app.config.get('MAIL_PASSWORD') or '')}")
 
 with app.app_context():
@@ -90,8 +91,8 @@ with app.app_context():
         hotel_config.email = 'laorquideahotel45@gmail.com'
         print("Correo del hotel actualizado a laorquideahotel45@gmail.com")
 
-    # Administradores
-    if not User.query.filter_by(username='jhonny').first():
+    # Administradores (solo se siembran si se definió la contraseña en el entorno/.env)
+    if Config.ADMIN_JHONNY_PASS and not User.query.filter_by(username='jhonny').first():
         jhonny = User(
             username='jhonny',
             password=Config.ADMIN_JHONNY_PASS,
@@ -100,8 +101,10 @@ with app.app_context():
         )
         db.session.add(jhonny)
         print("Usuario inicial creado: jhonny (admin)")
+    elif not Config.ADMIN_JHONNY_PASS:
+        print("ADVERTENCIA: ADMIN_JHONNY_PASS no definida; no se crea jhonny.")
 
-    if not User.query.filter_by(username='edwin').first():
+    if Config.ADMIN_EDWIN_PASS and not User.query.filter_by(username='edwin').first():
         edwin = User(
             username='edwin',
             password=Config.ADMIN_EDWIN_PASS,
@@ -110,9 +113,11 @@ with app.app_context():
         )
         db.session.add(edwin)
         print("Usuario inicial creado: edwin (admin)")
+    elif not Config.ADMIN_EDWIN_PASS:
+        print("ADVERTENCIA: ADMIN_EDWIN_PASS no definida; no se crea edwin.")
     
     # Recepcionistas
-    if not User.query.filter_by(username='ana').first():
+    if Config.RECEP_ANA_PASS and not User.query.filter_by(username='ana').first():
         ana = User(
             username='ana',
             password=Config.RECEP_ANA_PASS,
@@ -121,6 +126,8 @@ with app.app_context():
         )
         db.session.add(ana)
         print("Usuario inicial creado: ana (recepcionista)")
+    elif not Config.RECEP_ANA_PASS:
+        print("ADVERTENCIA: RECEP_ANA_PASS no definida; no se crea ana.")
     
     if Habitacion.query.count() == 0:
         habitaciones = [
@@ -219,4 +226,5 @@ with app.app_context():
     db.session.commit()
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000, host='0.0.0.0')
+    debug_enabled = os.environ.get('FLASK_DEBUG', '0').lower() in ('1', 'true', 'yes')
+    app.run(debug=debug_enabled, port=5000, host='0.0.0.0')
